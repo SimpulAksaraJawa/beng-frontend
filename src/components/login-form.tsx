@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import React from "react"
+import api from "@/lib/axios"
 
 export function LoginForm({
   className,
@@ -30,12 +31,12 @@ export function LoginForm({
     // Handle login logic here
     console.log("Login form submitted");
     try {
-      axios.post('/api/login', {
+      api.post('/api/login', {
         email,
         password
       });
       // Redirect or show success message
-    } catch (error) {
+    } catch (error: any) {
       if (error.response.status === 401) {
 
       }

@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select"
 
 export function RegisterForm({
   className,
@@ -37,7 +39,7 @@ export function RegisterForm({
                 <Input
                   id="name"
                   type="text"
-                  placeholder="m@example.com"
+                  placeholder="Ash Frost"
                   required
                 />
               </div>
@@ -64,11 +66,15 @@ export function RegisterForm({
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="role">Role</Label>
-                <Input
-                  id="role"
-                  type="email"
-                  required
-                />
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                    <SelectItem value="USER">Member</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
