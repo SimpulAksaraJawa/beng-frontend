@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,10 +16,30 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!email.trim() || !password.trim()) {
+      alert("Please fill in all fields");
+      return;
+    }
+
     // Handle login logic here
     console.log("Login form submitted");
+    try {
+      axios.post('/api/login', {
+        email,
+        password
+      });
+      // Redirect or show success message
+    } catch (error) {
+      if (error.response.status === 401) {
+
+      }
+    }
   }
 
   return (
@@ -39,6 +60,7 @@ export function LoginForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
+
                   required
                 />
               </div>
