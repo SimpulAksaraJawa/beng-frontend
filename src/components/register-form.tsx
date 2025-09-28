@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@radix-ui/react-select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "./ui/select"
 import api from "@/lib/axios"
 
 export function RegisterForm({
@@ -23,6 +23,8 @@ export function RegisterForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("USER");
+
+  const [emailExist, setEmailExist] = useState(false);
 
   const { setAuth } = useAuth();
   const navigate = useNavigate();
@@ -36,19 +38,19 @@ export function RegisterForm({
     }
 
     try {
-      const res = await api.post('/api/register', {
+      const res = await api.post('/auth/register', {
         name,
         email,
         password,
         role
       }, { withCredentials: true });
 
-      const { jwtToken } = res.data;
-      setAuth({ name, email, role }, jwtToken);
+      const { jwtToken, user } = res.data;
+      setAuth(user, jwtToken);
       navigate('/dashboard');
     } catch (error: any) {
-      if (error.response.status === 400) {
-        alert(error.response.data.message);
+      if (error.response?.status === 401) {
+        setEmailExist(true);
       } else {
         alert(`Internal Server Error: ${error.message}`);
       }
@@ -56,7 +58,7 @@ export function RegisterForm({
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleRegister}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle className="text-center">Create an account</CardTitle>
@@ -65,7 +67,7 @@ export function RegisterForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleRegister}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="name">Name</Label>
@@ -81,6 +83,7 @@ export function RegisterForm({
               <div className="grid gap-3">
                 <Label htmlFor="email">Email</Label>
                 <Input
+                  style={{ border: `${emailExist ? "1px solid red" : ""}` }}
                   id="email"
                   type="email"
                   placeholder="your-email@example.com"
@@ -88,6 +91,7 @@ export function RegisterForm({
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
+                {emailExist && <Label className="text-red-500">Email already registered</Label>}
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">
@@ -97,25 +101,25 @@ export function RegisterForm({
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="role">Role</Label>
-                <Select value={role} onValueChange={(value) => setRole(value)}>
-                  <SelectTrigger>
+                <Select defaultValue={role} onValueChange={(value) => setRole(value)}>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel>Roles</SelectLabel>
-                      <SelectItem value="ADMIN">Admin</SelectItem>
+                      <SelectLabel>Role</SelectLabel>
                       <SelectItem value="USER">Member</SelectItem>
+                      <SelectItem value="ADMIN">Admin</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
-                  Login
+                  Register
                 </Button>
                 <Button type="button" variant="outline" className="w-full">
-                  Login with Google
+                  Register with Google
                 </Button>
               </div>
             </div>

@@ -13,7 +13,7 @@ type AuthContextType = {
   accessToken: string | null;
   setAuth: (user: User, token: string) => void;
   clearAuth: () => void;
-  loading: boolean; // useful while rehydrating
+  loading: boolean; // useful while refreshing
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,29 +36,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     delete axios.defaults.headers.common["Authorization"];
   }
 
-  // Rehydrate on mount: call /api/auth/refresh to get new access token (refresh cookie will be sent automatically)
   useEffect(() => {
-    let mounted = true;
-    async function rehydrate() {
+    async function refresh() {
       try {
         const res = await axios.post("/auth/refresh", {}, { withCredentials: true });
-        const { jwtToken } = res.data;
-        // decode jwtToken to get user info OR your backend can return user data too.
-        // If backend doesn't return user, you can decode using a small helper or ask API to return user
-        const payload = parseJwt(jwtToken); // implement parseJwt below or return user from backend
-        if (!mounted) return;
-        setAuth({ name: payload.name, email: payload.email, role: payload.role }, jwtToken);
+        const { jwtToken, user } = res.data;
+        setAuth(user, jwtToken);
       } catch (error: any) {
         // not logged in / refresh failed
-        if (!mounted) return;
         clearAuth();
       } finally {
-        if (mounted) setLoading(false);
+        setLoading(false);
       }
     }
 
-    rehydrate();
-    return () => { mounted = false; };
+    refresh();
   }, []);
 
   return (

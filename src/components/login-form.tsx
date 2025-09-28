@@ -14,8 +14,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import React from "react"
 import api from "@/lib/axios"
-import { set } from "zod"
-import { eslintUseValue } from "@mui/x-data-grid/internals"
 
 export function LoginForm({
   className,
@@ -38,7 +36,7 @@ export function LoginForm({
     }
 
     try {
-      const res = await api.post('/api/login', {
+      const res = await api.post('/auth/login', {
         email,
         password
       }, { withCredentials: true });
@@ -48,7 +46,7 @@ export function LoginForm({
       navigate('/dashboard');
 
     } catch (error: any) {
-      if (error.response.status === 401) {
+      if (error.response?.status === 401) {
         if (error.response.data.invalid === "email") {
           setEmailError(true);
         } else {
@@ -60,12 +58,14 @@ export function LoginForm({
         } else {
           setPasswordError(false);
         }
+      } else {
+        alert(`Internal Server Error: ${error.message}`);
       }
     }
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleLogin}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
@@ -74,24 +74,33 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleLogin}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="email">Email</Label>
                 <Input
+                  style={{ border: `${emailError ? "1px solid red" : ""}` }}
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="your-email@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
+                {emailError && <Label className="text-red-500">Invalid email</Label>}
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                 </div>
-                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Input
+                  style={{ border: `${passwordError ? "1px solid red" : ""}` }}
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required />
+                {passwordError && <Label className="text-red-500">Invalid password</Label>}
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
