@@ -11,7 +11,6 @@ export type Path =
   | `/product`
   | `/stock`
   | `/supplier`
-  | `/test`
 
 export type Params = {
   

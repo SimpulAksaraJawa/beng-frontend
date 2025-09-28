@@ -14,8 +14,14 @@ export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle register logic here
+    console.log("Register form submitted");
+  }
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleRegister}>
       <Card>
         <CardHeader>
           <CardTitle>Create an account</CardTitle>
@@ -72,12 +78,6 @@ export function RegisterForm({
                   Login with Google
                 </Button>
               </div>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <a href="#" className="underline underline-offset-4">
-                Sign up
-              </a>
             </div>
           </form>
         </CardContent>
