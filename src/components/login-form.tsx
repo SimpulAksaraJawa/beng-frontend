@@ -1,4 +1,6 @@
 import { useState } from "react"
+import { useNavigate } from "@/router"
+import { useAuth } from "@/contexts/AuthContext"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,6 +14,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import React from "react"
 import api from "@/lib/axios"
+import { set } from "zod"
+import { eslintUseValue } from "@mui/x-data-grid/internals"
 
 export function LoginForm({
   className,
@@ -19,6 +23,11 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+
+  const { setAuth } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,17 +37,29 @@ export function LoginForm({
       return;
     }
 
-    // Handle login logic here
-    console.log("Login form submitted");
     try {
-      api.post('/api/login', {
+      const res = await api.post('/api/login', {
         email,
         password
-      });
-      // Redirect or show success message
+      }, { withCredentials: true });
+
+      const { jwtToken, user } = res.data;
+      setAuth(user, jwtToken);
+      navigate('/dashboard');
+
     } catch (error: any) {
       if (error.response.status === 401) {
+        if (error.response.data.invalid === "email") {
+          setEmailError(true);
+        } else {
+          setEmailError(false);
+        }
 
+        if (error.response.data.invalid === "password") {
+          setPasswordError(true);
+        } else {
+          setPasswordError(false);
+        }
       }
     }
   }
@@ -61,21 +82,16 @@ export function LoginForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
-
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">

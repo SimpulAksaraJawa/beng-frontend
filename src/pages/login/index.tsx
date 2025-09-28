@@ -11,7 +11,7 @@ const loginPage = () => {
                 <div className="w-full max-w-sm">
                     {!register && <LoginForm />}
                     {register && <RegisterForm />}
-                    <p className="mt-4 text-center text-sm block">
+                    <p className="mt-4 text-center text-sm">
                         {register ? "Already have an account? " : "Don't have an account? "}
                         <a className="underline underline-offset-4" onClick={() => setRegister(prev => !prev)}>
                             {register ? "Login" : "Sign up"}
