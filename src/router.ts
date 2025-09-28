@@ -8,11 +8,12 @@ export type Path =
   | `/customer`
   | `/dashboard`
   | `/product`
+  | `/product/:id`
   | `/stock`
   | `/supplier`
 
 export type Params = {
-  
+  '/product/:id': { id: string }
 }
 
 export type ModalPath = never
