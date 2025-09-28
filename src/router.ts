@@ -7,6 +7,7 @@ export type Path =
   | `/`
   | `/customer`
   | `/dashboard`
+  | `/home`
   | `/product`
   | `/stock`
   | `/supplier`
