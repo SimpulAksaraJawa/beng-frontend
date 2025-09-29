@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, ArrowLeft, Pencil } from "lucide-react";
 import api from "@/api/axios";
+import { useQuery } from "@tanstack/react-query";
 
 // Interfaces
 interface SKU {
@@ -49,43 +50,43 @@ function bufferToBase64FromObject(bufferObj: { type: string; data: number[] }): 
   return btoa(binary);
 }
 
+// Fetch single product
+const fetchProduct = async (id: string | undefined): Promise<Product> => {
+  const res = await api.get(`/products/${id}`, { headers: { "Content-Type": "application/json" } });
+  const raw = res.data;
+
+  return {
+    id: raw.id,
+    name: raw.name,
+    category: { categoryName: raw.category?.categoryName || raw.categoryName || "Unknown" },
+    brand: { name: raw.brand?.name || raw.brandName || "Unknown" },
+    initialPrice: raw.initialPrice ?? 0,
+    skus: raw.skus || [],
+    images: raw.images || [],
+  };
+};
+
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [product, setProduct] = useState<Product | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeSku, setActiveSku] = useState<SKU | null>(null);
 
-  // inside ProductDetailPage:
+  const { data: product, isLoading, error } = useQuery({
+    queryKey: ["product", id],
+    queryFn: () => fetchProduct(id),
+    enabled: !!id, // only run query if id exists
+  });
 
-useEffect(() => {
-  async function load() {
-    try {
-      const res = await api.get(`/products/${id}`, { headers: { "Content-Type": "application/json" } });
-      const raw = res.data;
-
-      const mapped: Product = {
-        id: raw.id,
-        name: raw.name,
-        category: { categoryName: raw.category?.categoryName || raw.categoryName || "Unknown" },
-        brand: { name: raw.brand?.name || raw.brandName || "Unknown" },
-        initialPrice: raw.initialPrice ?? 0,
-        skus: raw.skus || [],
-        images: raw.images || []
-      };
-
-      setProduct(mapped);
-      if (mapped.skus.length > 0) setActiveSku(mapped.skus[0]);
-    } catch (err) {
-      console.error(err);
-    }
+  // set initial active SKU when product is loaded
+  if (product && !activeSku && product.skus.length > 0) {
+    setActiveSku(product.skus[0]);
   }
-  load();
-}, [id]);
 
-
-  if (!product) return <div className="p-6">Loading product...</div>;
+  if (isLoading) return <div className="p-6">Loading product...</div>;
+  if (error) return <div className="p-6 text-red-500">Failed to load product.</div>;
+  if (!product) return <div className="p-6">Product not found.</div>;
 
   const images = product.images || [];
   const hasImages = images.length > 0;
@@ -93,18 +94,17 @@ useEffect(() => {
     ? `data:image/jpeg;base64,${bufferToBase64FromObject(images[currentImageIndex].url)}`
     : null;
 
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat("id-ID").format(price);
+  const formatPrice = (price: number) => new Intl.NumberFormat("id-ID").format(price);
 
   return (
     <div className="p-6 space-y-8">
       {/* Back Button */}
       <Button
         variant="outline"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/product")}
         className="px-4 py-2 cursor-pointer"
       >
-        <ArrowLeft />Back
+        <ArrowLeft /> Back
       </Button>
 
       <div className="grid md:grid-cols-2 gap-8">
@@ -148,8 +148,9 @@ useEffect(() => {
           <Button
             variant="secondary"
             className="mb-2 cursor-pointer"
+            onClick={() => navigate(`/product/edit/${id}`)}
           >
-            <Pencil/>Edit
+            <Pencil /> Edit
           </Button>
 
           <h1 className="text-3xl font-bold">{product.name}</h1>
@@ -175,7 +176,6 @@ useEffect(() => {
                   </tr>
                 </thead>
                 <tbody>
-                  {/* Empty for now */}
                   <tr>
                     <td className="px-4 py-2 text-gray-400" colSpan={3}>
                       No supplier data
@@ -207,9 +207,7 @@ useEffect(() => {
           {/* Note */}
           <div className="mt-4 p-3 bg-gray-100 rounded">
             <h2 className="font-semibold mb-2">Product Description</h2>
-            <p>
-            {activeSku?.skuDesc || ""}
-          </p>
+            <p>{activeSku?.skuDesc || ""}</p>
           </div>
         </div>
       </div>

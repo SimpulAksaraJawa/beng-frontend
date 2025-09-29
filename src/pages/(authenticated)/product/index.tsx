@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
 
 interface ProductImage {
   url: { type: string; data: number[] };
@@ -46,48 +47,38 @@ function bufferToBase64FromObject(bufferObj: { type: string; data: number[] }): 
   return btoa(binary);
 }
 
+// Fetch products function
+const fetchProducts = async (): Promise<Product[]> => {
+  const response = await api.get("/products", {
+    headers: { "Content-Type": "application/json" },
+  });
+  const rawProducts = response.data;
+
+  return rawProducts.map((p: any) => {
+    const firstSku = p.skus && p.skus.length > 0 ? p.skus[0] : null;
+    const price = firstSku?.salePrice ?? p.initialPrice ?? 0;
+
+    return {
+      id: p.id,
+      name: p.name,
+      price,
+      category: p.category?.categoryName || p.categoryName || "Unknown",
+      images: p.images || [],
+    };
+  });
+};
+
 export default function Page() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<number, number>>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const navigate = useNavigate();
 
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("id-ID").format(price);
-  };
-
-  useEffect(() => {
-    async function loadProducts() {
-      try {
-        const response = await api.get("/products", {headers: { "Content-Type": "application/json" }});
-        const rawProducts = response.data;
-
-        const mapped: Product[] = rawProducts.map((p: any) => {
-          const firstSku = p.skus && p.skus.length > 0 ? p.skus[0] : null;
-          const price = firstSku?.salePrice ?? p.initialPrice ?? 0;
-
-          return {
-            id: p.id,
-            name: p.name,
-            price,
-            category: p.category?.categoryName || p.categoryName || "Unknown",
-            images: p.images || [],
-          };
-        });
-
-        setProducts(mapped);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadProducts();
-  }, []);
+  const { data: products = [], isLoading, error } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+    staleTime: 1000 * 60 * 15, // 15 minutes
+  });
 
   const prevImage = (productId: number, total: number) => {
     setCurrentImageIndex((prev) => ({
@@ -103,7 +94,11 @@ export default function Page() {
     }));
   };
 
-  if (loading) return <div className="p-6">Loading products...</div>;
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("id-ID").format(price);
+
+  if (isLoading) return <div className="p-6">Loading products...</div>;
+  if (error) return <div className="p-6 text-red-500">Failed to load products.</div>;
 
   const categories = Array.from(new Set(products.map((p) => p.category)));
 
@@ -126,7 +121,6 @@ export default function Page() {
           </Badge>
         </div>
 
-        {/* Make search full width */}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-black h-4 w-4" />
           <Input
@@ -148,14 +142,20 @@ export default function Page() {
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
               {categories.map((cat) => (
-                <SelectItem key={cat} value={cat} className="hover:cursor-pointer">
+                <SelectItem key={cat} value={cat}>
                   {cat}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Button variant="secondary" className="cursor-pointer" onClick={() => navigate("/product/new")} >Add Product</Button>
+          <Button
+            variant="secondary"
+            className="cursor-pointer"
+            onClick={() => navigate("/product/new")}
+          >
+            Add Product
+          </Button>
         </div>
       </div>
 
@@ -166,8 +166,8 @@ export default function Page() {
           const hasImages = product.images.length > 0;
           const currentImageUrl = hasImages
             ? `data:image/jpeg;base64,${bufferToBase64FromObject(
-              product.images[currentIndex].url
-            )}`
+                product.images[currentIndex].url
+              )}`
             : null;
 
           return (
@@ -216,7 +216,12 @@ export default function Page() {
                     {product.category}
                   </p>
                 </div>
-                <Button variant="outline" size="sm" className="cursor-pointer ml-2 text-sm" onClick={() => navigate(`/product/${product.id}`)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-2 text-sm"
+                  onClick={() => navigate(`/product/${product.id}`)}
+                >
                   Details
                 </Button>
               </CardContent>

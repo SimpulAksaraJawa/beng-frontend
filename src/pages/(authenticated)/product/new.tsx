@@ -1,19 +1,12 @@
 import { useState, useEffect } from "react";
 import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
-import {
-  Input,
-} from "@/components/ui/input";
-import {
-  Label,
-} from "@/components/ui/label";
-import {
-  Button,
-} from "@/components/ui/button";
-import {
-  Checkbox,
-} from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { SearchableSelect } from "@/components/searchable-select";
+import DOMPurify from "dompurify"; 
 
 interface SKU {
   code: string;
@@ -38,13 +31,15 @@ const AddProductPage = () => {
   ]);
   const [images, setImages] = useState<File[]>([]);
 
+  const sanitize = (val: string) => DOMPurify.sanitize(val.trim());
+
   useEffect(() => {
     api.get("/brands").then((res) => {
       const arr = Array.isArray(res.data)
         ? res.data
         : Array.isArray(res.data.brands)
-          ? res.data.brands
-          : [];
+        ? res.data.brands
+        : [];
       setBrands(arr.map((b: any) => b.name || b.brandName));
     });
 
@@ -52,8 +47,8 @@ const AddProductPage = () => {
       const arr = Array.isArray(res.data)
         ? res.data
         : Array.isArray(res.data.categories)
-          ? res.data.categories
-          : [];
+        ? res.data.categories
+        : [];
       setCategories(arr.map((c: any) => c.name || c.categoryName));
     });
   }, []);
@@ -88,16 +83,45 @@ const AddProductPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const cleanName = sanitize(name);
+    const cleanBrand = sanitize(brandName || "unknown");
+    const cleanCategory = sanitize(categoryName || "unknown");
+
+    const cleanSkus = skus.map((sku) => ({
+      code: sanitize(sku.code),
+      name: sanitize(sku.name),
+      desc: sanitize(sku.desc),
+      salePrice: sanitize(sku.salePrice),
+    }));
+
+    if (hasInitialStocks) {
+      if (!initialQty || isNaN(Number(initialQty)) || Number(initialQty) <= 0) {
+        alert("Invalid initial quantity");
+        return;
+      }
+      if (!initialPrice || isNaN(Number(initialPrice)) || Number(initialPrice) <= 0) {
+        alert("Invalid initial price");
+        return;
+      }
+    }
+
+    const allowedNameRegex = /^[a-zA-Z0-9\s\-_.()]+$/;
+    if (!allowedNameRegex.test(cleanName)) {
+      alert("Product name contains invalid characters");
+      return;
+    }
+
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("brandName", brandName || "unknown");
-    formData.append("categoryName", categoryName || "unknown");
+    formData.append("name", cleanName);
+    formData.append("brandName", cleanBrand);
+    formData.append("categoryName", cleanCategory);
     formData.append("hasInitialStocks", hasInitialStocks.toString());
     if (hasInitialStocks) {
-      formData.append("initialQty", initialQty);
-      formData.append("initialPrice", initialPrice);
+      formData.append("initialQty", sanitize(initialQty));
+      formData.append("initialPrice", sanitize(initialPrice));
     }
-    formData.append("skus", JSON.stringify(skus));
+    formData.append("skus", JSON.stringify(cleanSkus));
     images.forEach((img) => formData.append("images", img));
 
     try {
@@ -160,7 +184,12 @@ const AddProductPage = () => {
               setHasInitialStocks(checked as boolean)
             }
           />
-          <Label htmlFor="initial-stock" className="font-bold text-[#209ebb]">Has initial stock?</Label>
+          <Label
+            htmlFor="initial-stock"
+            className="font-bold text-[#209ebb]"
+          >
+            Has initial stock?
+          </Label>
         </div>
 
         {hasInitialStocks && (
@@ -186,7 +215,7 @@ const AddProductPage = () => {
           </div>
         )}
 
-        {/* SKU Section */}
+        {/* SKUs */}
         <div>
           <h2 className="text-xl font-semibold">Product Variants (SKUs)</h2>
           <div className="space-y-4 mt-4">
@@ -242,44 +271,42 @@ const AddProductPage = () => {
         </div>
 
         {/* Images */}
-        {/* Images */}
-<div className="space-y-2">
-  <Label>Add Product Images (max 3)</Label>
-  <Input
-    type="file"
-    accept="image/jpeg,image/png,image/jpg"
-    multiple
-    onChange={handleImages}
-  />
-  <p className="text-sm text-gray-500">
-    Accepted file types: <strong>.jpg, .jpeg, .png</strong>
-  </p>
-  <p className="text-sm text-gray-500">
-    Selected: {images.length}/3
-  </p>
+        <div className="space-y-2">
+          <Label>Add Product Images (max 3)</Label>
+          <Input
+            type="file"
+            accept="image/jpeg,image/png,image/jpg"
+            multiple
+            onChange={handleImages}
+          />
+          <p className="text-sm text-gray-500">
+            Accepted file types: <strong>.jpg, .jpeg, .png</strong>
+          </p>
+          <p className="text-sm text-gray-500">
+            Selected: {images.length}/3
+          </p>
 
-  {images.length > 0 && (
-    <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-      {images.map((file, idx) => (
-        <li key={idx} className="flex justify-between items-center">
-          <span>{file.name}</span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-red-500 hover:text-red-700 cursor-pointer hover:bg-transparent"
-            onClick={() =>
-              setImages((prev) => prev.filter((_, i) => i !== idx))
-            }
-          >
-            Remove
-          </Button>
-        </li>
-      ))}
-    </ul>
-  )}
-</div>
-
+          {images.length > 0 && (
+            <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
+              {images.map((file, idx) => (
+                <li key={idx} className="flex justify-between items-center">
+                  <span>{file.name}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-500 hover:text-red-700 cursor-pointer hover:bg-transparent"
+                    onClick={() =>
+                      setImages((prev) => prev.filter((_, i) => i !== idx))
+                    }
+                  >
+                    Remove
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         {/* Buttons */}
         <div className="flex gap-4">

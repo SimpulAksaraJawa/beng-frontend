@@ -9,12 +9,14 @@ export type Path =
   | `/dashboard`
   | `/product`
   | `/product/:id`
+  | `/product/edit/:id`
   | `/product/new`
   | `/stock`
   | `/supplier`
 
 export type Params = {
   '/product/:id': { id: string }
+  '/product/edit/:id': { id: string }
 }
 
 export type ModalPath = never
