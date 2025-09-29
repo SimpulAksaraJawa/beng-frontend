@@ -18,13 +18,11 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenuButton,
-  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from "@radix-ui/react-collapsible";
 
 // This is sample data.
@@ -145,8 +143,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <Collapsible className="group/collapsible">
-          <SidebarMenuItem>
-            <CollapsibleTrigger asChild>
               <SidebarMenuButton className="hover:bg-white/50 data-[state=open]:hover:bg-white/50 active:bg-white/50">
                 <div className="flex justify-start items-center flex-row">
                   <img
@@ -159,9 +155,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </h1>
                 </div>
               </SidebarMenuButton>
-            </CollapsibleTrigger>
             <CollapsibleContent></CollapsibleContent>
-          </SidebarMenuItem>
         </Collapsible>
       </SidebarHeader>
       <SidebarContent>
