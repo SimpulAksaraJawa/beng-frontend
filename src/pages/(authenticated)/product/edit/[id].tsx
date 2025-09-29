@@ -22,6 +22,7 @@ type SKUStringFields = "code" | "name" | "desc" | "salePrice";
 
 interface ExistingImage {
   id: number;
+  alt?: string | null;
   url: string;
 }
 
@@ -260,6 +261,7 @@ export default function EditProductPage() {
         {/* Has Initial Stocks */}
         <div className="flex items-center space-x-2">
           <Checkbox
+            className="cursor-pointer"
             id="initial-stock"
             checked={hasInitialStocks}
             onCheckedChange={(checked) => setHasInitialStocks(checked as boolean)}
@@ -290,22 +292,22 @@ export default function EditProductPage() {
                 <Input placeholder="SKU Name" value={sku.name} onChange={(e) => handleSKUChange(idx, "name", e.target.value)} required />
                 <Input placeholder="SKU Description" value={sku.desc} onChange={(e) => handleSKUChange(idx, "desc", e.target.value)} />
                 <Input type="number" placeholder="Sale Price" value={sku.salePrice} onChange={(e) => handleSKUChange(idx, "salePrice", e.target.value)} required />
-                {idx > 0 && <Button type="button" variant="destructive" onClick={() => removeSKU(idx)}>Remove SKU</Button>}
+                {idx > 0 && <Button type="button" variant="destructive" className="cursor-pointer" onClick={() => removeSKU(idx)}>Remove SKU</Button>}
               </div>
             ))}
           </div>
-          <Button type="button" variant="secondary" onClick={addSKU}>+ Add Another SKU</Button>
+          <Button type="button" variant="secondary" className="mt-4 cursor-pointer" onClick={addSKU}>+ Add Another SKU</Button>
         </div>
 
         {/* Existing Images */}
         {existingImages.length > 0 && (
           <div className="space-y-2">
             <Label>Existing Images</Label>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
+            <ul className="list-disc space-y-1 text-sm text-gray-700 flex flex-row gap-4">
               {existingImages.map((img) => (
-                <li key={img.id} className="flex items-center space-x-2">
-                  <img src={img.url} alt="Product" className="h-16 w-16 object-cover" />
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setExistingImages(prev => prev.filter(i => i.id !== img.id))}>Remove</Button>
+                <li key={img.id} className="flex items-center space-x-2 bg-[#8ecae6]/50 rounded pl-2">
+                  <p>{img.alt}</p>
+                  <Button type="button" variant="ghost" size="sm" className="text-red-600 hover:text-red-700 cursor-pointer hover:bg-transparent" onClick={() => setExistingImages(prev => prev.filter(i => i.id !== img.id))}>Remove</Button>
                 </li>
               ))}
             </ul>
@@ -332,7 +334,7 @@ export default function EditProductPage() {
         {/* Buttons */}
         <div className="flex gap-4">
           <Button type="submit">Save Product</Button>
-          <Button type="button" variant="outline" onClick={() => navigate(`/product/${id}`)}>Cancel</Button>
+          <Button type="button" className="cursor-pointer" variant="outline" onClick={() => navigate(`/product/${id}`)}>Cancel</Button>
         </div>
       </form>
     </div>

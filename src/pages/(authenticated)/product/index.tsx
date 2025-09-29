@@ -219,7 +219,7 @@ export default function Page() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="ml-2 text-sm"
+                  className="ml-2 text-sm cursor-pointer"
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
                   Details
