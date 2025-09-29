@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { SiteHeader } from "@/components/site-header";
 import api from "@/api/axios";
-
+import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -52,6 +52,8 @@ export default function Page() {
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<number, number>>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const navigate = useNavigate();
+
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("id-ID").format(price);
@@ -60,7 +62,7 @@ export default function Page() {
   useEffect(() => {
     async function loadProducts() {
       try {
-        const response = await api.get("/products");
+        const response = await api.get("/products", {headers: { "Content-Type": "application/json" }});
         const rawProducts = response.data;
 
         const mapped: Product[] = rawProducts.map((p: any) => {
@@ -153,12 +155,12 @@ export default function Page() {
             </SelectContent>
           </Select>
 
-          <Button variant="secondary" className="cursor-pointer">Add Product</Button>
+          <Button variant="secondary" className="cursor-pointer" onClick={() => navigate("/product/new")} >Add Product</Button>
         </div>
       </div>
 
       {/* Products grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredProducts.map((product) => {
           const currentIndex = currentImageIndex[product.id] ?? 0;
           const hasImages = product.images.length > 0;
@@ -208,14 +210,14 @@ export default function Page() {
               <CardContent className="flex justify-between items-end">
                 <div>
                   <p className="text-[#209ebb] font-extrabold">
-                    Rp {formatPrice(product.price)}
+                    Rp{formatPrice(product.price)}
                   </p>
                   <p className="text-gray-500 text-sm font-medium">
                     {product.category}
                   </p>
                 </div>
-                <Button variant="outline" size="sm" className="cursor-pointer">
-                  View Details
+                <Button variant="outline" size="sm" className="cursor-pointer ml-2 text-sm" onClick={() => navigate(`/product/${product.id}`)}>
+                  Details
                 </Button>
               </CardContent>
             </Card>

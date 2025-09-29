@@ -9,6 +9,7 @@ export type Path =
   | `/dashboard`
   | `/product`
   | `/product/:id`
+  | `/product/new`
   | `/stock`
   | `/supplier`
 
