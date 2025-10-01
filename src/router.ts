@@ -7,6 +7,8 @@ export type Path =
   | `/`
   | `/customer`
   | `/dashboard`
+  | `/orders`
+  | `/orders/new`
   | `/product`
   | `/product/:id`
   | `/product/edit/:id`

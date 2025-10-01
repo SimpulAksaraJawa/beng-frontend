@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
+import Printable from "@/components/printable";
 
 interface ProductImage {
   url: { type: string; data: number[] };
@@ -47,7 +48,7 @@ function bufferToBase64FromObject(bufferObj: { type: string; data: number[] }): 
   return btoa(binary);
 }
 
-// Fetch products function
+ // Fetch products function
 const fetchProducts = async (): Promise<Product[]> => {
   const response = await api.get("/products", {
     headers: { "Content-Type": "application/json" },
@@ -63,10 +64,13 @@ const fetchProducts = async (): Promise<Product[]> => {
       name: p.name,
       price,
       category: p.category?.categoryName || p.categoryName || "Unknown",
+      brand: p.brandName || "",
+      quantity: p.initialQty || 0,
       images: p.images || [],
     };
   });
 };
+ 
 
 export default function Page() {
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<number, number>>({});
@@ -132,6 +136,7 @@ export default function Page() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Printable products={products as any} />
           <Select
             value={selectedCategory}
             onValueChange={(value) => setSelectedCategory(value)}

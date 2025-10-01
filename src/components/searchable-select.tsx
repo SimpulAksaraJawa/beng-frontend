@@ -17,39 +17,40 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-interface SearchableSelectProps {
+interface SearchableSelectProps<T extends string | number> {
   label: string;
-  options: string[];
-  value: string;
-  onChange: (value: string) => void;
-  onAddNew: (value: string) => void;
+  options: T[];
+  value: T;
+  onChange: (value: T) => void;
+  onAddNew: (value: T) => void;
 }
 
-export function SearchableSelect({
+export function SearchableSelect<T extends string | number>({
   label,
   options,
   value,
   onChange,
   onAddNew,
-}: SearchableSelectProps) {
+}: SearchableSelectProps<T>) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const handleSelect = (val: string) => {
+  const handleSelect = (val: T) => {
     onChange(val);
     setOpen(false);
   };
 
   const handleAdd = () => {
     if (search.trim()) {
-      onAddNew(search.trim());
-      onChange(search.trim());
+      const newVal = search.trim() as T;
+      onAddNew(newVal);
+      onChange(newVal);
       setOpen(false);
     }
   };
 
   const filtered = options.filter((opt) =>
-    opt.toLowerCase().includes(search.toLowerCase())
+    opt.toString().toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -62,7 +63,7 @@ export function SearchableSelect({
             role="combobox"
             className="w-full justify-between"
           >
-            {value ? value : `Select ${label}`}
+            {value ? value.toString() : `Select ${label}`}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -78,7 +79,7 @@ export function SearchableSelect({
               <CommandGroup>
                 {filtered.map((opt) => (
                   <CommandItem
-                    key={opt}
+                    key={opt.toString()}
                     onSelect={() => handleSelect(opt)}
                     className="cursor-pointer"
                   >
@@ -88,12 +89,12 @@ export function SearchableSelect({
                         value === opt ? "opacity-100" : "opacity-0"
                       )}
                     />
-                    {opt}
+                    {opt.toString()}
                   </CommandItem>
                 ))}
               </CommandGroup>
             </CommandList>
-            {search && !options.includes(search) && (
+            {search && !options.includes(search as T) && (
               <div className="border-t p-2">
                 <Button
                   variant="ghost"
@@ -112,3 +113,4 @@ export function SearchableSelect({
     </div>
   );
 }
+

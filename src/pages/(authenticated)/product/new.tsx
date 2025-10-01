@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SearchableSelect } from "@/components/searchable-select";
 import DOMPurify from "dompurify"; 
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SKU {
   code: string;
@@ -17,7 +18,7 @@ interface SKU {
 
 const AddProductPage = () => {
   const navigate = useNavigate();
-
+  const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [brandName, setBrandName] = useState("");
   const [categoryName, setCategoryName] = useState("");
@@ -129,6 +130,7 @@ const AddProductPage = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("Product created successfully!");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       navigate("/product");
     } catch (err) {
       console.error(err);
