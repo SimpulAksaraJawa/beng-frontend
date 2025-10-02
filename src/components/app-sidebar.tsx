@@ -1,30 +1,29 @@
-"use client"
-
-import * as React from "react"
+import * as React from "react";
 import {
-  AudioWaveform,
   BookOpen,
   Bot,
-  Command,
   Frame,
-  GalleryVerticalEnd,
   Map,
   PieChart,
   Settings2,
   SquareTerminal,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { NavMain } from "@/components/nav-main";
+import { NavProjects } from "@/components/nav-projects";
+import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenuButton,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+} from "@radix-ui/react-collapsible";
 
 // This is sample data.
 const data = {
@@ -33,27 +32,10 @@ const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
   navMain: [
     {
-      title: "Playground",
-      url: "#",
+      title: "Dashboard",
+      url: "/dashboard",
       icon: SquareTerminal,
       isActive: true,
       items: [
@@ -72,27 +54,27 @@ const data = {
       ],
     },
     {
-      title: "Models",
-      url: "#",
+      title: "Products",
+      url: "/product",
       icon: Bot,
       items: [
         {
           title: "Genesis",
-          url: "#",
+          url: "/product",
         },
         {
           title: "Explorer",
-          url: "#",
+          url: "/",
         },
         {
           title: "Quantum",
-          url: "#",
+          url: "/",
         },
       ],
     },
     {
-      title: "Documentation",
-      url: "#",
+      title: "Orders",
+      url: "/orders",
       icon: BookOpen,
       items: [
         {
@@ -154,13 +136,27 @@ const data = {
       icon: Map,
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <Collapsible className="group/collapsible">
+              <SidebarMenuButton className="hover:bg-white/50 data-[state=open]:hover:bg-white/50 active:bg-white/50">
+                <div className="flex justify-start items-center flex-row">
+                  <img
+                    src="/favicon.png"
+                    alt="BENG Logo"
+                    className="-ml-2 h-8 w-8 drop-shadow-2xl"
+                  />
+                  <h1 className="text-xl font-bold text-[#209ebb] group-data-[state=collapsed]/sidebar:hidden">
+                    BENG
+                  </h1>
+                </div>
+              </SidebarMenuButton>
+            <CollapsibleContent></CollapsibleContent>
+        </Collapsible>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
@@ -171,5 +167,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
