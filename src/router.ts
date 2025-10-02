@@ -8,6 +8,7 @@ export type Path =
   | `/customer`
   | `/dashboard`
   | `/orders`
+  | `/orders/edit/:id`
   | `/orders/new`
   | `/product`
   | `/product/:id`
@@ -17,6 +18,7 @@ export type Path =
   | `/supplier`
 
 export type Params = {
+  '/orders/edit/:id': { id: string }
   '/product/:id': { id: string }
   '/product/edit/:id': { id: string }
 }

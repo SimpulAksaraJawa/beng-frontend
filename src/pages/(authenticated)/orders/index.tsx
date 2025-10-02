@@ -1,7 +1,7 @@
 import { DataGrid, GridColDef, GridRowParams, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
 import { Button as ButtonShad } from "@/components/ui/button";
-import { Edit, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
 import { SiteHeader } from "@/components/site-header";
@@ -82,7 +82,6 @@ export default function OrdersPage() {
     staleTime: 1000 * 60 * 15,
   });
 
-  const handleEdit = (id: number) => navigate(`/orders/edit/${id}`);
   const handleView = (id: number) => navigate(`/orders/${id}`);
 
   if (isLoading) return <div className="p-6">Loading orders...</div>;
@@ -116,24 +115,14 @@ export default function OrdersPage() {
       flex: 1,
       minWidth: 100,
       renderCell: (params: GridRenderCellParams<Order>) => (
-        <Box sx={{ display: "flex", gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 0.2 }}>
           <Button
-            variant="outlined"
-            size="small"
-            color="primary"
-            startIcon={<Edit />}
-            onClick={() => handleEdit(params.row.id)}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="outlined"
+            variant="text"
             size="small"
             color="secondary"
             startIcon={<Eye />}
             onClick={() => handleView(params.row.id)}
           >
-            View
           </Button>
         </Box>
       ),
@@ -161,9 +150,11 @@ export default function OrdersPage() {
               pagination: { paginationModel: { pageSize: 10, page: 0 } },
             }}
             sx={{
+              fontFamily: "Outfit, sans-serif",
               "& .MuiDataGrid-columnHeaders": {
                 backgroundColor: "#f9fafb",
                 fontWeight: "bold",
+                fontFamily: "Outfit, sans-serif",
               },
             }}
           />
