@@ -51,7 +51,7 @@ const data = {
       items: [
         {
           title: "Adjustments",
-          url: "/adjustments",
+          url: "/adjustment",
         },
         // {
         //   title: "Explorer",

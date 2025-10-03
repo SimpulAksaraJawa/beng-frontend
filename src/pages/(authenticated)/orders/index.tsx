@@ -1,7 +1,7 @@
 import { DataGrid, GridColDef, GridRowParams, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
 import { Button as ButtonShad } from "@/components/ui/button";
-import { Eye, Minus, Search } from "lucide-react";
+import { Eye, Minus} from "lucide-react";
 import api from "@/api/axios";
 import { SiteHeader } from "@/components/site-header";
 import { useQuery } from "@tanstack/react-query";
@@ -9,8 +9,6 @@ import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { useNavigate } from "react-router";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 
 interface Supplier {
   id: number;
@@ -252,15 +250,16 @@ export default function OrdersPage() {
       </Box>
 
       {/* Receipts */}
-      <div className="mt-6 space-y-4">
+      <div className="mt-6 space-y-4 w-[60%]">
         {openReceipts.map((order) => (
           <Card key={order.id} className="p-6">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Invoice: {order.invoice}</CardTitle>
               <ButtonShad
-                variant="ghost"
+                variant="destructive"
                 size="icon"
                 onClick={() => handleClose(order.id)}
+                className="cursor-pointer"
               >
                 <Minus className="h-4 w-4" />
               </ButtonShad>
