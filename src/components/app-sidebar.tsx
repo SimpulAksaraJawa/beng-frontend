@@ -82,7 +82,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         title: "Sale",
-        url: "#",
+        url: "/sales",
         icon: Tag,
         items: [
           {

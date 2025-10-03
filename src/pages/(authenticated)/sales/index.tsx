@@ -1,3 +1,4 @@
+/* Old Sale Frontend Code (Are you really going to do this to yourself)
 import { DataGrid, GridColDef, GridRowParams, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
 import { Button as ButtonShad } from "@/components/ui/button";
@@ -173,3 +174,4 @@ export default function SalesPage() {
         </div>
     );
 }
+*/

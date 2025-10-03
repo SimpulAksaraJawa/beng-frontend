@@ -1,3 +1,4 @@
+/* on God, don't regret your choice
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "@/api/axios";
@@ -231,7 +232,7 @@ const AddSalesPage = () => {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Create New Sale</h1>
 
-      {/* === EDIT WARNING DIALOG === */}
+      //{/* === EDIT WARNING DIALOG === }
       <AlertDialog open={showEditWarning} onOpenChange={setShowEditWarning}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -256,7 +257,7 @@ const AddSalesPage = () => {
         }}
         className="space-y-6"
       >
-        {/* No Invoice */}
+        //{/* No Invoice }
         <div className="space-y-2">
           <Label>No Invoice (optional)</Label>
           <Input
@@ -266,7 +267,7 @@ const AddSalesPage = () => {
           />
         </div>
 
-        {/* Supplier */}
+        //{/* Supplier }
         <div className="space-y-2">
           <SearchableSelect
             label="Customer"
@@ -279,7 +280,7 @@ const AddSalesPage = () => {
           />
         </div>
 
-        {/* Order Date & Time */}
+        //{/* Order Date & Time }
         <div className="space-y-2">
           <Label>Order Date & Time</Label>
           <Input
@@ -290,130 +291,131 @@ const AddSalesPage = () => {
           />
         </div>
 
-        {/* Products */}
-        <div>
-          <h2 className="text-xl font-semibold">Products</h2>
-          <div className="space-y-4 mt-4">
-            {products.map((p, idx) => (
-              <div key={idx} className="border p-4 rounded-md space-y-2">
-                {/* Product Name */}
-                <SearchableSelect
-                  label="Product Name"
-                  options={productsOptions.map((po) => po.name)}
-                  value={p.productName}
-                  onChange={(v) => handleProductChange(idx, v)}
-                  onAddNew={(newProduct) => handleProductChange(idx, newProduct)}
-                />
+        //{/* Products }
+<div>
+  <h2 className="text-xl font-semibold">Products</h2>
+  <div className="space-y-4 mt-4">
+    {products.map((p, idx) => (
+      <div key={idx} className="border p-4 rounded-md space-y-2">
+        //{/* Product Name }
+        <SearchableSelect
+          label="Product Name"
+          options={productsOptions.map((po) => po.name)}
+          value={p.productName}
+          onChange={(v) => handleProductChange(idx, v)}
+          onAddNew={(newProduct) => handleProductChange(idx, newProduct)}
+        />
 
-                {/* Brand */}
-                <SearchableSelect
-                  label="Brand"
-                  options={brands.map((b) => b.name)}
-                  value={p.brandName}
-                  onChange={(v) => handleDetailChange(idx, "brandName", v)}
-                  onAddNew={(newBrand) =>
-                    setBrands((prev) => [
-                      ...prev,
-                      { id: prev.length + 1, name: newBrand },
-                    ])
-                  }
-                />
+        //{/* Brand }
+        <SearchableSelect
+          label="Brand"
+          options={brands.map((b) => b.name)}
+          value={p.brandName}
+          onChange={(v) => handleDetailChange(idx, "brandName", v)}
+          onAddNew={(newBrand) =>
+            setBrands((prev) => [
+              ...prev,
+              { id: prev.length + 1, name: newBrand },
+            ])
+          }
+        />
 
-                {/* Category */}
-                <SearchableSelect
-                  label="Category"
-                  options={categories.map((c) => c.name)}
-                  value={p.categoryName}
-                  onChange={(v) => handleDetailChange(idx, "categoryName", v)}
-                  onAddNew={(newCat) =>
-                    setCategories((prev) => [
-                      ...prev,
-                      { id: prev.length + 1, name: newCat },
-                    ])
-                  }
-                />
+        //{/* Category }
+        <SearchableSelect
+          label="Category"
+          options={categories.map((c) => c.name)}
+          value={p.categoryName}
+          onChange={(v) => handleDetailChange(idx, "categoryName", v)}
+          onAddNew={(newCat) =>
+            setCategories((prev) => [
+              ...prev,
+              { id: prev.length + 1, name: newCat },
+            ])
+          }
+        />
 
-                {/* Quantity */}
-                <Input
-                  type="number"
-                  placeholder="Quantity"
-                  value={p.saleQty}
-                  onChange={(e) =>
-                    handleDetailChange(idx, "saleQty", e.target.value)
-                  }
-                  required
-                />
+        //{/* Quantity }
+        <Input
+          type="number"
+          placeholder="Quantity"
+          value={p.saleQty}
+          onChange={(e) =>
+            handleDetailChange(idx, "saleQty", e.target.value)
+          }
+          required
+        />
 
-                {/* Price */}
-                <Input
-                  type="number"
-                  placeholder="Price"
-                  value={p.salePrice}
-                  onChange={(e) =>
-                    handleDetailChange(idx, "salePrice", e.target.value)
-                  }
-                  required
-                />
+        //{/* Price }
+        <Input
+          type="number"
+          placeholder="Price"
+          value={p.salePrice}
+          onChange={(e) =>
+            handleDetailChange(idx, "salePrice", e.target.value)
+          }
+          required
+        />
 
-                {/* Remove button */}
-                {idx > 0 && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => removeProduct(idx)}
-                  >
-                    Remove Product
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-
+        //{/* Remove button }
+        {idx > 0 && (
           <Button
             type="button"
-            variant="secondary"
-            className="mt-4"
-            onClick={addProduct}
+            variant="destructive"
+            onClick={() => removeProduct(idx)}
           >
-            + Add Another Product
+            Remove Product
           </Button>
-        </div>
+        )}
+      </div>
+    ))}
+  </div>
 
-        {/* Total Price */}
-        <div className="text-lg font-bold">Total Amount: {totalAmount}</div>
+  <Button
+    type="button"
+    variant="secondary"
+    className="mt-4"
+    onClick={addProduct}
+  >
+    + Add Another Product
+  </Button>
+</div>
 
-        {/* Form Buttons */}
-        <div className="flex gap-4">
-          <Button type="submit">Save Sale</Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate("/sales")}
-          >
-            Cancel
-          </Button>
-        </div>
-      </form>
+//{/* Total Price }
+<div className="text-lg font-bold">Total Amount: {totalAmount}</div>
 
-      {/* === SAVE CONFIRM DIALOG === */}
-      <AlertDialog open={showSaveConfirm} onOpenChange={setShowSaveConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Save</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure all details are correct?
-              You cannot edit this order after saving.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>No, Go Back</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSubmit}>Yes, Save</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+//{/* Form Buttons }
+<div className="flex gap-4">
+  <Button type="submit">Save Sale</Button>
+  <Button
+    type="button"
+    variant="outline"
+    onClick={() => navigate("/sales")}
+  >
+    Cancel
+  </Button>
+</div>
+      </form >
+
+  //{/* === SAVE CONFIRM DIALOG ===}
+  < AlertDialog open = { showSaveConfirm } onOpenChange = { setShowSaveConfirm } >
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Confirm Save</AlertDialogTitle>
+        <AlertDialogDescription>
+          Are you sure all details are correct?
+          You cannot edit this order after saving.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel>No, Go Back</AlertDialogCancel>
+        <AlertDialogAction onClick={handleSubmit}>Yes, Save</AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+</ >
+    </div >
   );
 };
 
 
 export default AddSalesPage;
+*/
