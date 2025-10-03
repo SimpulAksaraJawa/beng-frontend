@@ -5,12 +5,13 @@ import { components, hooks, utils } from '@generouted/react-router/client'
 
 export type Path =
   | `/`
+  | `/adjustment`
   | `/customer`
   | `/dashboard`
   | `/home`
   | `/login`
   | `/orders`
-  | `/orders/edit/:id`
+  | `/orders/details`
   | `/orders/new`
   | `/product`
   | `/product/:id`
@@ -24,7 +25,6 @@ export type Path =
   | `/supplier`
 
 export type Params = {
-  '/orders/edit/:id': { id: string }
   '/product/:id': { id: string }
   '/product/edit/:id': { id: string }
   '/sales/edit/:id': { id: string }
