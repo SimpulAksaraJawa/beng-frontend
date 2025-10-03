@@ -31,15 +31,15 @@ export default function OrderDetailsPage() {
     });
 
     const columns: GridColDef<OrderDetailRow>[] = [
-        { field: "invoice", headerName: "Invoice No.", flex: 1, minWidth: 120 },
-        { field: "supplierName", headerName: "Supplier Name", flex: 1.5, minWidth: 180 },
-        { field: "productName", headerName: "Product Name", flex: 1.5, minWidth: 180 },
-        { field: "qty", headerName: "Product Quantity", flex: 1, minWidth: 120 },
+        { field: "invoice", headerName: "Invoice No.", flex: 1, maxWidth: 200 },
+        { field: "supplierName", headerName: "Supplier Name", flex: 1.5, maxWidth: 200 },
+        { field: "productName", headerName: "Product Name", flex: 1.5, maxWidth: 200 },
+        { field: "qty", headerName: "Product Quantity", flex: 1 , maxWidth: 200},
         {
             field: "price",
             headerName: "Product Price",
             flex: 1,
-            minWidth: 120,
+            maxWidth: 200,
             valueGetter: (params: GridRowParams<OrderDetailRow> | null, row: OrderDetailRow) => { return formatRupiah(row?.price) }
         },
     ];
@@ -51,7 +51,7 @@ export default function OrderDetailsPage() {
         <div className="p-6 w-[100%] mx-auto">
             <SiteHeader />
             <h1 className="text-2xl font-bold my-4">Order Details</h1>
-            <Box sx={{ height: 600, width: "100%" }}>
+            <Box sx={{ height: 800, width: "70%" }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
@@ -68,6 +68,7 @@ export default function OrderDetailsPage() {
                             fontFamily: "Outfit, sans-serif",
                         },
                     }}
+                    showToolbar
                 />
             </Box>
         </div>

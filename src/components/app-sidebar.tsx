@@ -1,12 +1,11 @@
 import * as React from "react";
 import {
-  BookOpen,
-  Bot,
-  Frame,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
+  Package,
+  ReceiptText,
+  Tag,
+  Boxes,
+  Factory,
+  Users,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -33,41 +32,41 @@ const data = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-      ],
-    },
+    // {
+    //   title: "Dashboard",
+    //   url: "/dashboard",
+    //   icon: SquareTerminal,
+    //   isActive: true,
+    //   items: [
+    //     {
+    //       title: "History",
+    //       url: "#",
+    //     },
+    //   ],
+    // },
     {
       title: "Products",
       url: "/product",
-      icon: Bot,
+      icon: Package,
       items: [
         {
-          title: "Genesis",
-          url: "/product",
+          title: "Adjustments",
+          url: "/adjustments",
         },
-        {
-          title: "Explorer",
-          url: "/",
-        },
-        {
-          title: "Quantum",
-          url: "/",
-        },
+        // {
+        //   title: "Explorer",
+        //   url: "/",
+        // },
+        // {
+        //   title: "Quantum",
+        //   url: "/",
+        // },
       ],
     },
     {
       title: "Orders",
       url: "/orders",
-      icon: BookOpen,
+      icon: ReceiptText,
       items: [
         {
           title: "Order Details",
@@ -76,36 +75,47 @@ const data = {
       ],
     },
     {
-      title: "Settings",
+      title: "Sale",
       url: "#",
-      icon: Settings2,
+      icon: Tag,
       items: [
         {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
+          title: "Sale Details",
+          url: "/sale/details",
         },
       ],
     },
+    {
+      title: "Stock",
+      url: "/Stock",
+      icon: Boxes,
+    },
+    // {
+    //   title: "Settings",
+    //   url: "#",
+    //   icon: Settings2,
+    //   items: [
+    //     {
+    //       title: "General",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Team",
+    //       url: "#",
+    //     },
+    //   ],
+    // },
   ],
-  projects: [
+  users: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
+      name: "Supplier",
+      url: "/supplier",
+      icon: Factory,
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      name: "Customer",
+      url: "/customer",
+      icon: Users,
     },
   ],
 };
@@ -132,7 +142,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavProjects projects={data.users} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
