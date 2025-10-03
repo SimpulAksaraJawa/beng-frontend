@@ -48,7 +48,7 @@ export default function OrderDetailsPage() {
     if (error) return <div className="p-6 text-red-500">Failed to load order details.</div>;
 
     return (
-        <div className="p-6 w-full mx-auto">
+        <div className="p-6 w-[100%] mx-auto">
             <SiteHeader />
             <h1 className="text-2xl font-bold my-4">Order Details</h1>
             <Box sx={{ height: 600, width: "100%" }}>

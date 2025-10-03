@@ -1,11 +1,13 @@
 import { DataGrid, GridColDef, GridRowParams, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
 import { Button as ButtonShad } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Eye, Minus } from "lucide-react";
 import api from "@/api/axios";
-import { useNavigate } from "react-router-dom";
 import { SiteHeader } from "@/components/site-header";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 
 interface Supplier {
   id: number;
@@ -16,6 +18,8 @@ interface OrderDetail {
   id: number;
   productId: number;
   productName: string;
+  brandName?: string;
+  categoryName?: string;
   qty: number;
   price: number;
 }
@@ -29,41 +33,33 @@ interface Order {
   orderDetail: OrderDetail[];
 }
 
-// Helper functions
+// format helpers
 function formatDate(dateStr: string | Date | null) {
   if (!dateStr) return "N/A";
   const d = new Date(dateStr);
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
-  const year = d.getFullYear();
-  return `${day}-${month}-${year}`;
+  return d.toLocaleDateString("id-ID");
 }
 
 function formatRupiah(amount: number | null) {
   if (amount == null) return "N/A";
   return (
     "Rp " +
-    amount
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ".") // add dots as thousands separator
+    amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
   );
 }
 
 export default function OrdersPage() {
-  const navigate = useNavigate();
+  const [openReceipts, setOpenReceipts] = useState<Order[]>([]);
 
   const fetchOrders = async (): Promise<Order[]> => {
-    // Fetch suppliers
     const supplierRes = await api.get("/suppliers");
     const suppliersData: Supplier[] = Array.isArray(supplierRes.data?.data)
       ? supplierRes.data.data
       : [];
 
-    // Fetch orders
     const orderRes = await api.get("/orders");
     const ordersData = Array.isArray(orderRes.data?.data) ? orderRes.data.data : [];
 
-    // Map orders
     const mappedOrders: Order[] = ordersData.map((o: any) => ({
       id: o.id,
       invoice: o.invoice ?? "N/A",
@@ -75,14 +71,35 @@ export default function OrdersPage() {
 
     return mappedOrders;
   };
-  
- const { data: orders = [], isLoading, error } = useQuery({
+
+  const { data: orders = [], isLoading, error } = useQuery({
     queryKey: ["orders"],
-    queryFn: fetchOrders, // <-- pass the function reference, not call it
+    queryFn: fetchOrders,
     staleTime: 1000 * 60 * 15,
   });
 
-  const handleView = (id: number) => navigate(`/orders/${id}`);
+  // fetch single order when clicking eye
+  const handleView = async (id: number) => {
+  if (openReceipts.find((o) => o.id === id)) return;
+
+  const res = await api.get(`/orders/${id}`);
+  const o = res.data.data;
+
+  const mappedOrder: Order = {
+    id: o.id,
+    invoice: o.invoice ?? "N/A",
+    supplierName: o.supplierName ?? "Unknown",
+    orderDate: o.date ?? null,   // 👈 map date properly
+    totalPrice: o.totalPrice ?? 0,
+    orderDetail: o.orderDetail ?? [],
+  };
+
+  setOpenReceipts((prev) => [...prev, mappedOrder]);
+};
+
+  const handleClose = (id: number) => {
+    setOpenReceipts((prev) => prev.filter((o) => o.id !== id));
+  };
 
   if (isLoading) return <div className="p-6">Loading orders...</div>;
   if (error) return <div className="p-6 text-red-500">Failed to load orders.</div>;
@@ -95,18 +112,16 @@ export default function OrdersPage() {
       headerName: "Order Date",
       flex: 1,
       minWidth: 100,
-      valueGetter: (params: GridRowParams<Order> | null, row: Order) => {
-        console.log(row.orderDate);
-        console.log(params?.row?.orderDate);
-        return formatDate(row?.orderDate);
-      },
+      valueGetter: (params: GridRowParams<Order> | null, row: Order) =>
+        formatDate(row?.orderDate),
     },
     {
       field: "totalPrice",
       headerName: "Total Price",
       flex: 1,
       minWidth: 100,
-      valueGetter: (params: GridRowParams<Order> | null, row: Order) => { return formatRupiah(row?.totalPrice) }
+      valueGetter: (params: GridRowParams<Order> | null, row: Order) =>
+        formatRupiah(row?.totalPrice),
     },
     {
       field: "actions",
@@ -122,8 +137,7 @@ export default function OrdersPage() {
             color="secondary"
             startIcon={<Eye />}
             onClick={() => handleView(params.row.id)}
-          >
-          </Button>
+          />
         </Box>
       ),
     },
@@ -131,34 +145,81 @@ export default function OrdersPage() {
 
   return (
     <div className="p-6 w-[100%] mx-auto">
-      <div>
-        <SiteHeader/>
-        <div className="flex items-center justify-between mt-4 mb-4">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">Orders</h1>
-          </div>
-          <ButtonShad onClick={() => {navigate('/orders/new')}}>+ Add new order</ButtonShad>
+      <SiteHeader />
+      <div className="flex items-center justify-between mt-4 mb-4">
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">Orders</h1>
         </div>
-        <Box sx={{ height: 600, width: "100%" }}>
-          <DataGrid
-            rows={orders}
-            columns={columns}
-            getRowId={(row) => row.id}
-            loading={isLoading}
-            pageSizeOptions={[5, 10, 20]}
-            initialState={{
-              pagination: { paginationModel: { pageSize: 10, page: 0 } },
-            }}
-            sx={{
+        <ButtonShad className="cursor-pointer" onClick={() => {}}>
+          + Add new order
+        </ButtonShad>
+      </div>
+
+      <Box sx={{ height: 600, width: "100%" }}>
+        <DataGrid
+          rows={orders}
+          columns={columns}
+          getRowId={(row) => row.id}
+          loading={isLoading}
+          pageSizeOptions={[5, 10, 20]}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 10, page: 0 } },
+          }}
+          sx={{
+            fontFamily: "Outfit, sans-serif",
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: "#f9fafb",
+              fontWeight: "bold",
               fontFamily: "Outfit, sans-serif",
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "#f9fafb",
-                fontWeight: "bold",
-                fontFamily: "Outfit, sans-serif",
-              },
-            }}
-          />
-        </Box>
+            },
+          }}
+        />
+      </Box>
+
+      {/* Receipts shown below */}
+      <div className="mt-6 space-y-4">
+        {openReceipts.map((order) => (
+          <Card key={order.id} className="p-6">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Invoice: {order.invoice}</CardTitle>
+              <ButtonShad variant="ghost" size="icon" onClick={() => handleClose(order.id)}>
+                <Minus className="h-4 w-4" />
+              </ButtonShad>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4 flex flex-row justify-between">
+                <p><strong>Supplier:</strong> {order.supplierName}</p>
+                <p><strong>Date:</strong> {formatDate(order.orderDate)}</p>
+                <p><strong>Total:</strong> {formatRupiah(order.totalPrice)}</p>
+              </div>
+
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Brand</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Qty</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Subtotal</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {order.orderDetail.map((d) => (
+                    <TableRow key={d.id}>
+                      <TableCell>{d.productName}</TableCell>
+                      <TableCell>{d.brandName ?? "N/A"}</TableCell>
+                      <TableCell>{d.categoryName ?? "N/A"}</TableCell>
+                      <TableCell>{d.qty}</TableCell>
+                      <TableCell>{formatRupiah(d.price)}</TableCell>
+                      <TableCell>{formatRupiah(d.qty * d.price)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );
