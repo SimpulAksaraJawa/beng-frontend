@@ -26,7 +26,7 @@ interface Sale {
     customerName: string;
     saleDate: Date;
     totalAmount: number;
-    saleDetail: SaleDetail[];
+    saledetail: SaleDetail[];
 }
 
 // Helper functions
@@ -70,13 +70,13 @@ export default function SalesPage() {
             customerName: customerData.find((s) => s.id === o.customerId)?.name ?? "Unknown",
             saleDate: o.date ?? null,
             totalAmount: o.totalAmount ?? 0,
-            saleDetail: o.saledetail ?? [],
+            saledetail: o.saledetail ?? [],
         }));
 
         return mappedSales;
     };
 
-    const { data: orders = [], isLoading, error } = useQuery({
+    const { data: sales = [], isLoading, error } = useQuery({
         queryKey: ["sales"],
         queryFn: fetchSales, // <-- pass the function reference, not call it
         staleTime: 1000 * 60 * 15,
@@ -148,7 +148,7 @@ export default function SalesPage() {
                 </div>
                 <Box sx={{ height: 600, width: "100%" }}>
                     <DataGrid
-                        rows={orders}
+                        rows={sales}
                         columns={columns}
                         getRowId={(row) => row.id}
                         loading={isLoading}

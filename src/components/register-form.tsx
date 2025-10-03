@@ -118,9 +118,6 @@ export function RegisterForm({
                 <Button type="submit" className="w-full">
                   Register
                 </Button>
-                <Button type="button" variant="outline" className="w-full">
-                  Register with Google
-                </Button>
               </div>
             </div>
           </form>

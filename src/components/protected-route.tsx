@@ -18,7 +18,7 @@ const ProtectedRoute = ({ children }: Props) => {
     }
 
     if (!user || !accessToken) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/home" replace />;
     }
 
     return <>{children}</>;

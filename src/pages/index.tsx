@@ -15,7 +15,7 @@ const index = () => {
   }
 
   if (!user || !accessToken) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/home" replace />
   }
 
   return <Navigate to="/dashboard" replace />
