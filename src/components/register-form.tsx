@@ -59,11 +59,11 @@ export function RegisterForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      <Card className="pt-5">
         <CardHeader>
           <CardTitle className="text-center">Create an account</CardTitle>
           <CardDescription className="text-center">
-            Enter your email below to login to your account
+            Enter your information below to create an account
           </CardDescription>
         </CardHeader>
         <CardContent>

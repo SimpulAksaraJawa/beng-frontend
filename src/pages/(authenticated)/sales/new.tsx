@@ -59,7 +59,7 @@ const AddSalesPage = () => {
     )}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
   });
 
-  const [suppliers, setSuppliers] = useState<string[]>([]);
+  const [customers, setCustomers] = useState<string[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [productsOptions, setProductsOptions] = useState<ProductOption[]>([]);
@@ -83,7 +83,7 @@ const AddSalesPage = () => {
     api
       .get("/customers")
       .then((res) =>
-        setSuppliers((res.data.data || []).map((s: any) => s.name))
+        setCustomers((res.data.data || []).map((s: any) => s.name))
       )
       .catch((err) => console.error("Error fetching suppliers", err));
 
@@ -182,7 +182,7 @@ const AddSalesPage = () => {
   // --- Submit ---
   const handleSubmit = async () => {
     if (!customerName) {
-      alert("Supplier is required");
+      alert("Customer is required");
       return;
     }
     if (
@@ -269,12 +269,12 @@ const AddSalesPage = () => {
         {/* Supplier */}
         <div className="space-y-2">
           <SearchableSelect
-            label="Supplier"
-            options={suppliers}
+            label="Customer"
+            options={customers}
             value={customerName}
             onChange={(v) => setCustomerName(v)}
             onAddNew={(newSupplier) =>
-              setSuppliers((prev) => [...prev, newSupplier])
+              setCustomers((prev) => [...prev, newSupplier])
             }
           />
         </div>

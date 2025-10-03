@@ -18,6 +18,8 @@ export type Path =
   | `/product/new`
   | `/register`
   | `/sales`
+  | `/sales/edit/:id`
+  | `/sales/new`
   | `/stock`
   | `/supplier`
 
@@ -25,6 +27,7 @@ export type Params = {
   '/orders/edit/:id': { id: string }
   '/product/:id': { id: string }
   '/product/edit/:id': { id: string }
+  '/sales/edit/:id': { id: string }
 }
 
 export type ModalPath = never

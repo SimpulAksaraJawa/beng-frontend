@@ -58,13 +58,15 @@ export default function SalesPage() {
         const customerData: Customer[] = Array.isArray(customerRes.data?.data)
             ? customerRes.data.data
             : [];
+        console.log(customerRes)
 
         // Fetch orders
         const saleRes = await api.get("/sales");
         const salesData = Array.isArray(saleRes.data?.data) ? saleRes.data.data : [];
+        console.log(saleRes)
 
         // Map orders
-        const mappedSales: Sale[] = customerData.map((o: any) => ({
+        const mappedSales: Sale[] = salesData.map((o: any) => ({
             id: o.id,
             invoice: o.invoice ?? "N/A",
             customerName: customerData.find((s) => s.id === o.customerId)?.name ?? "Unknown",
@@ -72,6 +74,7 @@ export default function SalesPage() {
             totalAmount: o.totalAmount ?? 0,
             saledetail: o.saledetail ?? [],
         }));
+        console.log(mappedSales)
 
         return mappedSales;
     };
@@ -96,10 +99,10 @@ export default function SalesPage() {
 
     const columns: GridColDef<Sale>[] = [
         { field: "invoice", headerName: "Invoice No.", flex: 1, minWidth: 120 },
-        { field: "supplierName", headerName: "Supplier Name", flex: 1, minWidth: 180 },
+        { field: "customerName", headerName: "Customer Name", flex: 1, minWidth: 180 },
         {
-            field: "orderDate",
-            headerName: "Order Date",
+            field: "saleDate",
+            headerName: "Sale Date",
             flex: 1,
             minWidth: 100,
             valueGetter: (params: GridRowParams<Sale> | null, row: Sale) => {
@@ -109,8 +112,8 @@ export default function SalesPage() {
             },
         },
         {
-            field: "totalPrice",
-            headerName: "Total Price",
+            field: "totalAmount",
+            headerName: "Total Amount",
             flex: 1,
             minWidth: 100,
             valueGetter: (params: GridRowParams<Sale> | null, row: Sale) => { return formatRupiah(row?.totalAmount) }
@@ -144,7 +147,7 @@ export default function SalesPage() {
                     <div className="flex items-center gap-2">
                         <h1 className="text-2xl font-bold">Sales</h1>
                     </div>
-                    <ButtonShad onClick={() => { navigate('/orders/new') }}>+ Add new order</ButtonShad>
+                    <ButtonShad onClick={() => { navigate('/sales/new') }}>+ Add new sale</ButtonShad>
                 </div>
                 <Box sx={{ height: 600, width: "100%" }}>
                     <DataGrid

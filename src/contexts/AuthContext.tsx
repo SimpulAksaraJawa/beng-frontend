@@ -65,15 +65,3 @@ export function useAuth() {
   if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 }
-
-/** Helper to decode JWT payload without verifying (client-side only).
- *  You can also change backend to return user object with the token and skip this.
- */
-function parseJwt(token: string) {
-  try {
-    const [, payload] = token.split(".");
-    return JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
-  } catch {
-    return {};
-  }
-}

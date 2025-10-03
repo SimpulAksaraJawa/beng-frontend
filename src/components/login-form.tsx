@@ -70,7 +70,7 @@ export function LoginForm({
         <CardHeader>
           <CardTitle className="text-center">Login to your account</CardTitle>
           <CardDescription className="text-center">
-            Enter your email below to login to your account
+            Enter your email & password below to login to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
