@@ -11,7 +11,6 @@ const Layout = () => {
             <SidebarProvider>
                 <AppSidebar variant="inset" />
                 <SidebarInset>
-
                     <div className="flex flex-1 flex-col">
                         <Outlet />
                     </div>

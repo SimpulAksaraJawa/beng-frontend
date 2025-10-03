@@ -27,7 +27,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import api from "@/lib/axios"
+import api from "@/api/axios"
 
 export function NavUser({
   user,

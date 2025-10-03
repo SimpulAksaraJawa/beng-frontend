@@ -7,6 +7,7 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
+  DollarSign,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -96,6 +97,11 @@ const data = {
       ],
     },
     {
+      title: "Sales",
+      url: "/sales",
+      icon: DollarSign,
+    },
+    {
       title: "Settings",
       url: "#",
       icon: Settings2,
@@ -143,19 +149,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <Collapsible className="group/collapsible">
-              <SidebarMenuButton className="hover:bg-white/50 data-[state=open]:hover:bg-white/50 active:bg-white/50">
-                <div className="flex justify-start items-center flex-row">
-                  <img
-                    src="/favicon.png"
-                    alt="BENG Logo"
-                    className="-ml-2 h-8 w-8 drop-shadow-2xl"
-                  />
-                  <h1 className="text-xl font-bold text-[#209ebb] group-data-[state=collapsed]/sidebar:hidden">
-                    BENG
-                  </h1>
-                </div>
-              </SidebarMenuButton>
-            <CollapsibleContent></CollapsibleContent>
+          <SidebarMenuButton className="hover:bg-white/50 data-[state=open]:hover:bg-white/50 active:bg-white/50">
+            <div className="flex justify-start items-center flex-row">
+              <img
+                src="/favicon.png"
+                alt="BENG Logo"
+                className="-ml-2 h-8 w-8 drop-shadow-2xl"
+              />
+              <h1 className="text-xl font-bold text-[#209ebb] group-data-[state=collapsed]/sidebar:hidden">
+                BENG
+              </h1>
+            </div>
+          </SidebarMenuButton>
+          <CollapsibleContent></CollapsibleContent>
         </Collapsible>
       </SidebarHeader>
       <SidebarContent>

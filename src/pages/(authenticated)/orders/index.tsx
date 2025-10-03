@@ -1,7 +1,7 @@
 import { DataGrid, GridColDef, GridRowParams, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
 import { Button as ButtonShad } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Eye, LoaderIcon } from "lucide-react";
 import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
 import { SiteHeader } from "@/components/site-header";
@@ -75,8 +75,8 @@ export default function OrdersPage() {
 
     return mappedOrders;
   };
-  
- const { data: orders = [], isLoading, error } = useQuery({
+
+  const { data: orders = [], isLoading, error } = useQuery({
     queryKey: ["orders"],
     queryFn: fetchOrders, // <-- pass the function reference, not call it
     staleTime: 1000 * 60 * 15,
@@ -84,8 +84,15 @@ export default function OrdersPage() {
 
   const handleView = (id: number) => navigate(`/orders/${id}`);
 
-  if (isLoading) return <div className="p-6">Loading orders...</div>;
-  if (error) return <div className="p-6 text-red-500">Failed to load orders.</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">
+        <LoaderIcon className="animate-spin size-10" />
+        <p>Loading orders...</p>
+      </div>
+    )
+  }
+  if (error) return <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">Failed to load orders.</div>;
 
   const columns: GridColDef<Order>[] = [
     { field: "invoice", headerName: "Invoice No.", flex: 1, minWidth: 120 },
@@ -132,12 +139,12 @@ export default function OrdersPage() {
   return (
     <div className="p-6 w-[100%] mx-auto">
       <div>
-        <SiteHeader/>
+        <SiteHeader />
         <div className="flex items-center justify-between mt-4 mb-4">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">Orders</h1>
           </div>
-          <ButtonShad onClick={() => {navigate('/orders/new')}}>+ Add new order</ButtonShad>
+          <ButtonShad onClick={() => { navigate('/orders/new') }}>+ Add new order</ButtonShad>
         </div>
         <Box sx={{ height: 600, width: "100%" }}>
           <DataGrid

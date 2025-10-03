@@ -1,6 +1,6 @@
 // src/context/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import axios from "@/lib/axios"; // your axios instance that has withCredentials = true
+import axios from "@/api/axios"; // your axios instance that has withCredentials = true
 
 type User = {
   name: string;

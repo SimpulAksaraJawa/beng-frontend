@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "./ui/select"
-import api from "@/lib/axios"
+import api from "@/api/axios"
 
 export function RegisterForm({
   className,
@@ -62,7 +62,7 @@ export function RegisterForm({
       <Card>
         <CardHeader>
           <CardTitle className="text-center">Create an account</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-center">
             Enter your email below to login to your account
           </CardDescription>
         </CardHeader>

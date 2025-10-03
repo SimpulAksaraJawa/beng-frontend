@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, LoaderIcon } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -23,17 +23,6 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import Printable from "@/components/printable";
 
-<<<<<<< HEAD
-const ProductPage = () => {
-  return (
-    <div>
-      <h1>Help Me</h1>
-    </div>
-  )
-}
-
-export default ProductPage
-=======
 interface ProductImage {
   url: { type: string; data: number[] };
   alt?: string | null;
@@ -59,7 +48,7 @@ function bufferToBase64FromObject(bufferObj: { type: string; data: number[] }): 
   return btoa(binary);
 }
 
- // Fetch products function
+// Fetch products function
 const fetchProducts = async (): Promise<Product[]> => {
   const response = await api.get("/products", {
     headers: { "Content-Type": "application/json" },
@@ -81,7 +70,7 @@ const fetchProducts = async (): Promise<Product[]> => {
     };
   });
 };
- 
+
 
 export default function Page() {
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<number, number>>({});
@@ -112,8 +101,16 @@ export default function Page() {
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("id-ID").format(price);
 
-  if (isLoading) return <div className="p-6">Loading products...</div>;
-  if (error) return <div className="p-6 text-red-500">Failed to load products.</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">
+        <LoaderIcon className="animate-spin size-10" />
+        <p>Loading products...</p>
+      </div>
+    )
+  }
+
+  if (error) return <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">Failed to load products.</div>;
 
   const categories = Array.from(new Set(products.map((p) => p.category)));
 
@@ -182,8 +179,8 @@ export default function Page() {
           const hasImages = product.images.length > 0;
           const currentImageUrl = hasImages
             ? `data:image/jpeg;base64,${bufferToBase64FromObject(
-                product.images[currentIndex].url
-              )}`
+              product.images[currentIndex].url
+            )}`
             : null;
 
           return (
@@ -248,4 +245,3 @@ export default function Page() {
     </div>
   );
 }
->>>>>>> Placeholder
