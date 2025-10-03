@@ -75,13 +75,13 @@ const data = {
       ],
     },
     {
-      title: "Sale",
-      url: "#",
+      title: "Sales",
+      url: "/sales",
       icon: Tag,
       items: [
         {
           title: "Sale Details",
-          url: "/sale/details",
+          url: "/sales/details",
         },
       ],
     },

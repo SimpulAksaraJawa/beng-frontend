@@ -1,4 +1,4 @@
-import { DataGrid, GridColDef, GridRowParams, GridValueGetter } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRowParams } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
 import { SiteHeader } from "@/components/site-header";
 import { useQuery } from "@tanstack/react-query";
