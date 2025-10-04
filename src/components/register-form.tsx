@@ -47,7 +47,7 @@ export function RegisterForm({
 
       const { jwtToken, user } = res.data;
       setAuth(user, jwtToken);
-      navigate('/dashboard');
+      navigate('/product');
     } catch (error: any) {
       if (error.response?.status === 401) {
         setEmailExist(true);

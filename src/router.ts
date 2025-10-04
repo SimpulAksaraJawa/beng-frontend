@@ -7,11 +7,9 @@ export type Path =
   | `/`
   | `/adjustment`
   | `/adjustment/new`
-  | `/customer`
   | `/customers`
   | `/customers/edit/:id`
   | `/customers/new`
-  | `/dashboard`
   | `/home`
   | `/login`
   | `/orders`
@@ -25,10 +23,10 @@ export type Path =
   | `/register`
   | `/sales`
   | `/sales/details`
+  | `/sales/edit/:id`
   | `/sales/new`
   | `/stock`
   | `/stock/StockAnalytics`
-  | `/supplier`
   | `/suppliers`
   | `/suppliers/edit/:id`
   | `/suppliers/new`
@@ -37,6 +35,7 @@ export type Params = {
   '/customers/edit/:id': { id: string }
   '/product/:id': { id: string }
   '/product/edit/:id': { id: string }
+  '/sales/edit/:id': { id: string }
   '/suppliers/edit/:id': { id: string }
 }
 

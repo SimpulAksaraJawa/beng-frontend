@@ -4,7 +4,7 @@ import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button as ButtonShad } from "@/components/ui/button";
-import { Eye, X, Plus } from "lucide-react";
+import { Eye, X, Plus, LoaderIcon } from "lucide-react";
 import api from "@/api/axios";
 import { useNavigate } from "react-router";
 
@@ -122,8 +122,15 @@ export default function AdjustmentsPage() {
     },
   ];
 
-  if (isLoading) return <div className="p-6">Loading adjustments...</div>;
-  if (error) return <div className="p-6 text-red-500">Failed to load adjustments.</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">
+        <LoaderIcon className="animate-spin size-10" />
+        <p>Loading adjustment...</p>
+      </div>
+    )
+  }
+  if (error) return <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">Failed to load adjustment.</div>;
 
   return (
     <div className="p-6 w-full flex flex-row gap-2">

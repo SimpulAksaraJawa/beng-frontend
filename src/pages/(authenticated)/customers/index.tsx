@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { Pencil } from "lucide-react";
+import { Pencil, LoaderIcon } from "lucide-react";
 
 interface Customer {
   id: number;
@@ -62,7 +62,7 @@ export default function CustomersPage() {
       minWidth: 150,
       maxWidth: 200,
     },
-        {
+    {
       field: "actions",
       headerName: "Actions",
       width: 150,
@@ -72,15 +72,21 @@ export default function CustomersPage() {
           size="sm"
           variant="outline"
         >
-          <Pencil className="text-orange-400"/>
+          <Pencil className="text-orange-400" />
         </Button>
       ),
     },
   ];
 
-  if (isLoading) return <div className="p-6">Loading customers...</div>;
-  if (error)
-    return <div className="p-6 text-red-500">Failed to load customers.</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">
+        <LoaderIcon className="animate-spin size-10" />
+        <p>Loading customers...</p>
+      </div>
+    )
+  }
+  if (error) return <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">Failed to load customers.</div>;
 
   const rows = customers.map((c) => ({
     ...c,
@@ -95,7 +101,7 @@ export default function CustomersPage() {
       <SiteHeader />
       <div className="flex justify-between items-center mt-4 mb-4">
         <h1 className="text-2xl font-bold">Customers</h1>
-        <ButtonShad onClick={() => {navigate("/customers/new")}}>+ Add Customer</ButtonShad>
+        <ButtonShad onClick={() => { navigate("/customers/new") }}>+ Add Customer</ButtonShad>
       </div>
 
       <Box sx={{ height: 600, width: "100%" }}>

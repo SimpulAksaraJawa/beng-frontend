@@ -1,11 +1,11 @@
 import api from "@/api/axios";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
 import { Button as ButtonShad } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
-import { Pencil } from "lucide-react";
+import { Pencil, LoaderIcon } from "lucide-react";
 
 interface Supplier {
   id: number;
@@ -24,7 +24,7 @@ export default function SuppliersPage() {
     const suppliersData: Supplier[] = Array.isArray(supplierRes.data?.data)
       ? supplierRes.data.data
       : [];
-      console.log("Fetched suppliers:", suppliersData);
+    console.log("Fetched suppliers:", suppliersData);
     return suppliersData;
   };
 
@@ -34,8 +34,15 @@ export default function SuppliersPage() {
     staleTime: 1000 * 60 * 15,
   });
 
-  if (isLoading) return <div className="p-6">Loading suppliers...</div>;
-  if (error) return <div className="p-6 text-red-500">Failed to load suppliers.</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">
+        <LoaderIcon className="animate-spin size-10" />
+        <p>Loading suppliers...</p>
+      </div>
+    )
+  }
+  if (error) return <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">Failed to load suppliers.</div>;
 
   const columns: GridColDef<Supplier>[] = [
     { field: "name", headerName: "Supplier Name", flex: 1, minWidth: 150 },
@@ -69,7 +76,7 @@ export default function SuppliersPage() {
           variant="text"
           size="small"
           color="info"
-          startIcon={<Pencil/>}
+          startIcon={<Pencil />}
           onClick={() => navigate(`/suppliers/edit/${params.row.id}`)}
         />
       ),

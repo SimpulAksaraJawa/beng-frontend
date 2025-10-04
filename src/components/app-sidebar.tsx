@@ -6,6 +6,7 @@ import {
   Boxes,
   Factory,
   Users,
+  Key,
   LucideIcon,
 } from "lucide-react";
 
@@ -40,20 +41,23 @@ type MainLink = {
 type UserLink = {
   name: string;
   url: string;
-  icon?: LucideIcon;
+  icon: LucideIcon;
 }
 
-type innerPath = {
+type innerMainPath = {
   [key: string]: MainLink;
+}
+
+type innerUserPath = {
+  [key: string]: UserLink;
 }
 
 type Path = {
   navMain: MainLink[];
-  users: any;
+  users: UserLink[];
 }
 
-
-const path: innerPath = {
+const navMainPath: innerMainPath = {
   products: {
     title: "Products",
     url: "/product",
@@ -95,8 +99,21 @@ const path: innerPath = {
   permission: {
     title: "Permission Updates",
     url: "/permission",
-    icon: ReceiptText,
-  }
+    icon: Key,
+  },
+}
+
+const userPath: innerUserPath = {
+  suppliers: {
+    name: "Suppliers",
+    url: "/suppliers",
+    icon: Factory,
+  },
+  customers: {
+    name: "Customers",
+    url: "/customers",
+    icon: Users,
+  },
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -108,47 +125,35 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     if (currUser.role === "ADMIN") {
       return {
         navMain: [
-          path.products,
-          path.orders,
-          path.sales,
-          path.stock,
-          path.permission
+          navMainPath.products,
+          navMainPath.orders,
+          navMainPath.sales,
+          navMainPath.stock,
+          navMainPath.permission
         ],
         users: [
-          {
-            name: "Supplier",
-            url: "/suppliers",
-            icon: Factory,
-          },
-          {
-            name: "Customer",
-            url: "/customers",
-            icon: Users,
-          },
+          userPath.suppliers,
+          userPath.customers
         ]
       }
     }
 
-    const features = ["products", "orders", "sales", "stock"]
-    const allowed = {
-      navMain: [] as MainLink[],
-      users: [
-        {
-          name: "Supplier",
-          url: "/suppliers",
-          icon: Factory,
-        },
-        {
-          name: "Customer",
-          url: "/customers",
-          icon: Users,
-        },
-      ] as UserLink[]
+    const navMainFeature = ["products", "orders", "sales", "stock"]
+    const usersFeature = ["suppliers", "customers"]
+    const allowed: Path = {
+      navMain: [],
+      users: []
     }
 
-    features.forEach((f: string) => {
+    navMainFeature.forEach((f: string) => {
       if (currUser.permissions[f]?.includes("read")) {
-        allowed.navMain.push(path[f]);
+        allowed.navMain.push(navMainPath[f]);
+      }
+    })
+
+    usersFeature.forEach((f: string) => {
+      if (currUser.permissions[f]?.includes("read")) {
+        allowed.users.push(userPath[f]);
       }
     })
 
@@ -172,7 +177,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <Collapsible className="group/collapsible">
           <SidebarMenuButton className="hover:bg-white/50 data-[state=open]:hover:bg-white/50 active:bg-white/50">
-            <div onClick={() => navigate("/dashboard")} className="flex justify-start items-center flex-row">
+            <div onClick={() => navigate("/product")} className="flex justify-start items-center flex-row">
               <img
                 src="/favicon.png"
                 alt="BENG Logo"
