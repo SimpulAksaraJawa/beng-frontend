@@ -1,0 +1,123 @@
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { Box } from "@mui/material";
+import { Button, Button as ButtonShad } from "@/components/ui/button";
+import api from "@/api/axios";
+import { SiteHeader } from "@/components/site-header";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { Pencil } from "lucide-react";
+
+interface Customer {
+  id: number;
+  name: string;
+  address?: string;
+  email?: string;
+  phoneNumber?: string;
+}
+
+export default function CustomersPage() {
+  const navigate = useNavigate();
+  const fetchCustomers = async (): Promise<Customer[]> => {
+    const res = await api.get("/customers");
+    return Array.isArray(res.data?.data) ? res.data.data : [];
+  };
+
+  const {
+    data: customers = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["customers"],
+    queryFn: fetchCustomers,
+    staleTime: 1000 * 60 * 15,
+  });
+
+  const columns: GridColDef<Customer>[] = [
+    {
+      field: "name",
+      headerName: "Name",
+      flex: 1,
+      minWidth: 150,
+      maxWidth: 170,
+    },
+    {
+      field: "address",
+      headerName: "Address",
+      flex: 1,
+      minWidth: 200,
+      maxWidth: 210,
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      flex: 1,
+      minWidth: 200,
+      maxWidth: 210,
+    },
+    {
+      field: "phoneNumber",
+      headerName: "Phone",
+      flex: 1,
+      minWidth: 150,
+      maxWidth: 200,
+    },
+        {
+      field: "actions",
+      headerName: "Actions",
+      width: 150,
+      renderCell: (params) => (
+        <Button
+          onClick={() => navigate(`/customers/edit/${params.row.id}`)}
+          size="sm"
+          variant="outline"
+        >
+          <Pencil className="text-orange-400"/>
+        </Button>
+      ),
+    },
+  ];
+
+  if (isLoading) return <div className="p-6">Loading customers...</div>;
+  if (error)
+    return <div className="p-6 text-red-500">Failed to load customers.</div>;
+
+  const rows = customers.map((c) => ({
+    ...c,
+    name: c.name ?? "Unknown",
+    address: c.address ?? "N/A",
+    email: c.email ?? "N/A",
+    phoneNumber: c.phoneNumber ?? "N/A",
+  }));
+
+  return (
+    <div className="p-6 w-[100%] mx-auto">
+      <SiteHeader />
+      <div className="flex justify-between items-center mt-4 mb-4">
+        <h1 className="text-2xl font-bold">Customers</h1>
+        <ButtonShad onClick={() => {navigate("/customers/new")}}>+ Add Customer</ButtonShad>
+      </div>
+
+      <Box sx={{ height: 600, width: "100%" }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          getRowId={(row) => row.id}
+          loading={isLoading}
+          pageSizeOptions={[5, 10, 20]}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 10, page: 0 } },
+          }}
+          sx={{
+            fontFamily: "Outfit, sans-serif",
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: "#f9fafb",
+              fontWeight: "bold",
+            },
+          }}
+          showToolbar
+        />
+      </Box>
+    </div>
+  );
+}

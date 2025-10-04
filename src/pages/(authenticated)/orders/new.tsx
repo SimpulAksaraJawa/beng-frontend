@@ -361,6 +361,7 @@ const AddOrderPage = () => {
                     type="button"
                     variant="destructive"
                     onClick={() => removeProduct(idx)}
+                    className="cursor-pointer"
                   >
                     Remove Product
                   </Button>
@@ -372,7 +373,7 @@ const AddOrderPage = () => {
           <Button
             type="button"
             variant="secondary"
-            className="mt-4"
+            className="mt-4 cursor-pointer"
             onClick={addProduct}
           >
             + Add Another Product
@@ -384,8 +385,9 @@ const AddOrderPage = () => {
 
         {/* Form Buttons */}
         <div className="flex gap-4">
-          <Button type="submit">Save Order</Button>
+          <Button type="submit" className="cursor-pointer">Save Order</Button>
           <Button
+            className="cursor-pointer"
             type="button"
             variant="outline"
             onClick={() => navigate("/orders")}
