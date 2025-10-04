@@ -1,11 +1,5 @@
-import React from 'react'
+import StockInventoryPage from "./stock/index";
 
-const stock = () => {
-  return (
-    <div>
-      
-    </div>
-  )
+export default function StockPage() {
+  return <StockInventoryPage />;
 }
-
-export default stock

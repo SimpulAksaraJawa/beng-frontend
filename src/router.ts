@@ -20,6 +20,7 @@ export type Path =
   | `/sales/details`
   | `/sales/new`
   | `/stock`
+  | `/stock/StockAnalytics`
   | `/supplier`
 
 export type Params = {
