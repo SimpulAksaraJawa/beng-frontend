@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SiteHeader } from "@/components/site-header";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import axios from "@/api/axios";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
@@ -60,7 +60,21 @@ interface AnalyticsResponse {
 
 export default function StockInventoryPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [expandedProductId, setExpandedProductId] = useState<number | null>(null);
+
+  // Handle URL parameters to auto-open analytics for a specific product
+  useEffect(() => {
+    const productIdParam = searchParams.get('productId');
+    const viewParam = searchParams.get('view');
+    
+    if (productIdParam && viewParam === 'analytics') {
+      const productId = parseInt(productIdParam, 10);
+      if (!isNaN(productId)) {
+        setExpandedProductId(productId);
+      }
+    }
+  }, [searchParams]);
 
   // Analytics data query for the expanded product
   const { 
