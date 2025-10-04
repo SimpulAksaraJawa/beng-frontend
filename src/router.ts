@@ -17,6 +17,7 @@ export type Path =
   | `/orders`
   | `/orders/details`
   | `/orders/new`
+  | `/permission`
   | `/product`
   | `/product/:id`
   | `/product/edit/:id`
