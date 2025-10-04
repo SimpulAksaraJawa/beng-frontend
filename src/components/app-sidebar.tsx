@@ -86,7 +86,7 @@ const data = {
       ],
     },
     {
-      title: "Stock",
+      title: "Stocks",
       url: "/Stock",
       icon: Boxes,
     },
@@ -109,12 +109,12 @@ const data = {
   users: [
     {
       name: "Supplier",
-      url: "/supplier",
+      url: "/suppliers",
       icon: Factory,
     },
     {
       name: "Customer",
-      url: "/customer",
+      url: "/customers",
       icon: Users,
     },
   ],

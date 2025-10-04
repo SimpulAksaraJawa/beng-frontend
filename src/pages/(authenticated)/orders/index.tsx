@@ -50,10 +50,6 @@ export default function OrdersPage() {
   const [openReceipts, setOpenReceipts] = useState<Order[]>([]);
   const navigate = useNavigate();
 
-  // const [searchTerm, setSearchTerm] = useState("");
-  // const [selectedSupplier, setSelectedSupplier] = useState("all");
-  // const [dateTerm, setDateTerm] = useState(""); // 👈 new date filter
-
   const fetchOrders = async (): Promise<Order[]> => {
     const supplierRes = await api.get("/suppliers");
     const suppliersData: Supplier[] = Array.isArray(supplierRes.data?.data)
@@ -107,14 +103,13 @@ export default function OrdersPage() {
   if (error) return <div className="p-6 text-red-500">Failed to load orders.</div>;
 
   const columns: GridColDef<Order>[] = [
-    { field: "invoice", headerName: "Invoice No.", flex: 1, maxWidth: 200 },
-    { field: "supplierName", headerName: "Supplier Name", flex: 1, minWidth: 180, maxWidth:200 },
+    { field: "invoice", headerName: "Invoice No.", flex: 1, minWidth: 120 },
+    { field: "supplierName", headerName: "Supplier Name", flex: 1, minWidth: 180 },
     {
       field: "orderDate",
       headerName: "Order Date",
       flex: 1,
-      minWidth: 100,
-      maxWidth: 150,
+      minWidth: 150,
       valueGetter: (params: GridRowParams<Order> | null, row: Order) =>
         formatDate(row?.orderDate),
     },
@@ -123,7 +118,6 @@ export default function OrdersPage() {
       headerName: "Total Price",
       flex: 1,
       minWidth: 100,
-      maxWidth: 150,
       valueGetter: (params: GridRowParams<Order> | null, row: Order) =>
         formatRupiah(row?.totalPrice),
     },
@@ -133,7 +127,6 @@ export default function OrdersPage() {
       sortable: false,
       flex: 1,
       minWidth: 50,
-      maxWidth: 80,
       renderCell: (params: GridRenderCellParams<Order>) => (
         <Box sx={{ display: "block" }}>
           <Button
@@ -148,72 +141,17 @@ export default function OrdersPage() {
     },
   ];
 
-  // Apply filters
-  // const filteredOrders = orders.filter((o) => {
-  //   const matchesSearch =
-  //     o.invoice.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     o.supplierName.toLowerCase().includes(searchTerm.toLowerCase());
-
-  //   const matchesSupplier =
-  //     selectedSupplier === "all" || o.supplierName === selectedSupplier;
-
-  //   const productDate = o.orderDate ? o.orderDate.slice(0, 10) : "";
-  //   const matchesDate = dateTerm === "" || productDate === dateTerm;
-
-  //   return matchesSearch && matchesSupplier && matchesDate;
-  // });
-
-  // const suppliers = Array.from(new Set(orders.map((o) => o.supplierName)));
-
   return (
     <div className="p-6 w-[100%] mx-auto">
       <SiteHeader />
 
       {/* Header bar with search + filter */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mt-4 mb-4 w-[60%]">
+      <div className="flex flex-wrap items-center justify-between gap-4 mt-4 mb-4">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">Orders</h1>
         </div>
 
-        {/* Search */}
-        {/* <div className="relative flex-1 max-w-md">
-          <input
-            type="text"
-            placeholder="Search invoice or supplier..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#209ebb]"
-          />
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
-        </div> */}
-
-        {/* Date filter */}
-        {/* <div className="relative">
-          <Input
-            type="date"
-            value={dateTerm}
-            onChange={(e) => setDateTerm(e.target.value)}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#209ebb]"
-          />
-        </div> */}
-
         <div className="flex items-center gap-2">
-          {/* <Select
-            value={selectedSupplier}
-            onValueChange={(value) => setSelectedSupplier(value)}
-          >
-            <SelectTrigger className="w-48 cursor-pointer">
-              <SelectValue placeholder="All Suppliers" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Suppliers</SelectItem>
-              {suppliers.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select> */}
 
           <ButtonShad
             className="cursor-pointer"
@@ -227,7 +165,7 @@ export default function OrdersPage() {
       </div>
 
       {/* DataGrid */}
-      <Box sx={{ height: 800, width: "60%" }}>
+      <Box sx={{ height: 800, width: "100%" }}>
         <DataGrid
           rows={orders}
           columns={columns}
@@ -250,7 +188,7 @@ export default function OrdersPage() {
       </Box>
 
       {/* Receipts */}
-      <div className="mt-6 space-y-4 w-[60%]">
+      <div className="mt-6 space-y-4">
         {openReceipts.map((order) => (
           <Card key={order.id} className="p-6">
             <CardHeader className="flex flex-row items-center justify-between">

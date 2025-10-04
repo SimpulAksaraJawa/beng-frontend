@@ -117,6 +117,7 @@ const StockAnalyticsComponent: React.FC<StockAnalyticsProps> = ({
               <h3 className="font-medium text-lg mb-4">Stock Movement History</h3>
               <Box sx={{ height: 400, width: "100%" }}>
                 <DataGrid
+                  sx={{  fontFamily: "Outfit, sans-serif",}}
                   rows={analyticsData.data.logs}
                   columns={[
                     {
@@ -178,6 +179,7 @@ const StockAnalyticsComponent: React.FC<StockAnalyticsProps> = ({
                     pagination: { paginationModel: { pageSize: 5 } },
                   }}
                   pageSizeOptions={[5, 10, 25]}
+                  showToolbar
                 />
               </Box>
             </div>

@@ -439,14 +439,14 @@ export default function StockInventoryPage() {
           {isLoading && <span className="text-gray-500 ml-2">(Loading...)</span>}
         </div>
         <div className="space-x-2">
-          <Tooltip title="Adjust Stock">
+          <Tooltip title="Adjust Products">
             <Button 
               variant="contained" 
               color="primary"
               startIcon={<IconAdjustments size={18} />}
               onClick={() => navigate("/adjustment/new")}
             >
-              Adjust Stock
+              Adjust Products
             </Button>
           </Tooltip>
         </div>
@@ -479,12 +479,14 @@ export default function StockInventoryPage() {
           loading={isLoading}
           getRowId={(row) => row.id || row.stockId}
           sx={{
+            fontFamily: "Outfit, sans-serif",
             "& .MuiDataGrid-cell": {
               whiteSpace: "normal",
               lineHeight: "1.5",
               padding: "8px"
             }
           }}
+          showToolbar
         />
       </Box>
       

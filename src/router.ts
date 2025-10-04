@@ -8,6 +8,9 @@ export type Path =
   | `/adjustment`
   | `/adjustment/new`
   | `/customer`
+  | `/customers`
+  | `/customers/edit/:id`
+  | `/customers/new`
   | `/dashboard`
   | `/orders`
   | `/orders/details`
@@ -22,10 +25,15 @@ export type Path =
   | `/stock`
   | `/stock/StockAnalytics`
   | `/supplier`
+  | `/suppliers`
+  | `/suppliers/edit/:id`
+  | `/suppliers/new`
 
 export type Params = {
+  '/customers/edit/:id': { id: string }
   '/product/:id': { id: string }
   '/product/edit/:id': { id: string }
+  '/suppliers/edit/:id': { id: string }
 }
 
 export type ModalPath = never
