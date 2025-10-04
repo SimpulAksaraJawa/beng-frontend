@@ -147,7 +147,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
 
     features.forEach((f: string) => {
-      if (currUser.permissions[f].includes("read")) {
+      if (currUser.permissions[f]?.includes("read")) {
         allowed.navMain.push(path[f]);
       }
     })
@@ -158,7 +158,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const currUser = {
     name: user?.name || "Shadcn",
     email: user?.email || "my-email@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "/otter.png",
+    role: user?.role || "USER",
   }
 
   const data: Path = user ? userAccess(user) : {
