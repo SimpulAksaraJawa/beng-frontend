@@ -2,10 +2,13 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import axios from "@/api/axios"; // your axios instance that has withCredentials = true
 
-type User = {
+export type User = {
   name: string;
   email: string;
   role: string;
+  permissions: {
+    [key: string]: string[];
+  };
 };
 
 type AuthContextType = {

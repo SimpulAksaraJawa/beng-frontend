@@ -6,6 +6,7 @@ import {
   Boxes,
   Factory,
   Users,
+  LucideIcon,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -23,107 +24,146 @@ import {
   Collapsible,
   CollapsibleContent,
 } from "@radix-ui/react-collapsible";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, User } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+
+type MainLink = {
+  title: string;
+  url: string;
+  icon?: LucideIcon;
+  items?: {
+    title: string;
+    url: string;
+  }[];
+};
+
+type UserLink = {
+  name: string;
+  url: string;
+  icon?: LucideIcon;
+}
+
+type innerPath = {
+  [key: string]: MainLink;
+}
+
+type Path = {
+  navMain: MainLink[];
+  users: any;
+}
+
+
+const path: innerPath = {
+  products: {
+    title: "Products",
+    url: "/product",
+    icon: Package,
+    items: [
+      {
+        title: "Adjustments",
+        url: "/adjustments",
+      },
+    ]
+  },
+  orders: {
+    title: "Orders",
+    url: "/orders",
+    icon: ReceiptText,
+    items: [
+      {
+        title: "Order Details",
+        url: "/orders/details",
+      },
+    ],
+  },
+  sales: {
+    title: "Sale",
+    url: "/sales",
+    icon: Tag,
+    items: [
+      {
+        title: "Sale Details",
+        url: "/sale/details",
+      },
+    ],
+  },
+  stock: {
+    title: "Stock",
+    url: "/Stock",
+    icon: Boxes,
+  },
+  permission: {
+    title: "Permission Updates",
+    url: "/permission",
+    icon: ReceiptText,
+  }
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
 
   const navigate = useNavigate();
 
-  const data = {
-    user: {
-      name: user?.name || "Shadcn",
-      email: user?.email || "my-email@example.com",
-      avatar: "/avatars/shadcn.jpg",
-    },
-    navMain: [
-      // {
-      //   title: "Dashboard",
-      //   url: "/dashboard",
-      //   icon: SquareTerminal,
-      //   isActive: true,
-      //   items: [
-      //     {
-      //       title: "History",
-      //       url: "#",
-      //     },
-      //   ],
-      // },
-      {
-        title: "Products",
-        url: "/product",
-        icon: Package,
-        items: [
-          {
-            title: "Adjustments",
-            url: "/adjustments",
-          },
-          // {
-          //   title: "Explorer",
-          //   url: "/",
-          // },
-          // {
-          //   title: "Quantum",
-          //   url: "/",
-          // },
+  const userAccess = (currUser: User): Path => {
+    if (currUser.role === "ADMIN") {
+      return {
+        navMain: [
+          path.products,
+          path.orders,
+          path.sales,
+          path.stock,
+          path.permission
         ],
-      },
-      {
-        title: "Orders",
-        url: "/orders",
-        icon: ReceiptText,
-        items: [
+        users: [
           {
-            title: "Order Details",
-            url: "/orders/details",
+            name: "Supplier",
+            url: "/supplier",
+            icon: Factory,
           },
-        ],
-      },
-      {
-        title: "Sale",
-        url: "/sales",
-        icon: Tag,
-        items: [
           {
-            title: "Sale Details",
-            url: "/sale/details",
+            name: "Customer",
+            url: "/customer",
+            icon: Users,
           },
-        ],
-      },
-      {
-        title: "Stock",
-        url: "/Stock",
-        icon: Boxes,
-      },
-      // {
-      //   title: "Settings",
-      //   url: "#",
-      //   icon: Settings2,
-      //   items: [
-      //     {
-      //       title: "General",
-      //       url: "#",
-      //     },
-      //     {
-      //       title: "Team",
-      //       url: "#",
-      //     },
-      //   ],
-      // },
-    ],
-    users: [
-      {
-        name: "Supplier",
-        url: "/supplier",
-        icon: Factory,
-      },
-      {
-        name: "Customer",
-        url: "/customer",
-        icon: Users,
-      },
-    ],
+        ]
+      }
+    }
+
+    const features = ["products", "orders", "sales", "stock"]
+    const allowed = {
+      navMain: [] as MainLink[],
+      users: [
+        {
+          name: "Supplier",
+          url: "/supplier",
+          icon: Factory,
+        },
+        {
+          name: "Customer",
+          url: "/customer",
+          icon: Users,
+        },
+      ] as UserLink[]
+    }
+
+    features.forEach((f: string) => {
+      if (currUser.permissions[f].includes("read")) {
+        allowed.navMain.push(path[f]);
+      }
+    })
+
+    return allowed;
+  }
+
+  const currUser = {
+    name: user?.name || "Shadcn",
+    email: user?.email || "my-email@example.com",
+    avatar: "/avatars/shadcn.jpg",
+  }
+
+  const data: Path = user ? userAccess(user) : {
+    navMain: [],
+    users: []
   };
 
   return (
@@ -150,7 +190,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.users} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={currUser} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
