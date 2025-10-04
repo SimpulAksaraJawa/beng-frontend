@@ -1,22 +1,22 @@
+import ProtectedRoute from "@/components/protected-route";
 import { Outlet } from "react-router";
 import {
-  SidebarInset,
-  SidebarProvider,
+    SidebarInset,
+    SidebarProvider,
 } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar";
 const Layout = () => {
     return (
-        <SidebarProvider
-        
-      >
-            <AppSidebar variant="inset"/>
-            <SidebarInset>
-
-                <div className="flex flex-1 flex-col">
-                    <Outlet />
-                </div>
-            </SidebarInset>
-        </SidebarProvider>
+        <ProtectedRoute>
+            <SidebarProvider>
+                <AppSidebar variant="inset" />
+                <SidebarInset>
+                    <div className="flex flex-1 flex-col">
+                        <Outlet />
+                    </div>
+                </SidebarInset>
+            </SidebarProvider>
+        </ProtectedRoute>
     )
 }
 

@@ -27,6 +27,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import api from "@/api/axios"
 
 export function NavUser({
   user,
@@ -38,6 +39,14 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+
+  const handleLogout = async () => {
+    try {
+      await api.delete("/auth/logout")
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -100,7 +109,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

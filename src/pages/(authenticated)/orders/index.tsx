@@ -1,7 +1,7 @@
 import { DataGrid, GridColDef, GridRowParams, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
 import { Button as ButtonShad } from "@/components/ui/button";
-import { Eye, Minus} from "lucide-react";
+import { Eye, Minus, Search, LoaderIcon } from "lucide-react";
 import api from "@/api/axios";
 import { SiteHeader } from "@/components/site-header";
 import { useQuery } from "@tanstack/react-query";
@@ -99,8 +99,15 @@ export default function OrdersPage() {
     setOpenReceipts((prev) => prev.filter((o) => o.id !== id));
   };
 
-  if (isLoading) return <div className="p-6">Loading orders...</div>;
-  if (error) return <div className="p-6 text-red-500">Failed to load orders.</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">
+        <LoaderIcon className="animate-spin size-10" />
+        <p>Loading orders...</p>
+      </div>
+    )
+  }
+  if (error) return <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">Failed to load orders.</div>;
 
   const columns: GridColDef<Order>[] = [
     { field: "invoice", headerName: "Invoice No.", flex: 1, minWidth: 120 },

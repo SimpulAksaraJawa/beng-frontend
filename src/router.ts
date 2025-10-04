@@ -12,6 +12,8 @@ export type Path =
   | `/customers/edit/:id`
   | `/customers/new`
   | `/dashboard`
+  | `/home`
+  | `/login`
   | `/orders`
   | `/orders/details`
   | `/orders/new`
@@ -19,6 +21,7 @@ export type Path =
   | `/product/:id`
   | `/product/edit/:id`
   | `/product/new`
+  | `/register`
   | `/sales`
   | `/sales/details`
   | `/sales/new`
