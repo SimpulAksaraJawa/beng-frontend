@@ -5,6 +5,7 @@ import api from "@/api/axios";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import DOMPurify from "dompurify";
 import {
     AlertDialog,
@@ -22,6 +23,15 @@ export default function EditSupplierPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { user } = useAuth();
+    useEffect(() => {
+        const canEditSupplier =
+            user?.role === "ADMIN" || user?.permissions?.suppliers?.includes("update");
+
+        if (!canEditSupplier) {
+            navigate("/404");
+        }
+    }, [user, navigate]);
 
     const sanitize = (val: string) => DOMPurify.sanitize(val.trim());
 

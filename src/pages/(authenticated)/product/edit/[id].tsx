@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { SearchableSelect } from "@/components/searchable-select";
 import DOMPurify from "dompurify";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SKU {
   skuId?: number;
@@ -29,6 +30,7 @@ interface ExistingImage {
 export default function EditProductPage() {
   const { id } = useParams("/product/edit/:id");
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [name, setName] = useState("");
   const [brandName, setBrandName] = useState("");
@@ -44,6 +46,14 @@ export default function EditProductPage() {
   const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
   const [loading, setLoading] = useState(true);
   const queryClient = useQueryClient();
+  useEffect(() => {
+    const canCreate =
+      user?.role === "ADMIN" || user?.permissions?.products?.includes("update");
+  
+    if (!canCreate) {
+      navigate("/404");
+    }
+  }, [user, navigate]);
 
   const sanitize = (val: string) => DOMPurify.sanitize(val.trim());
 

@@ -1,9 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ArrowLeft, Pencil, ChevronDown, ChevronUp, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowLeft, ChevronDown, ChevronUp, Eye } from "lucide-react";
 import api from "@/api/axios";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Interfaces
 interface SKU {
@@ -131,6 +132,7 @@ const fetchProduct = async (id: string | undefined): Promise<Product> => {
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeSku, setActiveSku] = useState<SKU | null>(null);
@@ -189,27 +191,27 @@ export default function ProductDetailPage() {
   // Get all recent adjustments for the adjustment table
   const getAllProductAdjustments = () => {
     if (!adjustments) return [];
-    
+
     console.log("Raw adjustments data:", adjustments); // Debug log
-    
+
     // Ensure adjustments is an array - handle different API response structures
-    const adjustmentsArray = Array.isArray(adjustments) ? adjustments : 
-                             Array.isArray(adjustments.data) ? adjustments.data :
-                             [];
-    
+    const adjustmentsArray = Array.isArray(adjustments) ? adjustments :
+      Array.isArray(adjustments.data) ? adjustments.data :
+        [];
+
     if (!Array.isArray(adjustmentsArray)) {
       console.warn("Adjustments data is not an array:", adjustments);
       return [];
     }
-    
+
     // Process adjustments from the new API endpoint structure
     const processedAdjustments = adjustmentsArray.map((adj: any) => {
       console.log("Processing adjustment:", adj); // Debug log
-      
+
       // Get adjustment quantity from the products array for this product
       const productData = adj.products?.find((p: any) => p.productId === Number(id));
       const quantity = productData?.quantity || 0;
-      
+
       return {
         adjustmentId: adj.id,
         adjustmentDate: adj.date,
@@ -217,11 +219,11 @@ export default function ProductDetailPage() {
         adjustmentAction: adj.action,
       };
     })
-    .filter((adj: any) => adj.adjustmentId) // Only show adjustments that have valid data
-    .sort((a: any, b: any) => new Date(b.adjustmentDate).getTime() - new Date(a.adjustmentDate).getTime());
-    
+      .filter((adj: any) => adj.adjustmentId) // Only show adjustments that have valid data
+      .sort((a: any, b: any) => new Date(b.adjustmentDate).getTime() - new Date(a.adjustmentDate).getTime());
+
     console.log("Processed adjustments:", processedAdjustments); // Debug log
-    
+
     return processedAdjustments;
   };
 
@@ -239,7 +241,7 @@ export default function ProductDetailPage() {
   if (isLoading || isLoadingProductSuppliers || isLoadingLatestPrices || isLoadingAdjustments) {
     return <div className="p-6">Loading product data...</div>;
   }
-  
+
   if (error) return <div className="p-6 text-red-500">Failed to load product.</div>;
   if (!product) return <div className="p-6">Product not found.</div>;
 
@@ -251,6 +253,9 @@ export default function ProductDetailPage() {
 
   const formatPrice = (price: number) => new Intl.NumberFormat("id-ID").format(price);
   const allProductAdjustments = getAllProductAdjustments();
+
+  const canEditProduct =
+    user?.role === "ADMIN" || user?.permissions?.products?.includes("update");
 
   return (
     <div className="p-6 space-y-8">
@@ -301,13 +306,15 @@ export default function ProductDetailPage() {
 
         {/* Right side info */}
         <div>
-          <Button
-            variant="secondary"
-            className="mb-2 cursor-pointer"
-            onClick={() => navigate(`/product/edit/${id}`)}
-          >
-            <Pencil /> Edit
-          </Button>
+          {canEditProduct && (
+            <Button
+              variant="secondary"
+              className="cursor-pointer"
+              onClick={() => navigate(`/product/edit/${id}`)}
+            >
+              Edit Product
+            </Button>
+          )}
 
           <h1 className="text-3xl font-bold">{product.name}</h1>
           <p className="mb-2">
@@ -318,8 +325,8 @@ export default function ProductDetailPage() {
           {/* Price Selection */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">Select Supplier for Price:</label>
-            <select 
-              value={selectedSupplier || ''} 
+            <select
+              value={selectedSupplier || ''}
               onChange={(e) => setSelectedSupplier(e.target.value ? Number(e.target.value) : null)}
               className="border rounded px-3 py-2 w-full max-w-xs"
             >
@@ -352,10 +359,10 @@ export default function ProductDetailPage() {
               <div className="border rounded-lg overflow-hidden">
                 {productSuppliers && productSuppliers.length > 0 ? productSuppliers.map((supplier: ProductSupplier) => {
                   const latestPrice = latestPrices?.find((price: LatestPrice) => price.supplierId === supplier.supplierId);
-                  
+
                   return (
                     <div key={supplier.supplierId} className="border-b last:border-b-0">
-                      <div 
+                      <div
                         className="px-4 py-3 bg-gray-50 cursor-pointer hover:bg-gray-100 flex justify-between items-center"
                         onClick={() => setExpandedSupplier(expandedSupplier === supplier.supplierId ? null : supplier.supplierId)}
                       >
@@ -369,13 +376,13 @@ export default function ProductDetailPage() {
                           </div>
                         </div>
                         <div className="ml-2">
-                          {expandedSupplier === supplier.supplierId ? 
-                            <ChevronUp size={16} /> : 
+                          {expandedSupplier === supplier.supplierId ?
+                            <ChevronUp size={16} /> :
                             <ChevronDown size={16} />
                           }
                         </div>
                       </div>
-                      
+
                       {expandedSupplier === supplier.supplierId && (
                         <div className="px-4 py-2 bg-white">
                           <div className="text-sm font-medium mb-2">Price History:</div>
@@ -455,10 +462,9 @@ export default function ProductDetailPage() {
                               </div>
                               <div className="flex items-center gap-4">
                                 <span className="text-sm text-gray-600">
-                                  Qty: 
-                                  <span className={`ml-1 font-medium ${
-                                    adjustment.quantityChange > 0 ? 'text-green-600' : 'text-red-600'
-                                  }`}>
+                                  Qty:
+                                  <span className={`ml-1 font-medium ${adjustment.quantityChange > 0 ? 'text-green-600' : 'text-red-600'
+                                    }`}>
                                     {adjustment.quantityChange > 0 ? `+${adjustment.quantityChange}` : adjustment.quantityChange}
                                   </span>
                                 </span>
@@ -508,9 +514,8 @@ export default function ProductDetailPage() {
               {product.skus.map((sku) => (
                 <Button
                   key={sku.skuId}
-                  className={`border-2 border-[#8ecae6] bg-transparent text-[#232323] cursor-pointer hover:bg-[#8ecae6] ${
-                    activeSku?.skuId === sku.skuId ? "bg-[#209ebb] text-white border-none" : ""
-                  }`}
+                  className={`border-2 border-[#8ecae6] bg-transparent text-[#232323] cursor-pointer hover:bg-[#8ecae6] ${activeSku?.skuId === sku.skuId ? "bg-[#209ebb] text-white border-none" : ""
+                    }`}
                   onClick={() => setActiveSku(sku)}
                 >
                   {sku.skuName}

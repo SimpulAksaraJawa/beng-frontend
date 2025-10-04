@@ -9,6 +9,8 @@ import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { useNavigate } from "react-router";
+import { useAuth } from "@/contexts/AuthContext";
+
 
 interface Supplier {
   id: number;
@@ -49,6 +51,7 @@ function formatRupiah(amount: number | null) {
 export default function OrdersPage() {
   const [openReceipts, setOpenReceipts] = useState<Order[]>([]);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const fetchOrders = async (): Promise<Order[]> => {
     const supplierRes = await api.get("/suppliers");
@@ -98,6 +101,9 @@ export default function OrdersPage() {
   const handleClose = (id: number) => {
     setOpenReceipts((prev) => prev.filter((o) => o.id !== id));
   };
+  const canCreateOrder =
+    user?.role === "ADMIN" || user?.permissions?.orders?.includes("create");
+
 
   if (isLoading) {
     return (
@@ -160,14 +166,19 @@ export default function OrdersPage() {
 
         <div className="flex items-center gap-2">
 
-          <ButtonShad
-            className="cursor-pointer"
-            onClick={() => {
-              navigate("/orders/new");
-            }}
-          >
-            + Add new order
-          </ButtonShad>
+          {
+            canCreateOrder && (
+              <ButtonShad
+                className="cursor-pointer"
+                onClick={() => {
+                  navigate("/orders/new");
+                }}
+              >
+                + Add new order
+              </ButtonShad>
+            )
+          }
+
         </div>
       </div>
 

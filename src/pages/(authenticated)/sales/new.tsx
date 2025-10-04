@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
+import {useAuth} from "@/contexts/AuthContext"
 
 interface Brand {
   id: number;
@@ -87,6 +88,16 @@ const AddSalePage = () => {
 
   const [showEditWarning, setShowEditWarning] = useState(true);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+      const { user } = useAuth();
+
+    useEffect(() => {
+        const canCreateSales =
+          user?.role === "ADMIN" || user?.permissions?.sales?.includes("create");
+      
+        if (!canCreateSales) {
+          navigate("/404");
+        }
+      }, [user, navigate]);
 
   const sanitize = (val: string) => DOMPurify.sanitize(val.trim());
 

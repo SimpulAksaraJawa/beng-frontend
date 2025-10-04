@@ -1,10 +1,10 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
-import { Button, Button as ButtonShad } from "@/components/ui/button";
+import { Button as ButtonShad } from "@/components/ui/button";
 import api from "@/api/axios";
 import { SiteHeader } from "@/components/site-header";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router";
 import { Pencil, LoaderIcon } from "lucide-react";
 
@@ -18,6 +18,8 @@ interface Customer {
 
 export default function CustomersPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const fetchCustomers = async (): Promise<Customer[]> => {
     const res = await api.get("/customers");
     return Array.isArray(res.data?.data) ? res.data.data : [];
@@ -33,48 +35,32 @@ export default function CustomersPage() {
     staleTime: 1000 * 60 * 15,
   });
 
+  // ✅ Permissions must be defined BEFORE columns
+  const canCreateCustomer =
+    user?.role === "ADMIN" || user?.permissions?.customers?.includes("create");
+  const canEditCustomer =
+    user?.role === "ADMIN" || user?.permissions?.customers?.includes("update");
+
   const columns: GridColDef<Customer>[] = [
-    {
-      field: "name",
-      headerName: "Name",
-      flex: 1,
-      minWidth: 150,
-      maxWidth: 170,
-    },
-    {
-      field: "address",
-      headerName: "Address",
-      flex: 1,
-      minWidth: 200,
-      maxWidth: 210,
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      flex: 1,
-      minWidth: 200,
-      maxWidth: 210,
-    },
-    {
-      field: "phoneNumber",
-      headerName: "Phone",
-      flex: 1,
-      minWidth: 150,
-      maxWidth: 200,
-    },
+    { field: "name", headerName: "Name", flex: 1, minWidth: 150 },
+    { field: "address", headerName: "Address", flex: 1, minWidth: 200 },
+    { field: "email", headerName: "Email", flex: 1, minWidth: 200 },
+    { field: "phoneNumber", headerName: "Phone", flex: 1, minWidth: 150 },
     {
       field: "actions",
       headerName: "Actions",
       width: 150,
-      renderCell: (params) => (
-        <Button
-          onClick={() => navigate(`/customers/edit/${params.row.id}`)}
-          size="sm"
-          variant="outline"
-        >
-          <Pencil className="text-orange-400" />
-        </Button>
-      ),
+      renderCell: (params) =>
+        canEditCustomer ? (
+          <ButtonShad
+            size="sm"
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => navigate(`/customers/edit/${params.row.id}`)}
+          >
+            <Pencil className="text-orange-400" />
+          </ButtonShad>
+        ) : null,
     },
   ];
 
@@ -84,9 +70,16 @@ export default function CustomersPage() {
         <LoaderIcon className="animate-spin size-10" />
         <p>Loading customers...</p>
       </div>
-    )
+    );
   }
-  if (error) return <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">Failed to load customers.</div>;
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">
+        Failed to load customers.
+      </div>
+    );
+  }
 
   const rows = customers.map((c) => ({
     ...c,
@@ -101,7 +94,15 @@ export default function CustomersPage() {
       <SiteHeader />
       <div className="flex justify-between items-center mt-4 mb-4">
         <h1 className="text-2xl font-bold">Customers</h1>
-        <ButtonShad onClick={() => { navigate("/customers/new") }}>+ Add Customer</ButtonShad>
+        {canCreateCustomer && (
+          <ButtonShad
+            variant="secondary"
+            className="cursor-pointer"
+            onClick={() => navigate("/customers/new")}
+          >
+            Add Customer
+          </ButtonShad>
+        )}
       </div>
 
       <Box sx={{ height: 600, width: "100%" }}>
@@ -121,7 +122,6 @@ export default function CustomersPage() {
               fontWeight: "bold",
             },
           }}
-          showToolbar
         />
       </Box>
     </div>

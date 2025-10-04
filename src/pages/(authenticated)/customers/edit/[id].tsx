@@ -16,11 +16,22 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function EditCustomerPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const canEditCustomer =
+      user?.role === "ADMIN" || user?.permissions?.customers?.includes("update");
+  
+    if (!canEditCustomer) {
+      navigate("/404");
+    }
+  }, [user, navigate]);
 
   const sanitize = (val: string) => DOMPurify.sanitize(val.trim());
 

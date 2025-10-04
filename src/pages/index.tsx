@@ -1,7 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext'
 import { Navigate } from '@/router';
 import { LoaderIcon } from "lucide-react";
-import React from 'react'
 
 const index = () => {
   const { user, accessToken, loading } = useAuth();

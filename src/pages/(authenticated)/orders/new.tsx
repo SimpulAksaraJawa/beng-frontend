@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { SearchableSelect } from "@/components/searchable-select";
 import DOMPurify from "dompurify";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,7 +49,7 @@ interface OrderProduct {
 const AddOrderPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
+  const { user } = useAuth();
   const [noInvoice, setNoInvoice] = useState("");
   const [supplierName, setSupplierName] = useState("");
   const [orderDate, setOrderDate] = useState(() => {
@@ -75,6 +76,15 @@ const AddOrderPage = () => {
 
   const [showEditWarning, setShowEditWarning] = useState(true);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+
+  useEffect(() => {
+      const canCreateOrder =
+        user?.role === "ADMIN" || user?.permissions?.orders?.includes("create");
+    
+      if (!canCreateOrder) {
+        navigate("/404");
+      }
+    }, [user, navigate]);
 
   const sanitize = (val: string) => DOMPurify.sanitize(val.trim());
 

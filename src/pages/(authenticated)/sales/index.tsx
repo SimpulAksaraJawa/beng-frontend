@@ -19,6 +19,7 @@ import {
     TableCell,
 } from "@/components/ui/table";
 import { useNavigate } from "react-router";
+import {useAuth} from "@/contexts/AuthContext"
 
 // interface SaleDetail {
 //   id: number;
@@ -76,6 +77,10 @@ interface Sale {
 export default function SalesPage() {
     const [openReceipts, setOpenReceipts] = useState<Sale[]>([]);
     const navigate = useNavigate();
+    const {user} = useAuth();
+
+    const canCreateSales = 
+        user?.role === "ADMIN" || user?.permissions?.sales?.includes("create");
 
     // Fetch sales
     const fetchSales = async (): Promise<Sale[]> => {
@@ -196,9 +201,14 @@ export default function SalesPage() {
 
             <div className="flex flex-wrap items-center justify-between gap-4 mt-4 mb-4">
                 <h1 className="text-2xl font-bold">Sales</h1>
-                <ButtonShad onClick={() => navigate("/sales/new")}>
+                {
+                    canCreateSales && (
+                        <ButtonShad onClick={() => navigate("/sales/new")}>
                     + Add new sale
                 </ButtonShad>
+                    )
+                }
+                
             </div>
 
             <Box sx={{ height: 600, width: "100%" }}>

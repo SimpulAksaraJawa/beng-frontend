@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import api from "@/api/axios";
 import { SearchableSelect } from "@/components/searchable-select";
 import { useNavigate } from "react-router";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Product {
     id: number;
@@ -38,6 +39,16 @@ export default function NewAdjustmentPage() {
     const [sources, setSources] = useState<AdjustmentProductInput[]>([]);
     const [results, setResults] = useState<AdjustmentProductInput[]>([]);
     const navigate = useNavigate();
+    const { user } = useAuth();
+
+    useEffect(() => {
+        const canCreateAdjustment =
+          user?.role === "ADMIN" || user?.permissions?.adjustments?.includes("create");
+      
+        if (!canCreateAdjustment) {
+          navigate("/404");
+        }
+      }, [user, navigate]);
 
     useEffect(() => {
         api.get("/products").then((res) => {

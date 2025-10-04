@@ -8,6 +8,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { SearchableSelect } from "@/components/searchable-select";
 import DOMPurify from "dompurify"; 
 import { useQueryClient } from "@tanstack/react-query";
+import {useAuth} from "@/contexts/AuthContext";
+
 
 interface SKU {
   code: string;
@@ -31,8 +33,18 @@ const AddProductPage = () => {
     { code: "", name: "", desc: "", salePrice: "" },
   ]);
   const [images, setImages] = useState<File[]>([]);
+  const {user} = useAuth();
 
   const sanitize = (val: string) => DOMPurify.sanitize(val.trim());
+
+  useEffect(() => {
+  const canCreate =
+    user?.role === "ADMIN" || user?.permissions?.products?.includes("create");
+
+  if (!canCreate) {
+    navigate("/404");
+  }
+}, [user, navigate]);
 
   useEffect(() => {
     api.get("/brands").then((res) => {

@@ -5,11 +5,11 @@ import { useQuery, useQueries } from "@tanstack/react-query";
 import axios from "@/api/axios";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Tooltip, Button } from "@mui/material";
+import {Button as ButtonShad} from "@/components/ui/button";
 import { 
   IconEye, 
   IconChartBar,
   IconChevronUp, 
-  IconAdjustments
 } from "@tabler/icons-react";
 import StockAnalyticsComponent from "./StockAnalytics";
 
@@ -454,14 +454,14 @@ export default function StockInventoryPage() {
         </div>
         <div className="space-x-2">
           <Tooltip title="Adjust Products">
-            <Button 
-              variant="contained" 
+            <ButtonShad 
+              variant="default" 
               color="primary"
-              startIcon={<IconAdjustments size={18} />}
+              className="cursor-pointer"
               onClick={() => navigate("/adjustment/new")}
             >
               Adjust Products
-            </Button>
+            </ButtonShad>
           </Tooltip>
         </div>
       </div>

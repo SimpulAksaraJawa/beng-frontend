@@ -7,6 +7,7 @@ import { Button as ButtonShad } from "@/components/ui/button";
 import { Eye, X, Plus, LoaderIcon } from "lucide-react";
 import api from "@/api/axios";
 import { useNavigate } from "react-router";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AdjustmentProduct {
   id: number;
@@ -37,6 +38,10 @@ function formatRupiah(amount?: number) {
 export default function AdjustmentsPage() {
   const [selectedAdjustment, setSelectedAdjustment] = useState<Adjustment | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const canCreateAdjustment =
+    user?.role === "ADMIN" || user?.permissions?.adjustments?.includes("create");
 
   // Fetch main list
   const fetchAdjustments = async (): Promise<Adjustment[]> => {
@@ -138,9 +143,10 @@ export default function AdjustmentsPage() {
       <div className="flex-0.75 w-[50%]">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Adjustments</h1>
-          <ButtonShad variant="default" className="cursor-pointer" onClick={() => navigate('/adjustment/new')}>
-            <Plus /> Add New Adjustment
-          </ButtonShad>
+          {canCreateAdjustment && (
+            <ButtonShad variant="default" className="cursor-pointer" onClick={() => navigate('/adjustment/new')}>
+              <Plus /> Add New Adjustment
+            </ButtonShad>)}
         </div>
         <Box sx={{ height: 600 }}>
           <DataGrid

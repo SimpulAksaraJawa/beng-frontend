@@ -23,7 +23,6 @@ export type Path =
   | `/register`
   | `/sales`
   | `/sales/details`
-  | `/sales/edit/:id`
   | `/sales/new`
   | `/stock`
   | `/stock/StockAnalytics`
@@ -35,7 +34,6 @@ export type Params = {
   '/customers/edit/:id': { id: string }
   '/product/:id': { id: string }
   '/product/edit/:id': { id: string }
-  '/sales/edit/:id': { id: string }
   '/suppliers/edit/:id': { id: string }
 }
 

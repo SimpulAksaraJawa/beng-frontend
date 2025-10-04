@@ -2,10 +2,11 @@ import api from "@/api/axios";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { Button as ButtonShad } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
 import { Pencil, LoaderIcon } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext"
 
 interface Supplier {
   id: number;
@@ -18,6 +19,12 @@ interface Supplier {
 
 export default function SuppliersPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const canCreateSupplier =
+    user?.role === "ADMIN" || user?.permissions?.suppliers?.includes("create");
+  const canEditSupplier =
+    user?.role === "ADMIN" || user?.permissions?.scanEditSuppliers?.includes("update");
 
   const fetchSuppliers = async (): Promise<Supplier[]> => {
     const supplierRes = await api.get("/suppliers");
@@ -71,15 +78,17 @@ export default function SuppliersPage() {
       sortable: false,
       flex: 1,
       minWidth: 50,
-      renderCell: (params: GridRenderCellParams<Supplier>) => (
-        <Button
-          variant="text"
-          size="small"
-          color="info"
-          startIcon={<Pencil />}
-          onClick={() => navigate(`/suppliers/edit/${params.row.id}`)}
-        />
-      ),
+      renderCell: (params: GridRenderCellParams<Supplier>) => 
+        canEditSupplier ? (
+          <ButtonShad
+            size="sm"
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => navigate(`/suppliers/edit/${params.row.id}`)}
+          >
+            <Pencil className="text-orange-400" />
+          </ButtonShad>
+        ) : null,
     },
   ];
 
@@ -88,12 +97,17 @@ export default function SuppliersPage() {
       <SiteHeader />
       <div className="flex flex-wrap items-center justify-between gap-4 mt-4 mb-4">
         <h1 className="text-2xl font-bold">Suppliers</h1>
-        <ButtonShad
-          className="cursor-pointer"
-          onClick={() => navigate("/suppliers/new")}
-        >
-          + Add new supplier
-        </ButtonShad>
+        {
+          canCreateSupplier && (
+            <ButtonShad
+              className="cursor-pointer"
+              onClick={() => navigate("/suppliers/new")}
+            >
+              + Add new supplier
+            </ButtonShad>
+          )
+        }
+
       </div>
 
       <Box sx={{ height: 800, width: "100%" }}>

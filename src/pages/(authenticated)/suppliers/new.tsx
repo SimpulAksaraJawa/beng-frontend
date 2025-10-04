@@ -3,6 +3,8 @@ import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query"; // <-- import this
 import api from "@/api/axios";
 import DOMPurify from "dompurify";
+import { useEffect } from "react";
+import {useAuth} from "@/contexts/AuthContext"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -27,7 +29,15 @@ import {
 export default function NewSupplierPage() {
     const navigate = useNavigate();
     const queryClient = useQueryClient(); // <-- create queryClient instance
-
+    const { user } = useAuth();
+    useEffect(() => {
+        const canCreateSupplier =
+          user?.role === "ADMIN" || user?.permissions?.suppliers?.includes("update");
+      
+        if (!canCreateSupplier) {
+          navigate("/404");
+        }
+    }, [user, navigate]);
     const [supplierName, setSupplierName] = useState("");
     const [supplierEmail, setSupplierEmail] = useState("");
     const [supplierPhoneNumber, setSupplierPhoneNumber] = useState("");

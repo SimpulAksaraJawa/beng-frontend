@@ -8,6 +8,7 @@ import {
   Users,
   Key,
   LucideIcon,
+  Settings,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -27,6 +28,7 @@ import {
 } from "@radix-ui/react-collapsible";
 import { useAuth, User } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+
 
 type MainLink = {
   title: string;
@@ -62,12 +64,11 @@ const navMainPath: innerMainPath = {
     title: "Products",
     url: "/product",
     icon: Package,
-    items: [
-      {
-        title: "Adjustments",
-        url: "/adjustments",
-      },
-    ]
+  },
+  adjustments: {
+    title: "Adjustments",
+    url: "/adjustment",
+    icon: Settings,
   },
   orders: {
     title: "Orders",
@@ -97,7 +98,7 @@ const navMainPath: innerMainPath = {
     icon: Boxes,
   },
   permission: {
-    title: "Permission Updates",
+    title: "Permissions",
     url: "/permission",
     icon: Key,
   },
@@ -129,7 +130,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           navMainPath.orders,
           navMainPath.sales,
           navMainPath.stock,
-          navMainPath.permission
+          navMainPath.permission,
+          navMainPath.adjustments
         ],
         users: [
           userPath.suppliers,
@@ -138,7 +140,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }
     }
 
-    const navMainFeature = ["products", "orders", "sales", "stock"]
+    const navMainFeature = ["products", "orders", "sales", "stock", "adjustments"]
     const usersFeature = ["suppliers", "customers"]
     const allowed: Path = {
       navMain: [],

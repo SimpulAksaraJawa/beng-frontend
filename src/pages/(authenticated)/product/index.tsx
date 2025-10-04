@@ -22,6 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import Printable from "@/components/printable";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProductImage {
   url: { type: string; data: number[] };
@@ -77,7 +78,8 @@ export default function Page() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const navigate = useNavigate();
-
+  const { user } = useAuth();
+  
   const { data: products = [], isLoading, error } = useQuery({
     queryKey: ["products"],
     queryFn: fetchProducts,
@@ -119,6 +121,9 @@ export default function Page() {
     const matchesCategory = selectedCategory === "all" || p.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const canCreateProduct =
+    user?.role === "ADMIN" || user?.permissions?.products?.includes("create");
 
   return (
     <div className="p-6 space-y-6">
@@ -162,13 +167,15 @@ export default function Page() {
             </SelectContent>
           </Select>
 
-          <Button
-            variant="secondary"
-            className="cursor-pointer"
-            onClick={() => navigate("/product/new")}
-          >
-            Add Product
-          </Button>
+           {canCreateProduct && (
+            <Button
+              variant="secondary"
+              className="cursor-pointer"
+              onClick={() => navigate("/product/new")}
+            >
+              Add Product
+            </Button>
+          )}
         </div>
       </div>
 
@@ -223,7 +230,7 @@ export default function Page() {
               <CardContent className="flex justify-between items-end">
                 <div>
                   <p className="text-[#209ebb] font-extrabold">
-                    Rp{formatPrice(product.price)}
+                    <span>Rp </span>{formatPrice(product.price)}
                   </p>
                   <p className="text-gray-500 text-sm font-medium">
                     {product.category}
