@@ -104,11 +104,6 @@ export default function OrdersPage() {
   const canCreateOrder =
     user?.role === "ADMIN" || user?.permissions?.orders?.includes("create");
 
-  if (!user?.permissions.orders?.includes("read")) {
-    navigate("/product");
-  }
-
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">

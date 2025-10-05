@@ -438,10 +438,6 @@ export default function StockInventoryPage() {
     },
   ];
 
-  if (!user?.permissions.stocks?.includes("read")) {
-    navigate("/product");
-  }
-
   // Check if any individual product queries are still loading
   const isAnyProductQueryLoading = individualProductQueries.some(query => query.isLoading);
   const hasAnyProductQueryError = individualProductQueries.some(query => !!query.error);

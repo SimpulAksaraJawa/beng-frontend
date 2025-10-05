@@ -30,7 +30,7 @@ const initialRows = [
     { id: 2, feature: "adjustments", name: "Adjustments", read: false },
     { id: 3, feature: "orders", name: "Orders", read: false },
     { id: 4, feature: "sales", name: "Sales", read: false },
-    { id: 5, feature: "stocks", name: "Stock", read: false },
+    { id: 5, feature: "stock", name: "Stock", read: false },
     { id: 6, feature: "suppliers", name: "Suppliers", read: false },
     { id: 7, feature: "customers", name: "Customers", read: false },
 ];
@@ -75,7 +75,7 @@ export default function PermissionPage() {
             products: [],
             orders: [],
             sales: [],
-            stocks: [],
+            stock: [],
             suppliers: [],
             customers: [],
             adjustments: [],
@@ -114,10 +114,6 @@ export default function PermissionPage() {
             }
         }
     };
-
-    if (user?.role !== "ADMIN" && user?.permissions.permissions.includes("read")) {
-        navigate("/product")
-    }
 
     return (
         <div className="p-6 space-y-6">

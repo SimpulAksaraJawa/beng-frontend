@@ -64,10 +64,6 @@ export default function CustomersPage() {
     },
   ];
 
-  if (!user?.permissions.customers?.includes("read")) {
-    navigate("/product");
-  }
-
 
   if (isLoading) {
     return (
