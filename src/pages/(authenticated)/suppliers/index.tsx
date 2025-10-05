@@ -41,6 +41,10 @@ export default function SuppliersPage() {
     staleTime: 1000 * 60 * 15,
   });
 
+  if (!user?.permissions.suppliers?.includes("read")) {
+    navigate("/product")
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">
@@ -78,7 +82,7 @@ export default function SuppliersPage() {
       sortable: false,
       flex: 1,
       minWidth: 50,
-      renderCell: (params: GridRenderCellParams<Supplier>) => 
+      renderCell: (params: GridRenderCellParams<Supplier>) =>
         canEditSupplier ? (
           <ButtonShad
             size="sm"

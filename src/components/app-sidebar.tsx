@@ -127,11 +127,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       return {
         navMain: [
           navMainPath.products,
+          navMainPath.adjustments,
           navMainPath.orders,
           navMainPath.sales,
           navMainPath.stock,
           navMainPath.permission,
-          navMainPath.adjustments
         ],
         users: [
           userPath.suppliers,
@@ -140,7 +140,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }
     }
 
-    const navMainFeature = ["products", "orders", "sales", "stock", "adjustments"]
+    const navMainFeature = ["products", "adjustments", "orders", "sales", "stocks"]
     const usersFeature = ["suppliers", "customers"]
     const allowed: Path = {
       navMain: [],

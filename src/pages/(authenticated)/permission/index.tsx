@@ -21,16 +21,18 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "@/router";
 import api from "@/api/axios";
 
 const initialRows = [
     { id: 1, feature: "products", name: "Products", read: false },
-    { id: 2, feature: "orders", name: "Orders", read: false },
-    { id: 3, feature: "sales", name: "Sales", read: false },
-    { id: 4, feature: "stock", name: "Stock", read: false },
-    { id: 5, feature: "suppliers", name: "Suppliers", read: false },
-    { id: 6, feature: "customers", name: "Customers", read: false },
-    { id: 7, feature: "adjustments", name: "Adjustments", read: false },
+    { id: 2, feature: "adjustments", name: "Adjustments", read: false },
+    { id: 3, feature: "orders", name: "Orders", read: false },
+    { id: 4, feature: "sales", name: "Sales", read: false },
+    { id: 5, feature: "stocks", name: "Stock", read: false },
+    { id: 6, feature: "suppliers", name: "Suppliers", read: false },
+    { id: 7, feature: "customers", name: "Customers", read: false },
 ];
 
 const featureIcons: Record<string, React.ReactNode> = {
@@ -51,6 +53,9 @@ export default function PermissionPage() {
     const [changedUser, setChangedUser] = useState("");
     const [rows, setRows] = useState(initialRows);
 
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
     const handleCheckBoxChange = (id: number, checked: boolean) => {
         setRows((prev) =>
             prev.map((row) => (row.id === id ? { ...row, read: checked } : row))
@@ -70,7 +75,7 @@ export default function PermissionPage() {
             products: [],
             orders: [],
             sales: [],
-            stock: [],
+            stocks: [],
             suppliers: [],
             customers: [],
             adjustments: [],
@@ -81,6 +86,10 @@ export default function PermissionPage() {
                 permissions[row.feature].push("read");
             }
         });
+
+        if (!permissions.products.includes("read")) {
+            permissions.products.push("read");
+        }
 
         try {
             const res = await api.put(
@@ -105,6 +114,10 @@ export default function PermissionPage() {
             }
         }
     };
+
+    if (user?.role !== "ADMIN" && user?.permissions.permissions.includes("read")) {
+        navigate("/product")
+    }
 
     return (
         <div className="p-6 space-y-6">

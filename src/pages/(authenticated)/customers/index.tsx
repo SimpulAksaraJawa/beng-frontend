@@ -64,6 +64,11 @@ export default function CustomersPage() {
     },
   ];
 
+  if (!user?.permissions.customers?.includes("read")) {
+    navigate("/product");
+  }
+
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">

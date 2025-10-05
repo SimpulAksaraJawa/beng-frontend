@@ -79,7 +79,7 @@ export default function Page() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const { data: products = [], isLoading, error } = useQuery({
     queryKey: ["products"],
     queryFn: fetchProducts,
@@ -167,7 +167,7 @@ export default function Page() {
             </SelectContent>
           </Select>
 
-           {canCreateProduct && (
+          {canCreateProduct && (
             <Button
               variant="secondary"
               className="cursor-pointer"

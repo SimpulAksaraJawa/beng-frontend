@@ -19,7 +19,7 @@ import {
     TableCell,
 } from "@/components/ui/table";
 import { useNavigate } from "react-router";
-import {useAuth} from "@/contexts/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
 
 // interface SaleDetail {
 //   id: number;
@@ -77,9 +77,9 @@ interface Sale {
 export default function SalesPage() {
     const [openReceipts, setOpenReceipts] = useState<Sale[]>([]);
     const navigate = useNavigate();
-    const {user} = useAuth();
+    const { user } = useAuth();
 
-    const canCreateSales = 
+    const canCreateSales =
         user?.role === "ADMIN" || user?.permissions?.sales?.includes("create");
 
     // Fetch sales
@@ -145,6 +145,10 @@ export default function SalesPage() {
         setOpenReceipts((prev) => prev.filter((s) => s.id !== id));
     };
 
+    if (!user?.permissions.sales?.includes("read")) {
+        navigate("/product");
+    }
+
     if (isLoadingSales || isLoadingCustomers) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">
@@ -204,11 +208,11 @@ export default function SalesPage() {
                 {
                     canCreateSales && (
                         <ButtonShad onClick={() => navigate("/sales/new")}>
-                    + Add new sale
-                </ButtonShad>
+                            + Add new sale
+                        </ButtonShad>
                     )
                 }
-                
+
             </div>
 
             <Box sx={{ height: 600, width: "100%" }}>

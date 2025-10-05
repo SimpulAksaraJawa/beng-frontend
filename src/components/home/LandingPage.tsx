@@ -63,9 +63,9 @@ const LandingPage: React.FC = () => {
             <span>get full control of your operations in one easy-to-use platform.</span>
           </p>
         </div>
-<div>
-  <button
-          className="
+        <div>
+          <button
+            className="
             relative 
             px-10 py-4 
             rounded-full 
@@ -75,7 +75,7 @@ const LandingPage: React.FC = () => {
             bg-opacity-70 
             backdrop-blur-md 
             shadow-lg 
-            transition z-50
+            transition z-0
             duration-300 
             hover:scale-105 
             hover:shadow-xl
@@ -83,12 +83,12 @@ const LandingPage: React.FC = () => {
             cursor-pointer
             text-md
           "
-          onClick={() => {navigate("/register")}}
-        >
-          Get Started
-        </button>
+            onClick={() => { navigate("/register") }}
+          >
+            Get Started
+          </button>
 
-</div>
+        </div>
 
         {/* Right: Image */}
         <div className="flex justify-center w-full">

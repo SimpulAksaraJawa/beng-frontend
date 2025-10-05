@@ -104,6 +104,10 @@ export default function OrdersPage() {
   const canCreateOrder =
     user?.role === "ADMIN" || user?.permissions?.orders?.includes("create");
 
+  if (!user?.permissions.orders?.includes("read")) {
+    navigate("/product");
+  }
+
 
   if (isLoading) {
     return (
