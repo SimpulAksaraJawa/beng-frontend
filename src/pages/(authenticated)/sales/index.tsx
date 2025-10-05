@@ -8,7 +8,7 @@ import { Eye, Minus, LoaderIcon } from "lucide-react";
 import api from "@/api/axios";
 import { SiteHeader } from "@/components/site-header";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
     Table,
@@ -145,9 +145,13 @@ export default function SalesPage() {
         setOpenReceipts((prev) => prev.filter((s) => s.id !== id));
     };
 
-    if (!user?.permissions.sales?.includes("read")) {
-        navigate("/product");
-    }
+    useEffect(()=>{
+        const read =
+            user?.role === "ADMIN" || user?.permissions?.customers?.includes("read");
+        if (!read) {
+          navigate("/product");
+        }
+    },[user])
 
     if (isLoadingSales || isLoadingCustomers) {
         return (
