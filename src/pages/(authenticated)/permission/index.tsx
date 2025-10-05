@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import {
     Package,
     ReceiptText,
@@ -39,7 +39,7 @@ const featureIcons: Record<string, React.ReactNode> = {
     products: <Package size={20} />,
     orders: <ReceiptText size={20} />,
     sales: <Tag size={20} />,
-    stock: <Boxes size={20} />,
+    stocks: <Boxes size={20} />,
     suppliers: <Factory size={20} />,
     customers: <Users size={20} />,
     adjustments: <Settings size={20} />,
@@ -115,9 +115,12 @@ export default function PermissionPage() {
         }
     };
 
-    if (user?.role !== "ADMIN" && user?.permissions.permissions.includes("read")) {
+    useEffect(()=>{
+            if (user?.role !== "ADMIN" && user?.permissions.permissions.includes("read")) {
         navigate("/product")
     }
+    },[])
+
 
     return (
         <div className="p-6 space-y-6">

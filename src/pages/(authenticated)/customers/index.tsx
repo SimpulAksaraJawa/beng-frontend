@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router";
 import { Pencil, LoaderIcon } from "lucide-react";
+import {useEffect} from "react";
 
 interface Customer {
   id: number;
@@ -64,9 +65,13 @@ export default function CustomersPage() {
     },
   ];
 
-  if (!user?.permissions.customers?.includes("read")) {
-    navigate("/product");
-  }
+  useEffect(()=>{
+        const read =
+          user?.role === "ADMIN" || user?.permissions?.customers?.includes("read");
+    if (!read) {
+      navigate("/product");
+    }
+  },[user])
 
 
   if (isLoading) {

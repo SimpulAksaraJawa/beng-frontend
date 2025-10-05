@@ -5,7 +5,7 @@ import { Eye, Minus, Search, LoaderIcon } from "lucide-react";
 import api from "@/api/axios";
 import { SiteHeader } from "@/components/site-header";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { useNavigate } from "react-router";
@@ -104,9 +104,15 @@ export default function OrdersPage() {
   const canCreateOrder =
     user?.role === "ADMIN" || user?.permissions?.orders?.includes("create");
 
-  if (!user?.permissions.orders?.includes("read")) {
-    navigate("/product");
-  }
+
+      useEffect(()=>{
+        const read =
+          user?.role === "ADMIN" || user?.permissions?.orders?.includes("read");
+    if (!read) {
+      navigate("/product");
+    }
+  },[user])
+
 
 
   if (isLoading) {

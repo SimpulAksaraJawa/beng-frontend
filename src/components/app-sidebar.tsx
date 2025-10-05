@@ -82,19 +82,19 @@ const navMainPath: innerMainPath = {
     ],
   },
   sales: {
-    title: "Sale",
+    title: "Sales",
     url: "/sales",
     icon: Tag,
     items: [
       {
         title: "Sale Details",
-        url: "/sale/details",
+        url: "/sales/details",
       },
     ],
   },
-  stock: {
-    title: "Stock",
-    url: "/Stock",
+  stocks: {
+    title: "Stocks",
+    url: "/stock",
     icon: Boxes,
   },
   permission: {
@@ -130,7 +130,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           navMainPath.adjustments,
           navMainPath.orders,
           navMainPath.sales,
-          navMainPath.stock,
+          navMainPath.stocks,
           navMainPath.permission,
         ],
         users: [

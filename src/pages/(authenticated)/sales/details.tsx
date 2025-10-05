@@ -9,11 +9,8 @@ interface SaleDetailRow {
   invoice: string;
   customerName: string;
   productName: string;
-  brand: string | null;
-  category: string | null;
   qty: number;
   price: number;
-  saleDate: string;
 }
 
 function formatRupiah(amount: number | null) {
@@ -23,53 +20,39 @@ function formatRupiah(amount: number | null) {
     amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
   );
 }
-function formatDate(dateStr: string | Date | null) {
-  if (!dateStr) return "N/A";
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("id-ID");
-}
+
 export default function SaleDetailsPage() {
   const { data: rows = [], isLoading, error } = useQuery({
     queryKey: ["sale-details"],
     queryFn: async (): Promise<SaleDetailRow[]> => {
       const res = await api.get("/sale-details");
       const raw = res.data?.data ?? [];
+      console.log(res);
       return raw.map((item: any, idx: number) => ({
         id: idx, // required by DataGrid
         invoice: item.invoice,
         customerName: item.customerName,
         productName: item.productName,
-        brand: item.brand === "N/A" ? "" : item.brand,
-        category: item.category === "N/A" ? "" : item.category,
         qty: item.qty,
         price: item.price,
-        saleDate: item.saleDate,
       }));
     },
     staleTime: 1000 * 60 * 15,
   });
 
-const columns: GridColDef<SaleDetailRow>[] = [
-  { field: "invoice", headerName: "Invoice No.", flex: 1, minWidth: 150 },
-  { field: "customerName", headerName: "Customer", flex: 1.2, minWidth: 150 },
-  { field: "productName", headerName: "Product", flex: 1.5, minWidth: 180 },
-  { field: "qty", headerName: "Quantity", flex: 0.7, minWidth: 100 },
-  {
-    field: "price",
-    headerName: "Price",
-    flex: 1,
-    minWidth: 120,
-    valueGetter: (params: GridRowParams<SaleDetailRow> | null, row: SaleDetailRow) => { return formatRupiah(row?.price) },
-  },
-  {
-    field: "saleDate",
-    headerName: "Sale Date",
-    flex: 1.2,
-    minWidth: 180,
-    valueGetter: (params: GridRowParams<SaleDetailRow> | null, row: SaleDetailRow) => { return formatDate(row?.saleDate) }
-  },
-];
-
+  const columns: GridColDef<SaleDetailRow>[] = [
+    { field: "invoice", headerName: "Invoice No.", flex: 1, minWidth: 150 },
+    { field: "customerName", headerName: "Customer", flex: 1.2, minWidth: 150 },
+    { field: "productName", headerName: "Product", flex: 1.5, minWidth: 180 },
+    { field: "qty", headerName: "Quantity", flex: 0.7, minWidth: 100 },
+    {
+      field: "price",
+      headerName: "Price",
+      flex: 1,
+      minWidth: 120,
+      valueGetter: (params: GridRowParams<SaleDetailRow> | null, row: SaleDetailRow) => { return formatRupiah(row?.price) },
+    },
+  ];
 
   if (isLoading) return <div className="p-6">Loading...</div>;
   if (error) return <div className="p-6 text-red-500">Failed to load sale details.</div>;

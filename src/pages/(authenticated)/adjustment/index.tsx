@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
@@ -127,9 +127,13 @@ export default function AdjustmentsPage() {
     },
   ];
 
-  if (!user?.permissions.adjustments?.includes("read")) {
-    navigate("/product");
-  }
+  useEffect(()=>{
+        const read =
+          user?.role === "ADMIN" || user?.permissions?.adjustments?.includes("read");
+    if (!read) {
+      navigate("/product");
+    }
+  },[user])
 
   if (isLoading) {
     return (

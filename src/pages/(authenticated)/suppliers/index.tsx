@@ -7,6 +7,7 @@ import { Button as ButtonShad } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
 import { Pencil, LoaderIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext"
+import {useEffect} from "react";
 
 interface Supplier {
   id: number;
@@ -25,6 +26,14 @@ export default function SuppliersPage() {
     user?.role === "ADMIN" || user?.permissions?.suppliers?.includes("create");
   const canEditSupplier =
     user?.role === "ADMIN" || user?.permissions?.scanEditSuppliers?.includes("update");
+
+      useEffect(()=>{
+        const read =
+          user?.role === "ADMIN" || user?.permissions?.suppliers?.includes("read");
+    if (!read) {
+      navigate("/product");
+    }
+  },[user])
 
   const fetchSuppliers = async (): Promise<Supplier[]> => {
     const supplierRes = await api.get("/suppliers");
@@ -95,6 +104,13 @@ export default function SuppliersPage() {
         ) : null,
     },
   ];
+    useEffect(()=>{
+        const read =
+          user?.role === "ADMIN" || user?.permissions?.customers?.includes("read");
+    if (!read) {
+      navigate("/product");
+    }
+  },[user])
 
   return (
     <div className="p-6 w-full mx-auto">

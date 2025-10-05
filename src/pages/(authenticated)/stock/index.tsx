@@ -64,6 +64,13 @@ export default function StockInventoryPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [expandedProductId, setExpandedProductId] = useState<number | null>(null);
+  useEffect(() => {
+    const read =
+      user?.role === "ADMIN" || user?.permissions?.stocks?.includes("read");
+    if (!read) {
+      navigate("/product");
+    }
+  }, [user])
 
   // Handle URL parameters to auto-open analytics for a specific product
   useEffect(() => {
@@ -437,10 +444,6 @@ export default function StockInventoryPage() {
       },
     },
   ];
-
-  if (!user?.permissions.stocks?.includes("read")) {
-    navigate("/product");
-  }
 
   // Check if any individual product queries are still loading
   const isAnyProductQueryLoading = individualProductQueries.some(query => query.isLoading);
