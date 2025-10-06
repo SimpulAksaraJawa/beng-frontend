@@ -8,6 +8,7 @@ import { Eye, X, Plus, LoaderIcon } from "lucide-react";
 import api from "@/api/axios";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/contexts/AuthContext";
+import { SiteHeader } from "@/components/site-header";
 
 interface AdjustmentProduct {
   id: number;
