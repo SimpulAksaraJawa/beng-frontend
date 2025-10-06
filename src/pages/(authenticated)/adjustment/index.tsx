@@ -146,10 +146,10 @@ export default function AdjustmentsPage() {
   if (error) return <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">Failed to load adjustment.</div>;
 
   return (
-    <div className="p-6 w-full flex flex-row gap-2">
+    <div className="p-6 w-full flex flex-col gap-2">
       {/* LEFT TABLE */}
       <SiteHeader />
-      <div className="flex-0.75 w-[50%]">
+      <div className="flex-0.75 w-[100%]">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Adjustments</h1>
           {canCreateAdjustment && (
@@ -177,7 +177,7 @@ export default function AdjustmentsPage() {
       </div>
 
       {/* RIGHT DETAIL CARD */}
-      <div className="w-[50%] mt-14">
+      <div className="w-[100%] mt-14">
         {selectedAdjustment ? (
           <Card className="p-4 mr-10">
             <CardHeader className="flex flex-row justify-between items-center">
