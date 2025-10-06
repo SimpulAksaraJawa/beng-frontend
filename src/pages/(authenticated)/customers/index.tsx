@@ -65,14 +65,6 @@ export default function CustomersPage() {
     },
   ];
 
-  useEffect(()=>{
-        const read =
-          user?.role === "ADMIN" || user?.permissions?.customers?.includes("read");
-    if (!read) {
-      navigate("/product");
-    }
-  },[user])
-
 
   if (isLoading) {
     return (
