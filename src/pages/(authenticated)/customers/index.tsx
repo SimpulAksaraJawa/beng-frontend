@@ -42,13 +42,6 @@ export default function CustomersPage() {
   const canEditCustomer =
     user?.role === "ADMIN" || user?.permissions?.customers?.includes("update");
 
-  useEffect(() => {
-    const read =
-      user?.role === "ADMIN" || user?.permissions?.customers?.includes("read");
-    if (!read) {
-      navigate("/product");
-    }
-  }, [user])
 
   const columns: GridColDef<Customer>[] = [
     { field: "name", headerName: "Name", flex: 1, minWidth: 150 },
