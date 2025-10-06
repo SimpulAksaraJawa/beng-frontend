@@ -27,6 +27,14 @@ export default function SuppliersPage() {
   const canEditSupplier =
     user?.role === "ADMIN" || user?.permissions?.canEditSuppliers?.includes("update");
 
+  useEffect(() => {
+    const read =
+      user?.role === "ADMIN" || user?.permissions?.suppliers?.includes("read");
+    if (!read) {
+      navigate("/product");
+    }
+  }, [user])
+
   const fetchSuppliers = async (): Promise<Supplier[]> => {
     const supplierRes = await api.get("/suppliers");
     const suppliersData: Supplier[] = Array.isArray(supplierRes.data?.data)
