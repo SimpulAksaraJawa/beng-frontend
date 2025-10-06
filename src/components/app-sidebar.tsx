@@ -119,7 +119,6 @@ const userPath: innerUserPath = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
-
   const navigate = useNavigate();
 
   const userAccess = (currUser: User): Path => {
@@ -135,32 +134,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ],
         users: [
           userPath.suppliers,
-          userPath.customers
-        ]
-      }
+          userPath.customers,
+        ],
+      };
     }
+  const navMainFeature = ["products", "adjustments", "orders", "sales", "stocks"];
+  const allowed: Path = {
+    navMain: [],
+    users: [userPath.suppliers, userPath.customers],
+  };
 
-    const navMainFeature = ["products", "adjustments", "orders", "sales", "stocks"]
-    const usersFeature = ["suppliers", "customers"]
-    const allowed: Path = {
-      navMain: [],
-      users: []
+  navMainFeature.forEach((f: string) => {
+    if (currUser.permissions[f]?.includes("read")) {
+      allowed.navMain.push(navMainPath[f]);
     }
+  });
 
-    navMainFeature.forEach((f: string) => {
-      if (currUser.permissions[f]?.includes("read")) {
-        allowed.navMain.push(navMainPath[f]);
-      }
-    })
+  return allowed;
+};
 
-    usersFeature.forEach((f: string) => {
-      if (currUser.permissions[f]?.includes("read")) {
-        allowed.users.push(userPath[f]);
-      }
-    })
-
-    return allowed;
-  }
 
   const currUser = {
     name: user?.name || "Shadcn",
