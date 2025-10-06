@@ -104,13 +104,6 @@ export default function SuppliersPage() {
         ) : null,
     },
   ];
-    useEffect(()=>{
-        const read =
-          user?.role === "ADMIN" || user?.permissions?.customers?.includes("read");
-    if (!read) {
-      navigate("/product");
-    }
-  },[user])
 
   return (
     <div className="p-6 w-full mx-auto">
