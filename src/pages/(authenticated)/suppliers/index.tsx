@@ -25,7 +25,7 @@ export default function SuppliersPage() {
   const canCreateSupplier =
     user?.role === "ADMIN" || user?.permissions?.suppliers?.includes("create");
   const canEditSupplier =
-    user?.role === "ADMIN" || user?.permissions?.scanEditSuppliers?.includes("update");
+    user?.role === "ADMIN" || user?.permissions?.canEditSuppliers?.includes("update");
 
       useEffect(()=>{
         const read =
