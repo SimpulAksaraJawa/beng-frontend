@@ -31,8 +31,6 @@ const initialRows = [
     { id: 3, feature: "orders", name: "Orders", read: false },
     { id: 4, feature: "sales", name: "Sales", read: false },
     { id: 5, feature: "stocks", name: "Stock", read: false },
-    { id: 6, feature: "suppliers", name: "Suppliers", read: false },
-    { id: 7, feature: "customers", name: "Customers", read: false },
 ];
 
 const featureIcons: Record<string, React.ReactNode> = {
@@ -40,8 +38,6 @@ const featureIcons: Record<string, React.ReactNode> = {
     orders: <ReceiptText size={20} />,
     sales: <Tag size={20} />,
     stocks: <Boxes size={20} />,
-    suppliers: <Factory size={20} />,
-    customers: <Users size={20} />,
     adjustments: <Settings size={20} />,
 };
 
@@ -76,8 +72,6 @@ export default function PermissionPage() {
             orders: [],
             sales: [],
             stocks: [],
-            suppliers: [],
-            customers: [],
             adjustments: [],
         };
 
