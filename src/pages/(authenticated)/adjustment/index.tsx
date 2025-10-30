@@ -8,6 +8,7 @@ import { Eye, X, Plus, LoaderIcon } from "lucide-react";
 import api from "@/api/axios";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/contexts/AuthContext";
+import { SiteHeader } from "@/components/site-header";
 
 interface AdjustmentProduct {
   id: number;
@@ -148,6 +149,7 @@ export default function AdjustmentsPage() {
   return (
     <div className="p-6 w-full flex flex-row gap-2">
       {/* LEFT TABLE */}
+      <SiteHeader />
       <div className="flex-0.75 w-[50%]">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Adjustments</h1>

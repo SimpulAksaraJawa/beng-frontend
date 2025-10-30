@@ -123,44 +123,38 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate();
 
   const userAccess = (currUser: User): Path => {
-    if (currUser.role === "ADMIN") {
-      return {
-        navMain: [
-          navMainPath.products,
-          navMainPath.adjustments,
-          navMainPath.orders,
-          navMainPath.sales,
-          navMainPath.stocks,
-          navMainPath.permission,
-        ],
-        users: [
-          userPath.suppliers,
-          userPath.customers
-        ]
-      }
-    }
-
-    const navMainFeature = ["products", "adjustments", "orders", "sales", "stocks"]
-    const usersFeature = ["suppliers", "customers"]
-    const allowed: Path = {
-      navMain: [],
-      users: []
-    }
-
-    navMainFeature.forEach((f: string) => {
-      if (currUser.permissions[f]?.includes("read")) {
-        allowed.navMain.push(navMainPath[f]);
-      }
-    })
-
-    usersFeature.forEach((f: string) => {
-      if (currUser.permissions[f]?.includes("read")) {
-        allowed.users.push(userPath[f]);
-      }
-    })
-
-    return allowed;
+  if (currUser.role === "ADMIN") {
+    return {
+      navMain: [
+        navMainPath.products,
+        navMainPath.adjustments,
+        navMainPath.orders,
+        navMainPath.sales,
+        navMainPath.stocks,
+        navMainPath.permission,
+      ],
+      users: [
+        userPath.suppliers,
+        userPath.customers,
+      ],
+    };
   }
+
+  const navMainFeature = ["products", "adjustments", "orders", "sales", "stocks"];
+  const allowed: Path = {
+    navMain: [],
+    // ✅ Default users always visible
+    users: [userPath.suppliers, userPath.customers],
+  };
+
+  navMainFeature.forEach((f: string) => {
+    if (currUser.permissions[f]?.includes("read")) {
+      allowed.navMain.push(navMainPath[f]);
+    }
+  });
+
+  return allowed;
+};
 
   const currUser = {
     name: user?.name || "Shadcn",

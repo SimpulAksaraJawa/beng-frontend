@@ -198,9 +198,9 @@ export default function NewAdjustmentPage() {
                 adjustmentDate: new Date(DOMPurify.sanitize(adjustmentDate)),
                 products: [...sources, ...results].map((p) => {
                     const base = {
-                        quantity: Number(p.quantity),
-                        price: Number(p.price),
-                        role: p.role,
+                        adjustmentQuantity: Number(p.quantity),
+                        adjustmentPrice: Number(p.price),
+                        adjustmentRole: p.role,
                     };
                     return p.productId
                         ? { ...base, productId: p.productId }

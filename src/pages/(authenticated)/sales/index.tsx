@@ -147,7 +147,7 @@ export default function SalesPage() {
 
     useEffect(()=>{
         const read =
-            user?.role === "ADMIN" || user?.permissions?.customers?.includes("read");
+            user?.role === "ADMIN" || user?.permissions?.sales?.includes("read");
         if (!read) {
           navigate("/product");
         }
