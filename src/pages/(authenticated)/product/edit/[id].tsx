@@ -10,6 +10,7 @@ import { SearchableSelect } from "@/components/searchable-select";
 import DOMPurify from "dompurify";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { Spinner } from "@/components/ui/spinner";
 
 interface SKU {
   skuId?: number;
@@ -40,16 +41,19 @@ export default function EditProductPage() {
   const [hasInitialStocks, setHasInitialStocks] = useState(false);
   const [initialQty, setInitialQty] = useState("");
   const [initialPrice, setInitialPrice] = useState("");
-  const [skus, setSkus] = useState<SKU[]>([{ code: "", name: "", desc: "", salePrice: "" }]);
+  const [skus, setSkus] = useState<SKU[]>([
+    { code: "", name: "", desc: "", salePrice: "" },
+  ]);
   const [deletedSkuIds, setDeletedSkuIds] = useState<number[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
   useEffect(() => {
     const canCreate =
       user?.role === "ADMIN" || user?.permissions?.products?.includes("update");
-  
+
     if (!canCreate) {
       navigate("/404");
     }
@@ -63,16 +67,16 @@ export default function EditProductPage() {
       const arr = Array.isArray(res.data)
         ? res.data
         : Array.isArray(res.data.brands)
-          ? res.data.brands
-          : [];
+        ? res.data.brands
+        : [];
       setBrands(arr.map((b: any) => b.name || b.brandName));
     });
     api.get("/categories").then((res) => {
       const arr = Array.isArray(res.data)
         ? res.data
         : Array.isArray(res.data.categories)
-          ? res.data.categories
-          : [];
+        ? res.data.categories
+        : [];
       setCategories(arr.map((c: any) => c.name || c.categoryName));
     });
   }, []);
@@ -116,7 +120,8 @@ export default function EditProductPage() {
     loadProduct();
   }, [id]);
 
-  const addSKU = () => setSkus([...skus, { code: "", name: "", desc: "", salePrice: "" }]);
+  const addSKU = () =>
+    setSkus([...skus, { code: "", name: "", desc: "", salePrice: "" }]);
 
   const removeSKU = (idx: number) => {
     const skuToRemove = skus[idx];
@@ -126,7 +131,11 @@ export default function EditProductPage() {
     setSkus(skus.filter((_, i) => i !== idx));
   };
 
-  const handleSKUChange = (idx: number, field: SKUStringFields, value: string) => {
+  const handleSKUChange = (
+    idx: number,
+    field: SKUStringFields,
+    value: string
+  ) => {
     const updated = [...skus];
     updated[idx][field] = value;
     setSkus(updated);
@@ -143,16 +152,20 @@ export default function EditProductPage() {
     if (newFiles.length === 0) return;
 
     // Merge existingImages (already uploaded) + new files
-    const totalImages = [...existingImages.map(img => img as unknown as File), ...images, ...newFiles];
+    const totalImages = [
+      ...existingImages.map((img) => img as unknown as File),
+      ...images,
+      ...newFiles,
+    ];
 
     if (totalImages.length <= 3) {
-      setImages(prev => [...prev, ...newFiles]);
+      setImages((prev) => [...prev, ...newFiles]);
     } else {
       // Replace last images if over limit
       const availableSlots = 3 - existingImages.length;
       if (availableSlots > 0) {
         // Fill remaining slots first
-        setImages(prev => [...prev, ...newFiles.slice(0, availableSlots)]);
+        setImages((prev) => [...prev, ...newFiles.slice(0, availableSlots)]);
       } else {
         // Replace last existing image
         const updatedExistingImages = [...existingImages];
@@ -168,9 +181,9 @@ export default function EditProductPage() {
     }
   };
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const cleanName = sanitize(name);
     const cleanBrand = sanitize(brandName || "unknown");
@@ -213,9 +226,8 @@ export default function EditProductPage() {
     formData.append("skus", JSON.stringify(cleanSkus));
     formData.append("deletedSkuIds", JSON.stringify(deletedSkuIds));
 
-    const remainingImageIds = existingImages.map(img => img.id);
-formData.append("remainingImages", JSON.stringify(remainingImageIds));
-
+    const remainingImageIds = existingImages.map((img) => img.id);
+    formData.append("remainingImages", JSON.stringify(remainingImageIds));
 
     if (images.length > 0) {
       images.forEach((img) => formData.append("images", img));
@@ -223,11 +235,13 @@ formData.append("remainingImages", JSON.stringify(remainingImageIds));
 
     try {
       await api.put(`/products/${id}`, formData);
+      setIsSubmitting(false);
       alert("Product updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
       navigate(`/product/${id}`);
     } catch (err: any) {
       console.error("Update error:", err.response?.data || err);
+      setIsSubmitting(false);
       alert("Error updating product");
     }
   };
@@ -241,7 +255,12 @@ formData.append("remainingImages", JSON.stringify(remainingImageIds));
         {/* Product Name */}
         <div className="space-y-2">
           <Label>Name</Label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter product name" required />
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter product name"
+            required
+          />
         </div>
 
         {/* Brand */}
@@ -272,20 +291,34 @@ formData.append("remainingImages", JSON.stringify(remainingImageIds));
             className="cursor-pointer"
             id="initial-stock"
             checked={hasInitialStocks}
-            onCheckedChange={(checked) => setHasInitialStocks(checked as boolean)}
+            onCheckedChange={(checked) =>
+              setHasInitialStocks(checked as boolean)
+            }
           />
-          <Label htmlFor="initial-stock" className="font-bold text-[#209ebb]">Has initial stock?</Label>
+          <Label htmlFor="initial-stock" className="font-bold text-[#209ebb]">
+            Has initial stock?
+          </Label>
         </div>
 
         {hasInitialStocks && (
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Initial Quantity</Label>
-              <Input type="number" value={initialQty} onChange={(e) => setInitialQty(e.target.value)} placeholder="e.g. 50" />
+              <Input
+                type="number"
+                value={initialQty}
+                onChange={(e) => setInitialQty(e.target.value)}
+                placeholder="e.g. 50"
+              />
             </div>
             <div className="space-y-2">
               <Label>Initial Price</Label>
-              <Input type="number" value={initialPrice} onChange={(e) => setInitialPrice(e.target.value)} placeholder="e.g. 200000" />
+              <Input
+                type="number"
+                value={initialPrice}
+                onChange={(e) => setInitialPrice(e.target.value)}
+                placeholder="e.g. 200000"
+              />
             </div>
           </div>
         )}
@@ -296,15 +329,53 @@ formData.append("remainingImages", JSON.stringify(remainingImageIds));
           <div className="space-y-4 mt-4">
             {skus.map((sku, idx) => (
               <div key={idx} className="border p-4 rounded-md space-y-3">
-                <Input placeholder="SKU Code" value={sku.code} onChange={(e) => handleSKUChange(idx, "code", e.target.value)} required />
-                <Input placeholder="SKU Name" value={sku.name} onChange={(e) => handleSKUChange(idx, "name", e.target.value)} required />
-                <Input placeholder="SKU Description" value={sku.desc} onChange={(e) => handleSKUChange(idx, "desc", e.target.value)} />
-                <Input type="number" placeholder="Sale Price" value={sku.salePrice} onChange={(e) => handleSKUChange(idx, "salePrice", e.target.value)} required />
-                {idx > 0 && <Button type="button" variant="destructive" className="cursor-pointer" onClick={() => removeSKU(idx)}>Remove SKU</Button>}
+                <Input
+                  placeholder="SKU Code"
+                  value={sku.code}
+                  onChange={(e) => handleSKUChange(idx, "code", e.target.value)}
+                  required
+                />
+                <Input
+                  placeholder="SKU Name"
+                  value={sku.name}
+                  onChange={(e) => handleSKUChange(idx, "name", e.target.value)}
+                  required
+                />
+                <Input
+                  placeholder="SKU Description"
+                  value={sku.desc}
+                  onChange={(e) => handleSKUChange(idx, "desc", e.target.value)}
+                />
+                <Input
+                  type="number"
+                  placeholder="Sale Price"
+                  value={sku.salePrice}
+                  onChange={(e) =>
+                    handleSKUChange(idx, "salePrice", e.target.value)
+                  }
+                  required
+                />
+                {idx > 0 && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    className="cursor-pointer"
+                    onClick={() => removeSKU(idx)}
+                  >
+                    Remove SKU
+                  </Button>
+                )}
               </div>
             ))}
           </div>
-          <Button type="button" variant="secondary" className="mt-4 cursor-pointer" onClick={addSKU}>+ Add Another SKU</Button>
+          <Button
+            type="button"
+            variant="secondary"
+            className="mt-4 cursor-pointer"
+            onClick={addSKU}
+          >
+            + Add Another SKU
+          </Button>
         </div>
 
         {/* Existing Images */}
@@ -313,9 +384,24 @@ formData.append("remainingImages", JSON.stringify(remainingImageIds));
             <Label>Existing Images</Label>
             <ul className="list-disc space-y-1 text-sm text-gray-700 flex flex-row gap-4">
               {existingImages.map((img) => (
-                <li key={img.id} className="flex items-center space-x-2 bg-[#8ecae6]/50 rounded pl-2">
+                <li
+                  key={img.id}
+                  className="flex items-center space-x-2 bg-[#8ecae6]/50 rounded pl-2"
+                >
                   <p>{img.alt}</p>
-                  <Button type="button" variant="ghost" size="sm" className="text-red-600 hover:text-red-700 cursor-pointer hover:bg-transparent" onClick={() => setExistingImages(prev => prev.filter(i => i.id !== img.id))}>Remove</Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-600 hover:text-red-700 cursor-pointer hover:bg-transparent"
+                    onClick={() =>
+                      setExistingImages((prev) =>
+                        prev.filter((i) => i.id !== img.id)
+                      )
+                    }
+                  >
+                    Remove
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -325,14 +411,28 @@ formData.append("remainingImages", JSON.stringify(remainingImageIds));
         {/* New Images */}
         <div className="space-y-2">
           <Label>Add New Images (max 3)</Label>
-          <Input type="file" accept="image/jpeg,image/png,image/jpg" multiple onChange={handleImages} />
+          <Input
+            type="file"
+            accept="image/jpeg,image/png,image/jpg"
+            multiple
+            onChange={handleImages}
+          />
           <p className="text-sm text-gray-500">Selected: {images.length}/3</p>
           {images.length > 0 && (
             <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
               {images.map((file, idx) => (
                 <li key={idx} className="flex justify-between items-center">
                   <span>{file.name}</span>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setImages((prev) => prev.filter((_, i) => i !== idx))}>Remove</Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      setImages((prev) => prev.filter((_, i) => i !== idx))
+                    }
+                  >
+                    Remove
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -341,8 +441,29 @@ formData.append("remainingImages", JSON.stringify(remainingImageIds));
 
         {/* Buttons */}
         <div className="flex gap-4">
-          <Button type="submit" className="hover:cursor-pointer" variant="default">Save Product</Button>
-          <Button type="button" className="cursor-pointer" variant="outline" onClick={() => navigate(`/product/${id}`)}>Cancel</Button>
+          <Button
+            type="submit"
+            className="hover:cursor-pointer"
+            variant="default"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner/>
+                Loading...
+              </>
+            ) : (
+              "Save Product"
+            )}
+          </Button>
+          <Button
+            type="button"
+            className="cursor-pointer"
+            variant="outline"
+            onClick={() => navigate(`/product/${id}`)}
+          >
+            Cancel
+          </Button>
         </div>
       </form>
     </div>
