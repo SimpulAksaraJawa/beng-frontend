@@ -6,8 +6,8 @@ import { Box } from "@mui/material";
 import { Button as ButtonShad } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
 import { Pencil, LoaderIcon } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext"
-import {useEffect} from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Badge } from "@/components/ui/badge";
 
 interface Supplier {
   id: number;
@@ -73,7 +73,27 @@ export default function SuppliersPage() {
       flex: 1,
       minWidth: 200,
     },
-    { field: "status", headerName: "Status", flex: 1, minWidth: 100 },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      minWidth: 120,
+      renderCell: (params: GridRenderCellParams<Supplier>) => {
+        const isActive = params.row.status === "ACTIVE";
+
+        return (
+          <Badge variant={isActive ? "default" : "destructive"}
+            className={
+              isActive
+                ? "bg-[#49a135] hover:bg-green-600 text-white rounded-full"
+                : "rounded-full"
+            }
+          >
+            {isActive ? "Active" : "Inactive"}
+          </Badge>
+        );
+      },
+    },
     {
       field: "actions",
       headerName: "Actions",

@@ -58,7 +58,14 @@ const fetchProducts = async (): Promise<Product[]> => {
 
   return rawProducts.map((p: any) => {
     const firstSku = p.skus && p.skus.length > 0 ? p.skus[0] : null;
-    const price = firstSku?.salePrice ?? p.initialPrice ?? 0;
+
+    const rawPrice = firstSku?.salePrice ?? p.initialPrice ?? 0;
+
+    const price = Number(
+      typeof rawPrice === "object" && rawPrice !== null && "value" in rawPrice
+        ? rawPrice.value
+        : rawPrice
+    );
 
     return {
       id: p.id,
@@ -70,6 +77,7 @@ const fetchProducts = async (): Promise<Product[]> => {
       images: p.images || [],
     };
   });
+
 };
 
 
