@@ -110,7 +110,7 @@ export default function StockInventoryPage() {
     isLoading: isLoadingProducts,
     error: productsError
   } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["stock-products"],
     queryFn: async () => {
       try {
         const response = await axios.get("/products");
@@ -169,7 +169,7 @@ export default function StockInventoryPage() {
   // Fetch individual product details using a single hook call
   const individualProductQueries = useQueries({
     queries: uniqueProductIds.map(productId => ({
-      queryKey: ["product", productId],
+      queryKey: ["stock-product", productId],
       queryFn: async () => {
         try {
           const response = await axios.get(`/products/${productId}`);
@@ -193,7 +193,7 @@ export default function StockInventoryPage() {
 
   // Keep a batch query as a fallback
   const { data: allProductsData } = useQuery({
-    queryKey: ["allProductDetails"],
+    queryKey: ["stockallProductDetails"],
     queryFn: async () => {
       try {
         const response = await axios.get("/products");
