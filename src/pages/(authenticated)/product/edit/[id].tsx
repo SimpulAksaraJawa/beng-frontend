@@ -213,11 +213,9 @@ export default function EditProductPage() {
     formData.append("skus", JSON.stringify(cleanSkus));
     formData.append("deletedSkuIds", JSON.stringify(deletedSkuIds));
 
-    // deleted existing images
-    const deletedImageIds = existingImages
-      .filter((img) => !existingImages.includes(img))
-      .map((img) => img.id);
-    formData.append("deletedImageIds", JSON.stringify(deletedImageIds));
+    const remainingImageIds = existingImages.map(img => img.id);
+formData.append("remainingImages", JSON.stringify(remainingImageIds));
+
 
     if (images.length > 0) {
       images.forEach((img) => formData.append("images", img));
@@ -343,7 +341,7 @@ export default function EditProductPage() {
 
         {/* Buttons */}
         <div className="flex gap-4">
-          <Button type="submit">Save Product</Button>
+          <Button type="submit" className="hover:cursor-pointer" variant="default">Save Product</Button>
           <Button type="button" className="cursor-pointer" variant="outline" onClick={() => navigate(`/product/${id}`)}>Cancel</Button>
         </div>
       </form>

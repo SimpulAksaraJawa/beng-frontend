@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+// import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Routes } from "@generouted/react-router";
 import { AuthProvider } from './contexts/AuthContext';
@@ -9,11 +9,11 @@ import './App.css'
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  // <StrictMode>
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <Routes />
       </QueryClientProvider>
     </AuthProvider>
-  </StrictMode>,
+  // </StrictMode>,
 )
