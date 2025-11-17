@@ -49,7 +49,7 @@ export default function EditProductPage() {
   useEffect(() => {
     const canCreate =
       user?.role === "ADMIN" || user?.permissions?.products?.includes("update");
-  
+
     if (!canCreate) {
       navigate("/404");
     }
@@ -132,40 +132,53 @@ export default function EditProductPage() {
     setSkus(updated);
   };
 
+  // const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const files = e.target.files;
+  //   if (!files) return;
+
+  //   const newFiles = Array.from(files).filter((f) =>
+  //     ["image/jpeg", "image/png", "image/jpg"].includes(f.type)
+  //   );
+
+  //   if (newFiles.length === 0) return;
+
+  //   // Merge existingImages (already uploaded) + new files
+  //   const totalImages = [...existingImages.map(img => img as unknown as File), ...images, ...newFiles];
+
+  //   if (totalImages.length <= 3) {
+  //     setImages(prev => [...prev, ...newFiles]);
+  //   } else {
+  //     // Replace last images if over limit
+  //     const availableSlots = 3 - existingImages.length;
+  //     if (availableSlots > 0) {
+  //       // Fill remaining slots first
+  //       setImages(prev => [...prev, ...newFiles.slice(0, availableSlots)]);
+  //     } else {
+  //       // Replace last existing image
+  //       const updatedExistingImages = [...existingImages];
+  //       updatedExistingImages[updatedExistingImages.length - 1] = {
+  //         id: -1, // dummy id for the new upload
+  //         url: URL.createObjectURL(newFiles[0]),
+  //       };
+  //       setExistingImages(updatedExistingImages);
+  //       // If there are more new files, put them in images array (max 3 total)
+  //       const remaining = newFiles.slice(1, 3 - updatedExistingImages.length);
+  //       setImages(remaining);
+  //     }
+  //   }
+  // };
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
-    const newFiles = Array.from(files).filter((f) =>
-      ["image/jpeg", "image/png", "image/jpg"].includes(f.type)
-    );
+    const newFiles = Array.from(files);
 
-    if (newFiles.length === 0) return;
-
-    // Merge existingImages (already uploaded) + new files
-    const totalImages = [...existingImages.map(img => img as unknown as File), ...images, ...newFiles];
-
-    if (totalImages.length <= 3) {
-      setImages(prev => [...prev, ...newFiles]);
-    } else {
-      // Replace last images if over limit
-      const availableSlots = 3 - existingImages.length;
-      if (availableSlots > 0) {
-        // Fill remaining slots first
-        setImages(prev => [...prev, ...newFiles.slice(0, availableSlots)]);
-      } else {
-        // Replace last existing image
-        const updatedExistingImages = [...existingImages];
-        updatedExistingImages[updatedExistingImages.length - 1] = {
-          id: -1, // dummy id for the new upload
-          url: URL.createObjectURL(newFiles[0]),
-        };
-        setExistingImages(updatedExistingImages);
-        // If there are more new files, put them in images array (max 3 total)
-        const remaining = newFiles.slice(1, 3 - updatedExistingImages.length);
-        setImages(remaining);
-      }
+    if (existingImages.length + images.length + newFiles.length > 3) {
+      alert("Max 3 images");
+      return;
     }
+
+    setImages(prev => [...prev, ...newFiles]);
   };
 
 
@@ -213,8 +226,9 @@ export default function EditProductPage() {
     formData.append("skus", JSON.stringify(cleanSkus));
     formData.append("deletedSkuIds", JSON.stringify(deletedSkuIds));
 
-    const remainingImageIds = existingImages.map(img => img.id);
-formData.append("remainingImages", JSON.stringify(remainingImageIds));
+    // const remainingImageIds = existingImages.map(img => img.id);
+    formData.append("remainingImages", JSON.stringify(existingImages.map(img => img.id)));
+
 
 
     if (images.length > 0) {
