@@ -204,7 +204,7 @@ export default function SalesPage() {
           <Button
             variant="text"
             size="small"
-            color="secondary"
+            color="warning"
             startIcon={<Eye />}
             onClick={() => handleView(params.row.id)}
           />
