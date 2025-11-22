@@ -9,6 +9,7 @@ import { SearchableSelect } from "@/components/searchable-select";
 import DOMPurify from "dompurify"; 
 import { useQueryClient } from "@tanstack/react-query";
 import {useAuth} from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 
 interface SKU {
@@ -88,7 +89,7 @@ const AddProductPage = () => {
       ["image/jpeg", "image/png", "image/jpg"].includes(f.type)
     );
     if (images.length + valid.length > 3) {
-      alert("Max 3 images allowed");
+      toast.error("Max 3 images allowed");
       return;
     }
     setImages([...images, ...valid]);
@@ -110,18 +111,18 @@ const AddProductPage = () => {
 
     if (hasInitialStocks) {
       if (!initialQty || isNaN(Number(initialQty)) || Number(initialQty) <= 0) {
-        alert("Invalid initial quantity");
+        toast.error("Invalid initial quantity");
         return;
       }
       if (!initialPrice || isNaN(Number(initialPrice)) || Number(initialPrice) <= 0) {
-        alert("Invalid initial price");
+        toast.error("Invalid initial price");
         return;
       }
     }
 
     const allowedNameRegex = /^[a-zA-Z0-9\s\-_.()]+$/;
     if (!allowedNameRegex.test(cleanName)) {
-      alert("Product name contains invalid characters");
+      toast.warning("Product name contains invalid characters");
       return;
     }
 
@@ -141,12 +142,12 @@ const AddProductPage = () => {
       await api.post("/products", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert("Product created successfully!");
+      toast.success("Product created successfully!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
       navigate("/product");
     } catch (err) {
       console.error(err);
-      alert("Error creating product");
+      toast.error("Error creating product");
     }
   };
 

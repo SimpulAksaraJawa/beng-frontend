@@ -11,6 +11,7 @@ import DOMPurify from "dompurify";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 
 interface SKU {
   skuId?: number;
@@ -114,7 +115,7 @@ export default function EditProductPage() {
         setLoading(false);
       } catch (err) {
         console.error(err);
-        alert("Failed to load product");
+        toast.error("Failed to load product");
       }
     }
     loadProduct();
@@ -183,7 +184,7 @@ export default function EditProductPage() {
     const newFiles = Array.from(files);
 
     if (existingImages.length + images.length + newFiles.length > 3) {
-      alert("Max 3 images");
+      toast.error("Max 3 images");
       return;
     }
 
@@ -208,18 +209,18 @@ export default function EditProductPage() {
 
     if (hasInitialStocks) {
       if (!initialQty || Number(initialQty) <= 0) {
-        alert("Invalid initial quantity");
+        toast.error("Invalid initial quantity");
         return;
       }
       if (!initialPrice || Number(initialPrice) <= 0) {
-        alert("Invalid initial price");
+        toast.error("Invalid initial price");
         return;
       }
     }
 
     const allowedNameRegex = /^[a-zA-Z0-9\s\-_.()]+$/;
     if (!allowedNameRegex.test(cleanName)) {
-      alert("Product name contains invalid characters");
+      toast.warning("Product name contains invalid characters");
       return;
     }
 
@@ -247,13 +248,13 @@ export default function EditProductPage() {
     try {
       await api.put(`/products/${id}`, formData);
       setIsSubmitting(false);
-      alert("Product updated successfully!");
+      toast.success("Product updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
       navigate(`/product/${id}`);
     } catch (err: any) {
       console.error("Update error:", err.response?.data || err);
       setIsSubmitting(false);
-      alert("Error updating product");
+      toast.error("Error updating product");
     }
   };
 
