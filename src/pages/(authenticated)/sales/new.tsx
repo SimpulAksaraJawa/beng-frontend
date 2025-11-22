@@ -18,6 +18,7 @@ import {
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
 import {useAuth} from "@/contexts/AuthContext"
+import { toast } from "sonner";
 
 interface Brand {
   id: number;
@@ -260,7 +261,7 @@ const AddSalePage = () => {
   const handleSubmit = async () => {
     // basic validation
     if (!customerName?.trim()) {
-      alert("Customer is required");
+      toast.warning("Customer is required");
       return;
     }
     if (
@@ -273,7 +274,7 @@ const AddSalePage = () => {
           !p.salePrice
       )
     ) {
-      alert("All product fields are required");
+      toast.warning("All product fields are required");
       return;
     }
 
@@ -300,7 +301,7 @@ const AddSalePage = () => {
       navigate("/sales");
     } catch (err: any) {
       console.error(err?.response?.data ?? err);
-      alert(
+      toast.error(
         "Error creating sale: " +
           (err?.response?.data?.message || err?.message || "Unknown error")
       );
