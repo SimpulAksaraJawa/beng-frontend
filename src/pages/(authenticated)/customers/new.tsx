@@ -18,6 +18,7 @@ import {
     AlertDialogTitle,
     AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export default function NewCustomerPage() {
     const navigate = useNavigate();
@@ -42,7 +43,7 @@ export default function NewCustomerPage() {
 
     const handleSubmit = async () => {
         if (!name) {
-            alert("Name is required");
+            toast.warning("Name is required");
             return;
         }
 
@@ -59,7 +60,7 @@ export default function NewCustomerPage() {
             navigate("/customers");
         } catch (err: any) {
             console.error(err.response?.data || err);
-            alert(
+            toast.error(
                 "Error creating customer: " +
                 (err.response?.data?.message || err.message || "Unknown error")
             );
