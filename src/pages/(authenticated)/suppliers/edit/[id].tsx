@@ -18,6 +18,7 @@ import {
     AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@/components/ui/select";
+import { toast } from "sonner";
 
 export default function EditSupplierPage() {
     const { id } = useParams();
@@ -69,7 +70,7 @@ export default function EditSupplierPage() {
 
     const handleSubmit = async () => {
         if (!name) {
-            alert("Name is required");
+            toast.warning("Name is required");
             return;
         }
 
@@ -85,10 +86,11 @@ export default function EditSupplierPage() {
             await api.put(`/suppliers/${id}`, payload);
             queryClient.invalidateQueries({ queryKey: ["suppliers"] });
             queryClient.invalidateQueries({ queryKey: ["supplier", id] });
+            toast.success("Successfully updated supplier")
             navigate("/suppliers");
         } catch (err: any) {
             console.error(err.response?.data || err);
-            alert(
+            toast.error(
                 "Error updating supplier: " +
                 (err.response?.data?.message || err.message || "Unknown error")
             );

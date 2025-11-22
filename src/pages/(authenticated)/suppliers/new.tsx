@@ -25,6 +25,7 @@ import {
     AlertDialogTitle,
     AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export default function NewSupplierPage() {
     const navigate = useNavigate();
@@ -62,15 +63,15 @@ export default function NewSupplierPage() {
 
             if (res.data?.success) {
                 queryClient.invalidateQueries({ queryKey: ["suppliers"] });
-                alert("Supplier created successfully!");
+                toast.success("Supplier created successfully!");
                 navigate("/suppliers");
             } else {
-                alert("Failed to create supplier");
+                toast.error("Failed to create supplier");
             }
         } catch (err: any) {
             const msg = err.response?.data?.message || err.message;
             setError(msg);
-            alert(`Error: ${msg}`);
+            toast.error(`Error: ${msg}`);
         } finally {
             setLoading(false);
         }

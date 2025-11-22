@@ -298,6 +298,7 @@ const AddSalePage = () => {
       await api.post("/sales", payload);
       queryClient.invalidateQueries({ queryKey: ["sales"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Sales "+ payload.noInvoice + " successfully added")
       navigate("/sales");
     } catch (err: any) {
       console.error(err?.response?.data ?? err);

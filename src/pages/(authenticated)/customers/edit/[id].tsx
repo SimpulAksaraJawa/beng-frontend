@@ -83,6 +83,7 @@ export default function EditCustomerPage() {
       await api.put(`/customers/${id}`, payload);
       queryClient.invalidateQueries({ queryKey: ["customers"] });
       queryClient.invalidateQueries({ queryKey: ["customer", id] });
+      toast.success("Customer "+ payload.customerName + " successfully updated")
       navigate("/customers");
     } catch (err: any) {
       console.error(err.response?.data || err);

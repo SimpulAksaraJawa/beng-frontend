@@ -228,6 +228,7 @@ const AddOrderPage = () => {
       await api.post("/orders", payload);
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Order "+ payload.noInvoice+ " successfully added")
       navigate("/orders");
     } catch (err: any) {
       console.error(err.response?.data || err);

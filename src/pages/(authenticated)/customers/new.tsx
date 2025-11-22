@@ -57,6 +57,7 @@ export default function NewCustomerPage() {
         try {
             await api.post("/customers", payload);
             queryClient.invalidateQueries({ queryKey: ["customers"] });
+            toast.success("Customer " + payload.customerName + " successfully added")
             navigate("/customers");
         } catch (err: any) {
             console.error(err.response?.data || err);
