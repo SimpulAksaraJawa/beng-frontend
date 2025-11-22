@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import React from "react"
 import api from "@/api/axios"
+import { toast } from "sonner"
 
 export function LoginForm({
   className,
@@ -31,7 +32,7 @@ export function LoginForm({
     e.preventDefault();
 
     if (!email.trim() || !password.trim()) {
-      alert("Please fill in all fields");
+      toast.warning("Please fill in all fields");
       return;
     }
 
@@ -59,7 +60,7 @@ export function LoginForm({
           setPasswordError(false);
         }
       } else {
-        alert(`Internal Server Error: ${error.message}`);
+        toast.error(`Internal Server Error: ${error.message}`);
       }
     }
   }
