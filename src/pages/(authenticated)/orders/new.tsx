@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 interface Brand {
   id: number;
@@ -192,7 +193,7 @@ const AddOrderPage = () => {
   // --- Submit ---
   const handleSubmit = async () => {
     if (!supplierName) {
-      alert("Supplier is required");
+      toast.warning("Supplier is required");
       return;
     }
     if (
@@ -205,7 +206,7 @@ const AddOrderPage = () => {
           !p.orderPrice
       )
     ) {
-      alert("All product fields are required");
+      toast.warning("All product fields are required");
       return;
     }
 
@@ -230,7 +231,7 @@ const AddOrderPage = () => {
       navigate("/orders");
     } catch (err: any) {
       console.error(err.response?.data || err);
-      alert(
+      toast.error(
         "Error creating order: " +
           (err.response?.data?.message || err.message || "Unknown error")
       );
