@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "./ui/select"
 import api from "@/api/axios"
+import { toast } from "sonner"
 
 export function RegisterForm({
   className,
@@ -33,7 +34,7 @@ export function RegisterForm({
     e.preventDefault();
 
     if (!name.trim() || !email.trim() || !password.trim()) {
-      alert("Please fill in all fields");
+      toast.warning("Please fill in all fields");
       return;
     }
 
@@ -52,7 +53,7 @@ export function RegisterForm({
       if (error.response?.status === 401) {
         setEmailExist(true);
       } else {
-        alert(`Internal Server Error: ${error.message}`);
+        toast.error(`Internal Server Error: ${error.message}`);
       }
     }
   }
