@@ -7,7 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router";
 import { Pencil, LoaderIcon } from "lucide-react";
-import {useEffect} from "react";
 
 interface Customer {
   id: number;

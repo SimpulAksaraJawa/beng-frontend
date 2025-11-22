@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
@@ -37,12 +37,14 @@ function formatRupiah(amount?: number) {
 }
 
 export default function AdjustmentsPage() {
-  const [selectedAdjustment, setSelectedAdjustment] = useState<Adjustment | null>(null);
+  const [selectedAdjustment, setSelectedAdjustment] =
+    useState<Adjustment | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
 
   const canCreateAdjustment =
-    user?.role === "ADMIN" || user?.permissions?.adjustments?.includes("create");
+    user?.role === "ADMIN" ||
+    user?.permissions?.adjustments?.includes("create");
 
   // Fetch main list
   const fetchAdjustments = async (): Promise<Adjustment[]> => {
@@ -63,7 +65,11 @@ export default function AdjustmentsPage() {
     }));
   };
 
-  const { data: adjustments = [], isLoading, error } = useQuery({
+  const {
+    data: adjustments = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["adjustments"],
     queryFn: fetchAdjustments,
   });
@@ -108,6 +114,7 @@ export default function AdjustmentsPage() {
         <Button
           variant="text"
           size="small"
+          color="warning"
           onClick={() => handleView(params.row.id)}
           startIcon={<Eye />}
         />
@@ -128,13 +135,14 @@ export default function AdjustmentsPage() {
     },
   ];
 
-  useEffect(()=>{
-        const read =
-          user?.role === "ADMIN" || user?.permissions?.adjustments?.includes("read");
+  useEffect(() => {
+    const read =
+      user?.role === "ADMIN" ||
+      user?.permissions?.adjustments?.includes("read");
     if (!read) {
       navigate("/product");
     }
-  },[user])
+  }, [user]);
 
   if (isLoading) {
     return (
@@ -142,9 +150,14 @@ export default function AdjustmentsPage() {
         <LoaderIcon className="animate-spin size-10" />
         <p>Loading adjustment...</p>
       </div>
-    )
+    );
   }
-  if (error) return <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">Failed to load adjustment.</div>;
+  if (error)
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">
+        Failed to load adjustment.
+      </div>
+    );
 
   return (
     <div className="p-6 w-full flex flex-col gap-2">
@@ -154,9 +167,14 @@ export default function AdjustmentsPage() {
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Adjustments</h1>
           {canCreateAdjustment && (
-            <ButtonShad variant="default" className="cursor-pointer" onClick={() => navigate('/adjustment/new')}>
+            <ButtonShad
+              variant="default"
+              className="cursor-pointer"
+              onClick={() => navigate("/adjustment/new")}
+            >
               <Plus /> Add New Adjustment
-            </ButtonShad>)}
+            </ButtonShad>
+          )}
         </div>
         <Box sx={{ height: 600 }}>
           <DataGrid
@@ -167,9 +185,22 @@ export default function AdjustmentsPage() {
             pageSizeOptions={[5, 10]}
             sx={{
               fontFamily: "Outfit, sans-serif",
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "#f9fafb",
-                fontWeight: "bold",
+
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "rgba(32, 158, 187, 0.8) !important",
+                color: "#FFF !important",
+              },
+              // Alternating row colors
+              "& .MuiDataGrid-row:nth-of-type(odd)": {
+                backgroundColor: "oklch(0.6478 0.1098 218.2180 /5%)",
+              },
+              "& .MuiDataGrid-row:nth-of-type(even)": {
+                backgroundColor: "#ffffff",
+              },
+
+              // Optional: keep hover highlight consistent
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "oklch(0.6478 0.1098 218.2180 /10%)",
               },
             }}
             showToolbar
@@ -183,7 +214,11 @@ export default function AdjustmentsPage() {
           <Card className="p-4 mr-10">
             <CardHeader className="flex flex-row justify-between items-center">
               <CardTitle>Adjustment #{selectedAdjustment.id}</CardTitle>
-              <ButtonShad variant="ghost" size="icon" onClick={() => setSelectedAdjustment(null)}>
+              <ButtonShad
+                variant="ghost"
+                size="icon"
+                onClick={() => setSelectedAdjustment(null)}
+              >
                 <X className="h-4 w-4" />
               </ButtonShad>
             </CardHeader>

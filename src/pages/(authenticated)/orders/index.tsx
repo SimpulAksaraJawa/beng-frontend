@@ -1,7 +1,7 @@
 import { DataGrid, GridColDef, GridRowParams, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
 import { Button as ButtonShad } from "@/components/ui/button";
-import { Eye, Minus, Search, LoaderIcon } from "lucide-react";
+import { Eye, Minus, LoaderIcon } from "lucide-react";
 import api from "@/api/axios";
 import { SiteHeader } from "@/components/site-header";
 import { useQuery } from "@tanstack/react-query";
@@ -155,7 +155,7 @@ export default function OrdersPage() {
           <Button
             variant="text"
             size="small"
-            color="secondary"
+            color="warning"
             startIcon={<Eye />}
             onClick={() => handleView(params.row.id)}
           />
@@ -205,10 +205,22 @@ export default function OrdersPage() {
           }}
           sx={{
             fontFamily: "Outfit, sans-serif",
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "#f9fafb",
-              fontWeight: "bold",
-              fontFamily: "Outfit, sans-serif",
+
+            "& .MuiDataGrid-columnHeader": {
+              backgroundColor: "rgba(32, 158, 187, 0.8) !important",
+              color: "#FFF !important",
+            },
+            // Alternating row colors
+            "& .MuiDataGrid-row:nth-of-type(odd)": {
+              backgroundColor: "oklch(0.6478 0.1098 218.2180 /5%)",
+            },
+            "& .MuiDataGrid-row:nth-of-type(even)": {
+              backgroundColor: "#ffffff",
+            },
+
+            // Optional: keep hover highlight consistent
+            "& .MuiDataGrid-row:hover": {
+              backgroundColor: "oklch(0.6478 0.1098 218.2180 /10%)",
             },
           }}
           showToolbar

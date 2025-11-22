@@ -45,19 +45,19 @@ interface SaleProduct {
   salePrice: number | string;
 }
 
-interface SalePayload {
-  noInvoice?: string;
-  customerName: string;
-  saleDate: string;
-  totalAmount: number;
-  saleDetails: Array<{
-    productName: string;
-    brand: string;
-    category: string;
-    saleQty: number;
-    salePrice: number;
-  }>;
-}
+// interface SalePayload {
+//   noInvoice?: string;
+//   customerName: string;
+//   saleDate: string;
+//   totalAmount: number;
+//   saleDetails: Array<{
+//     productName: string;
+//     brand: string;
+//     category: string;
+//     saleQty: number;
+//     salePrice: number;
+//   }>;
+// }
 
 const AddSalePage = () => {
   const navigate = useNavigate();

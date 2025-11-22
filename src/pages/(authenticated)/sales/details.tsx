@@ -15,14 +15,15 @@ interface SaleDetailRow {
 
 function formatRupiah(amount: number | null) {
   if (amount == null) return "-";
-  return (
-    "Rp " +
-    amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-  );
+  return "Rp " + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
 export default function SaleDetailsPage() {
-  const { data: rows = [], isLoading, error } = useQuery({
+  const {
+    data: rows = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["sale-details"],
     queryFn: async (): Promise<SaleDetailRow[]> => {
       const res = await api.get("/sale-details");
@@ -50,12 +51,18 @@ export default function SaleDetailsPage() {
       headerName: "Price",
       flex: 1,
       minWidth: 120,
-      valueGetter: (params: GridRowParams<SaleDetailRow> | null, row: SaleDetailRow) => { return formatRupiah(row?.price) },
+      valueGetter: (
+        params: GridRowParams<SaleDetailRow> | null,
+        row: SaleDetailRow
+      ) => {
+        return formatRupiah(row?.price);
+      },
     },
   ];
 
   if (isLoading) return <div className="p-6">Loading...</div>;
-  if (error) return <div className="p-6 text-red-500">Failed to load sale details.</div>;
+  if (error)
+    return <div className="p-6 text-red-500">Failed to load sale details.</div>;
 
   return (
     <div className="p-6 w-[100%] mx-auto">
@@ -72,10 +79,22 @@ export default function SaleDetailsPage() {
           }}
           sx={{
             fontFamily: "Outfit, sans-serif",
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "#f9fafb",
-              fontWeight: "bold",
-              fontFamily: "Outfit, sans-serif",
+
+            "& .MuiDataGrid-columnHeader": {
+              backgroundColor: "rgba(32, 158, 187, 0.8) !important",
+              color: "#FFF !important",
+            },
+            // Alternating row colors
+            "& .MuiDataGrid-row:nth-of-type(odd)": {
+              backgroundColor: "oklch(0.6478 0.1098 218.2180 /5%)",
+            },
+            "& .MuiDataGrid-row:nth-of-type(even)": {
+              backgroundColor: "#ffffff",
+            },
+
+            // Optional: keep hover highlight consistent
+            "& .MuiDataGrid-row:hover": {
+              backgroundColor: "oklch(0.6478 0.1098 218.2180 /10%)",
             },
           }}
           showToolbar

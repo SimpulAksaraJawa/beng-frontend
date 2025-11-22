@@ -407,12 +407,12 @@ export default function StockInventoryPage() {
           const isExpanded = expandedProductId === productId;
 
           return (
-            <Box sx={{ display: "flex", gap: 0.2, alignItems: "center" }}>
+            <Box sx={{ display: "block", gap: 0.2, alignItems: "center"}}>
               <Tooltip title="View Product Details">
                 <Button
                   variant="text"
-                  size="small"
-                  color="secondary"
+                  size="medium"
+                  color="warning"
                   style={{ minWidth: "30px", padding: "4px" }}
                   onClick={() => navigate(`/product/${productId}`)}
                 >
@@ -422,8 +422,8 @@ export default function StockInventoryPage() {
               <Tooltip title={isExpanded ? "Hide Analytics" : "Show Analytics"}>
                 <Button
                   variant="text"
-                  size="small"
-                  color={isExpanded ? "primary" : "secondary"}
+                  size="medium"
+                  color={isExpanded ? "primary" : "warning"}
                   style={{ minWidth: "30px", padding: "4px" }}
                   onClick={() => {
                     if (isExpanded) {
@@ -503,11 +503,23 @@ export default function StockInventoryPage() {
           getRowId={(row) => row.id || row.stockId}
           sx={{
             fontFamily: "Outfit, sans-serif",
-            "& .MuiDataGrid-cell": {
-              whiteSpace: "normal",
-              lineHeight: "1.5",
-              padding: "8px"
-            }
+
+            "& .MuiDataGrid-columnHeader": {
+              backgroundColor: "rgba(32, 158, 187, 0.8) !important",
+              color: "#FFF !important",
+            },
+            // Alternating row colors
+            "& .MuiDataGrid-row:nth-of-type(odd)": {
+              backgroundColor: "oklch(0.6478 0.1098 218.2180 /5%)",
+            },
+            "& .MuiDataGrid-row:nth-of-type(even)": {
+              backgroundColor: "#ffffff",
+            },
+
+            // Optional: keep hover highlight consistent
+            "& .MuiDataGrid-row:hover": {
+              backgroundColor: "oklch(0.6478 0.1098 218.2180 /10%)",
+            },
           }}
           showToolbar
         />
