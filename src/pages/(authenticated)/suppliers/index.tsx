@@ -144,9 +144,22 @@ export default function SuppliersPage() {
           }}
           sx={{
             fontFamily: "Outfit, sans-serif",
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "#f9fafb",
-              fontWeight: "bold",
+
+            "& .MuiDataGrid-columnHeader": {
+              backgroundColor: "rgba(32, 158, 187, 0.8) !important",
+              color: "#FFF !important",
+            },
+            // Alternating row colors
+            "& .MuiDataGrid-row:nth-of-type(odd)": {
+              backgroundColor: "oklch(0.6478 0.1098 218.2180 /5%)",
+            },
+            "& .MuiDataGrid-row:nth-of-type(even)": {
+              backgroundColor: "#ffffff",
+            },
+
+            // Optional: keep hover highlight consistent
+            "& .MuiDataGrid-row:hover": {
+              backgroundColor: "oklch(0.6478 0.1098 218.2180 /10%)",
             },
           }}
           showToolbar
