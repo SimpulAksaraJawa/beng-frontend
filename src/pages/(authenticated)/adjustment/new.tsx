@@ -7,6 +7,7 @@ import api from "@/api/axios";
 import { SearchableSelect } from "@/components/searchable-select";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface Product {
     id: number;
@@ -94,7 +95,7 @@ export default function NewAdjustmentPage() {
         if (action === "COMBINE" && role === "SOURCE") {
             const selected = products.find((p) => p.name === productName);
             if (!selected) {
-                alert("In COMBINE, sources must be existing products.");
+                toast.warning("In COMBINE, sources must be existing products.");
                 return;
             }
         }
@@ -188,7 +189,7 @@ export default function NewAdjustmentPage() {
     const handleSubmit = async () => {
         const error = validateAdjustment();
         if (error) {
-            alert(error);
+            toast.error(error);
             return;
         }
 
@@ -217,11 +218,11 @@ export default function NewAdjustmentPage() {
 
             const res = await api.post("/adjustments", payload);
 
-            alert("Adjustment created successfully!");
+            toast.success("Adjustment created successfully!");
             navigate("/adjustment");
         } catch (err: any) {
             console.error(err);
-            alert(err.response?.data?.message || "Failed to create adjustment");
+            toast.error(err.response?.data?.message || "Failed to create adjustment");
         }
     };
 
