@@ -17,6 +17,7 @@ import {
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 export default function EditCustomerPage() {
   const { id } = useParams();
@@ -67,7 +68,7 @@ export default function EditCustomerPage() {
 
   const handleSubmit = async () => {
     if (!name) {
-      alert("Name is required");
+      toast.warning("Name is required");
       return;
     }
 
@@ -85,7 +86,7 @@ export default function EditCustomerPage() {
       navigate("/customers");
     } catch (err: any) {
       console.error(err.response?.data || err);
-      alert(
+      toast.error(
         "Error updating customer: " +
           (err.response?.data?.message || err.message || "Unknown error")
       );
