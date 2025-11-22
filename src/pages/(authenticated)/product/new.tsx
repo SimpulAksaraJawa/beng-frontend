@@ -6,11 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SearchableSelect } from "@/components/searchable-select";
-import DOMPurify from "dompurify"; 
+import DOMPurify from "dompurify";
 import { useQueryClient } from "@tanstack/react-query";
-import {useAuth} from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-
+import { Spinner } from "@/components/ui/spinner";
 
 interface SKU {
   code: string;
@@ -34,18 +34,20 @@ const AddProductPage = () => {
     { code: "", name: "", desc: "", salePrice: "" },
   ]);
   const [images, setImages] = useState<File[]>([]);
-  const {user} = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { user } = useAuth();
 
   const sanitize = (val: string) => DOMPurify.sanitize(val.trim());
 
   useEffect(() => {
-  const canCreate =
-    user?.role === "ADMIN" || user?.permissions?.products?.includes("create");
+    const canCreate =
+      user?.role === "ADMIN" || user?.permissions?.products?.includes("create");
 
-  if (!canCreate) {
-    navigate("/404");
-  }
-}, [user, navigate]);
+    if (!canCreate) {
+      navigate("/404");
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     api.get("/brands").then((res) => {
@@ -97,6 +99,7 @@ const AddProductPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const cleanName = sanitize(name);
     const cleanBrand = sanitize(brandName || "unknown");
@@ -114,7 +117,11 @@ const AddProductPage = () => {
         toast.error("Invalid initial quantity");
         return;
       }
-      if (!initialPrice || isNaN(Number(initialPrice)) || Number(initialPrice) <= 0) {
+      if (
+        !initialPrice ||
+        isNaN(Number(initialPrice)) ||
+        Number(initialPrice) <= 0
+      ) {
         toast.error("Invalid initial price");
         return;
       }
@@ -144,9 +151,11 @@ const AddProductPage = () => {
       });
       toast.success("Product created successfully!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      setIsSubmitting(false);
       navigate("/product");
     } catch (err) {
       console.error(err);
+      setIsSubmitting(false);
       toast.error("Error creating product");
     }
   };
@@ -199,10 +208,7 @@ const AddProductPage = () => {
               setHasInitialStocks(checked as boolean)
             }
           />
-          <Label
-            htmlFor="initial-stock"
-            className="font-bold text-[#209ebb]"
-          >
+          <Label htmlFor="initial-stock" className="font-bold text-[#209ebb]">
             Has initial stock?
           </Label>
         </div>
@@ -297,9 +303,7 @@ const AddProductPage = () => {
           <p className="text-sm text-gray-500">
             Accepted file types: <strong>.jpg, .jpeg, .png</strong>
           </p>
-          <p className="text-sm text-gray-500">
-            Selected: {images.length}/3
-          </p>
+          <p className="text-sm text-gray-500">Selected: {images.length}/3</p>
 
           {images.length > 0 && (
             <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
@@ -325,8 +329,19 @@ const AddProductPage = () => {
 
         {/* Buttons */}
         <div className="flex gap-4">
-          <Button type="submit" className="cursor-pointer">
-            Save Product
+          <Button
+            type="submit"
+            className="cursor-pointer"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner />
+                Loading...
+              </>
+            ) : (
+              "Save Product"
+            )}
           </Button>
           <Button
             type="button"
