@@ -155,9 +155,9 @@ export default function Dashboard() {
       </div>
 
       {/* 3 METRIC CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 grid-rows-1 md:grid-cols-6 gap-3">
         {/* SALES CARD */}
-        <Card className="h-[180px]">
+        <Card className="h-[180px] col-span-2">
           <CardHeader className="pt-6">
             <CardTitle>Sales</CardTitle>
             <CardDescription>{windowLabels[windowRange]}</CardDescription>
@@ -171,7 +171,7 @@ export default function Dashboard() {
         </Card>
 
         {/* ORDERS CARD */}
-        <Card className="h-[180px]">
+        <Card className="h-[180px] col-span-2">
           <CardHeader className="pt-6">
             <CardTitle>Orders</CardTitle>
             <CardDescription>{windowLabels[windowRange]}</CardDescription>
@@ -185,7 +185,7 @@ export default function Dashboard() {
         </Card>
 
         {/* PROFIT / DEFICIT CARD */}
-        <Card className="h-[180px]">
+        <Card className="h-[180px] col-span-2">
           <CardHeader className="pt-6">
             <CardTitle>Profit / Deficit</CardTitle>
             <CardDescription>{windowLabels[windowRange]}</CardDescription>
@@ -218,13 +218,13 @@ export default function Dashboard() {
           </CardContent>
         </Card>
         {/* CHART */}
-        <Card className="h-[350px] col-span-2">
+        <Card className="h-[280px] col-span-1 md:col-span-3">
           <CardHeader className="pt-6">
             <CardTitle>Orders & Sales Overview</CardTitle>
             <CardDescription>{windowLabels[windowRange]}</CardDescription>
           </CardHeader>
 
-          <CardContent className="h-[230px] w-full">
+          <CardContent className="h-[160px] w-full">
             <ChartContainer className="h-full w-full" config={chartConfig}>
               <AreaChart accessibilityLayer data={combined}>
                 <CartesianGrid vertical={false} horizontal={true} />
