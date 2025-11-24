@@ -39,7 +39,7 @@ const windowLabels: Record<string, string> = {
   "6m": "Last 6 Months",
 };
 
-// --- Format Rupiah ---
+// Format Rupiah
 const formatRupiah = (value: number) =>
   value.toLocaleString("id-ID", {
     style: "currency",
@@ -47,7 +47,7 @@ const formatRupiah = (value: number) =>
     minimumFractionDigits: 0,
   });
 
-// --- Fetchers ---
+// Fetchers
 const fetchOrdersTotal = async (windowRange: string) => {
   const res = await api.get(`/dashboard/orders?window=${windowRange}`);
   return res.data.total;
@@ -69,14 +69,8 @@ const fetchSalesChart = async (windowRange: string) => {
 };
 
 const chartConfig = {
-  orders: {
-    label: "Orders",
-    color: "var(--chart-1)",
-  },
-  sales: {
-    label: "Sales",
-    color: "var(--chart-2)",
-  },
+  orders: { label: "Orders", color: "var(--chart-1)" },
+  sales: { label: "Sales", color: "var(--chart-2)" },
 } satisfies ChartConfig;
 
 export default function Dashboard() {
@@ -91,7 +85,7 @@ export default function Dashboard() {
 
   const [windowRange, setWindowRange] = useState("1m");
 
-  // --- Queries ---
+  // Queries
   const { data: ordersTotal, isLoading: ordersTotalLoading } = useQuery({
     queryKey: ["orders-total", windowRange],
     queryFn: () => fetchOrdersTotal(windowRange),
@@ -112,17 +106,21 @@ export default function Dashboard() {
     queryFn: () => fetchSalesChart(windowRange),
   });
 
-  // --- Loading & Data checks ---
-  if (ordersLoading || salesLoading) return <p className="p-6">Loading chart...</p>;
-  if (!ordersChart || !salesChart) return <p className="p-6">No chart data found.</p>;
-  if (ordersTotalLoading || salesTotalLoading) return <p className="p-6">Loading summary...</p>;
-  if (ordersTotal == null || salesTotal == null) return <p className="p-6">No summary data found.</p>;
+  // Loading states
+  if (ordersLoading || salesLoading)
+    return <p className="p-6">Loading chart...</p>;
+  if (!ordersChart || !salesChart)
+    return <p className="p-6">No chart data found.</p>;
+  if (ordersTotalLoading || salesTotalLoading)
+    return <p className="p-6">Loading summary...</p>;
+  if (ordersTotal == null || salesTotal == null)
+    return <p className="p-6">No summary data found.</p>;
 
-  // --- Trend logic ---
+  // Trend logic
   const difference = salesTotal - ordersTotal;
   const isUptrend = difference >= 0;
 
-  // --- Combine chart points ---
+  // Combine datasets
   const combined = ordersChart.map((o: any) => {
     const matched = salesChart.find((s: any) => s.day === o.day);
     return {
@@ -134,7 +132,7 @@ export default function Dashboard() {
 
   return (
     <section className="p-6 w-full flex flex-col gap-6">
-      {/* HEADER + DROPDOWN */}
+      {/* HEADER + RANGE SELECT */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <h1 className="font-semibold text-2xl">
           Welcome Back, <span className="text-primary">{currUser.name}</span>!
@@ -156,70 +154,73 @@ export default function Dashboard() {
         </Select>
       </div>
 
+      {/* 3 METRIC CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {/* SUMMARY CARD */}
-        <Card className="col-span-1 h-[350px]">
-          <CardHeader>
-            <CardTitle className="pt-6">Total Revenue</CardTitle>
+        {/* SALES CARD */}
+        <Card className="h-[180px]">
+          <CardHeader className="pt-6">
+            <CardTitle>Sales</CardTitle>
             <CardDescription>{windowLabels[windowRange]}</CardDescription>
           </CardHeader>
-
-          <CardContent className="flex flex-col gap-6">
-            {/* SALES */}
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-yellow-300/50">
-                <Tag className="text-yellow-800" size={26} />
-              </div>
-              <div>
-                <h3 className="font-semibold leading-tight">Sales</h3>
-                <p className="text-xl font-bold leading-tight">
-                  {formatRupiah(salesTotal)}
-                </p>
-              </div>
+          <CardContent className="flex items-center gap-4">
+            <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-yellow-300/50">
+              <Tag className="text-yellow-800" size={26} />
             </div>
-
-            {/* ORDERS */}
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-blue-300/50">
-                <Receipt className="text-blue-800" size={26} />
-              </div>
-              <div>
-                <h3 className="font-semibold leading-tight">Orders</h3>
-                <p className="text-xl font-bold leading-tight">
-                  {formatRupiah(ordersTotal)}
-                </p>
-              </div>
-            </div>
-
-            {/* TREND */}
-            <div className="flex items-center gap-4">
-              <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center ${isUptrend ? "bg-green-300/50" : "bg-red-300/50"}`}
-              >
-                {isUptrend ? (
-                  <TrendingUp className="text-green-800" size={26} />
-                ) : (
-                  <TrendingDown className="text-red-800" size={26} />
-                )}
-              </div>
-
-              <div>
-                <h3 className="font-semibold leading-tight">Trend</h3>
-                <p className="text-xl font-bold leading-tight">
-                  {isUptrend ? "Profit" : "Deficit"}
-                </p>
-                <p className={isUptrend ? "text-green-700" : "text-red-700"}>
-                  {formatRupiah(difference)}
-                </p>
-              </div>
-            </div>
+            <p className="text-2xl font-bold">{formatRupiah(salesTotal)}</p>
           </CardContent>
         </Card>
 
-        {/* CHART CARD */}
-        <Card className="col-span-2 h-[350px]">
-          <CardHeader>
-            <CardTitle className="pt-6">Orders & Sales Overview</CardTitle>
+        {/* ORDERS CARD */}
+        <Card className="h-[180px]">
+          <CardHeader className="pt-6">
+            <CardTitle>Orders</CardTitle>
+            <CardDescription>{windowLabels[windowRange]}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex items-center gap-4">
+            <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-300/50">
+              <Receipt className="text-blue-800" size={26} />
+            </div>
+            <p className="text-2xl font-bold">{formatRupiah(ordersTotal)}</p>
+          </CardContent>
+        </Card>
+
+        {/* PROFIT / DEFICIT CARD */}
+        <Card className="h-[180px]">
+          <CardHeader className="pt-6">
+            <CardTitle>Profit / Deficit</CardTitle>
+            <CardDescription>{windowLabels[windowRange]}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex items-center gap-4">
+            <div
+              className={`w-12 h-12 flex items-center justify-center rounded-xl ${
+                isUptrend ? "bg-green-300/50" : "bg-red-300/50"
+              }`}
+            >
+              {isUptrend ? (
+                <TrendingUp className="text-green-800" size={26} />
+              ) : (
+                <TrendingDown className="text-red-800" size={26} />
+              )}
+            </div>
+
+            <div>
+              <p className="text-lg font-semibold">
+                {isUptrend ? "Profit" : "Deficit"}
+              </p>
+              <p
+                className={`text-xl font-bold ${
+                  isUptrend ? "text-green-700" : "text-red-700"
+                }`}
+              >
+                {formatRupiah(difference)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        {/* CHART */}
+        <Card className="h-[350px] col-span-2">
+          <CardHeader className="pt-6">
+            <CardTitle>Orders & Sales Overview</CardTitle>
             <CardDescription>{windowLabels[windowRange]}</CardDescription>
           </CardHeader>
 
@@ -237,17 +238,36 @@ export default function Dashboard() {
                   hide={true}
                 />
 
-                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent />}
+                />
 
                 <defs>
                   <linearGradient id="fillOrders" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-orders)" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="var(--color-orders)" stopOpacity={0.1} />
+                    <stop
+                      offset="5%"
+                      stopColor="var(--color-orders)"
+                      stopOpacity={0.8}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="var(--color-orders)"
+                      stopOpacity={0.1}
+                    />
                   </linearGradient>
 
                   <linearGradient id="fillSales" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-sales)" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="var(--color-sales)" stopOpacity={0.1} />
+                    <stop
+                      offset="5%"
+                      stopColor="var(--color-sales)"
+                      stopOpacity={0.8}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="var(--color-sales)"
+                      stopOpacity={0.1}
+                    />
                   </linearGradient>
                 </defs>
 
