@@ -1,3 +1,4 @@
+import { useState } from "react";
 import api from "@/api/axios";
 import { useQuery } from "@tanstack/react-query";
 import { AreaChart, Area, CartesianGrid, XAxis } from "recharts";
@@ -9,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  // CardFooter,
 } from "@/components/ui/card";
 
 import {
@@ -19,15 +19,53 @@ import {
   ChartConfig,
 } from "@/components/ui/chart";
 
-// --- Fetchers ---
-const fetchOrdersChart = async () => {
-  const res = await api.get("/dashboard/orders/chart?window=1m");
-  return res.data.data; // [{day, total}]
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+
+import { Receipt, Tag, TrendingDown, TrendingUp } from "lucide-react";
+
+const windowLabels: Record<string, string> = {
+  "1d": "Last 1 Day",
+  "3d": "Last 3 Days",
+  "1w": "Last 1 Week",
+  "2w": "Last 2 Weeks",
+  "1m": "Last 1 Month",
+  "3m": "Last 3 Months",
+  "6m": "Last 6 Months",
 };
 
-const fetchSalesChart = async () => {
-  const res = await api.get("/dashboard/sales/chart?window=1m");
-  return res.data.data; // [{day, total}]
+// --- Format Rupiah ---
+const formatRupiah = (value: number) =>
+  value.toLocaleString("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  });
+
+// --- Fetchers ---
+const fetchOrdersTotal = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/orders?window=${windowRange}`);
+  return res.data.total;
+};
+
+const fetchSalesTotal = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/sales?window=${windowRange}`);
+  return res.data.total;
+};
+
+const fetchOrdersChart = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/orders/chart?window=${windowRange}`);
+  return res.data.data;
+};
+
+const fetchSalesChart = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/sales/chart?window=${windowRange}`);
+  return res.data.data;
 };
 
 const chartConfig = {
@@ -43,6 +81,7 @@ const chartConfig = {
 
 export default function Dashboard() {
   const { user } = useAuth();
+
   const currUser = {
     name: user?.name || "Shadcn",
     email: user?.email || "my-email@example.com",
@@ -50,26 +89,40 @@ export default function Dashboard() {
     role: user?.role || "USER",
   };
 
-  // Queries
+  const [windowRange, setWindowRange] = useState("1m");
+
+  // --- Queries ---
+  const { data: ordersTotal, isLoading: ordersTotalLoading } = useQuery({
+    queryKey: ["orders-total", windowRange],
+    queryFn: () => fetchOrdersTotal(windowRange),
+  });
+
+  const { data: salesTotal, isLoading: salesTotalLoading } = useQuery({
+    queryKey: ["sales-total", windowRange],
+    queryFn: () => fetchSalesTotal(windowRange),
+  });
+
   const { data: ordersChart, isLoading: ordersLoading } = useQuery({
-    queryKey: ["orders-chart"],
-    queryFn: fetchOrdersChart,
+    queryKey: ["orders-chart", windowRange],
+    queryFn: () => fetchOrdersChart(windowRange),
   });
 
   const { data: salesChart, isLoading: salesLoading } = useQuery({
-    queryKey: ["sales-chart"],
-    queryFn: fetchSalesChart,
+    queryKey: ["sales-chart", windowRange],
+    queryFn: () => fetchSalesChart(windowRange),
   });
 
-  // Loading or no data
-  if (ordersLoading || salesLoading) {
-    return <p className="p-6">Loading chart...</p>;
-  }
-  if (!ordersChart || !salesChart) {
-    return <p className="p-6">No chart data found.</p>;
-  }
+  // --- Loading & Data checks ---
+  if (ordersLoading || salesLoading) return <p className="p-6">Loading chart...</p>;
+  if (!ordersChart || !salesChart) return <p className="p-6">No chart data found.</p>;
+  if (ordersTotalLoading || salesTotalLoading) return <p className="p-6">Loading summary...</p>;
+  if (ordersTotal == null || salesTotal == null) return <p className="p-6">No summary data found.</p>;
 
-  // Combine datasets by date
+  // --- Trend logic ---
+  const difference = salesTotal - ordersTotal;
+  const isUptrend = difference >= 0;
+
+  // --- Combine chart points ---
   const combined = ordersChart.map((o: any) => {
     const matched = salesChart.find((s: any) => s.day === o.day);
     return {
@@ -81,102 +134,145 @@ export default function Dashboard() {
 
   return (
     <section className="p-6 w-full flex flex-col gap-6">
-      <h1 className="font-semibold text-2xl">
-        Welcome Back, <span className="text-primary">{currUser.name}</span>!
-      </h1>
-      <div className="grid grid-cols-3 grid-rows-2 gap-3">
-        <Card className="col-span-1 row-span-1">
+      {/* HEADER + DROPDOWN */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <h1 className="font-semibold text-2xl">
+          Welcome Back, <span className="text-primary">{currUser.name}</span>!
+        </h1>
 
-        </Card>
-      <Card className="col-span-2 row-span-1">
-        <CardHeader>
-          <CardTitle className="pt-6">Orders & Sales Overview</CardTitle>
-          <CardDescription>Last 1 Month</CardDescription>
-        </CardHeader>
+        <Select value={windowRange} onValueChange={setWindowRange}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Select range" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1d">Last 1 Day</SelectItem>
+            <SelectItem value="3d">Last 3 Days</SelectItem>
+            <SelectItem value="1w">Last 1 Week</SelectItem>
+            <SelectItem value="2w">Last 2 Weeks</SelectItem>
+            <SelectItem value="1m">Last 1 Month</SelectItem>
+            <SelectItem value="3m">Last 3 Months</SelectItem>
+            <SelectItem value="6m">Last 6 Months</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-        <CardContent>
-          <ChartContainer config={chartConfig}>
-            <AreaChart
-              accessibilityLayer
-              data={combined}
-              margin={{ left: 12, right: 12 }}
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="day"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(value) => value.slice(5)}
-                hide={true}
-              />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {/* SUMMARY CARD */}
+        <Card className="col-span-1 h-[350px]">
+          <CardHeader>
+            <CardTitle className="pt-6">Total Revenue</CardTitle>
+            <CardDescription>{windowLabels[windowRange]}</CardDescription>
+          </CardHeader>
 
-              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-
-              <defs>
-                <linearGradient id="fillOrders" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-orders)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-orders)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-
-                <linearGradient id="fillSales" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-sales)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-sales)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-              </defs>
-
-              <Area
-                dataKey="sales"
-                type="monotone"
-                fill="url(#fillSales)"
-                fillOpacity={0.4}
-                stroke="var(--color-sales)"
-                stackId="a"
-              />
-
-              <Area
-                dataKey="orders"
-                type="monotone"
-                fill="url(#fillOrders)"
-                fillOpacity={0.4}
-                stroke="var(--color-orders)"
-                stackId="a"
-              />
-            </AreaChart>
-          </ChartContainer>
-        </CardContent>
-
-        {/* <CardFooter>
-          <div className="flex w-full items-start gap-2 text-sm">
-            <div className="grid gap-2">
-              <div className="flex items-center gap-2 leading-none font-medium">
-                Trending up <TrendingUp className="h-4 w-4" />
+          <CardContent className="flex flex-col gap-6">
+            {/* SALES */}
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-yellow-300/50">
+                <Tag className="text-yellow-800" size={26} />
               </div>
-              <div className="text-muted-foreground flex items-center gap-2 leading-none">
-                Based on behavior from last 30 days
+              <div>
+                <h3 className="font-semibold leading-tight">Sales</h3>
+                <p className="text-xl font-bold leading-tight">
+                  {formatRupiah(salesTotal)}
+                </p>
               </div>
             </div>
-          </div>
-        </CardFooter> */}
-      </Card>
+
+            {/* ORDERS */}
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-blue-300/50">
+                <Receipt className="text-blue-800" size={26} />
+              </div>
+              <div>
+                <h3 className="font-semibold leading-tight">Orders</h3>
+                <p className="text-xl font-bold leading-tight">
+                  {formatRupiah(ordersTotal)}
+                </p>
+              </div>
+            </div>
+
+            {/* TREND */}
+            <div className="flex items-center gap-4">
+              <div
+                className={`w-12 h-12 rounded-xl flex items-center justify-center ${isUptrend ? "bg-green-300/50" : "bg-red-300/50"}`}
+              >
+                {isUptrend ? (
+                  <TrendingUp className="text-green-800" size={26} />
+                ) : (
+                  <TrendingDown className="text-red-800" size={26} />
+                )}
+              </div>
+
+              <div>
+                <h3 className="font-semibold leading-tight">Trend</h3>
+                <p className="text-xl font-bold leading-tight">
+                  {isUptrend ? "Profit" : "Deficit"}
+                </p>
+                <p className={isUptrend ? "text-green-700" : "text-red-700"}>
+                  {formatRupiah(difference)}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* CHART CARD */}
+        <Card className="col-span-2 h-[350px]">
+          <CardHeader>
+            <CardTitle className="pt-6">Orders & Sales Overview</CardTitle>
+            <CardDescription>{windowLabels[windowRange]}</CardDescription>
+          </CardHeader>
+
+          <CardContent className="h-[230px] w-full">
+            <ChartContainer className="h-full w-full" config={chartConfig}>
+              <AreaChart accessibilityLayer data={combined}>
+                <CartesianGrid vertical={false} horizontal={true} />
+
+                <XAxis
+                  dataKey="day"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tickFormatter={(value) => value.slice(5)}
+                  hide={true}
+                />
+
+                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+
+                <defs>
+                  <linearGradient id="fillOrders" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--color-orders)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-orders)" stopOpacity={0.1} />
+                  </linearGradient>
+
+                  <linearGradient id="fillSales" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--color-sales)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-sales)" stopOpacity={0.1} />
+                  </linearGradient>
+                </defs>
+
+                <Area
+                  dataKey="sales"
+                  type="monotone"
+                  fill="url(#fillSales)"
+                  fillOpacity={0.4}
+                  stroke="var(--color-sales)"
+                  stackId="a"
+                />
+
+                <Area
+                  dataKey="orders"
+                  type="monotone"
+                  fill="url(#fillOrders)"
+                  fillOpacity={0.4}
+                  stroke="var(--color-orders)"
+                  stackId="a"
+                />
+              </AreaChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
       </div>
-      {/* Combined Orders + Sales Chart */}
     </section>
   );
 }
