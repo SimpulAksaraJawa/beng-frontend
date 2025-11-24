@@ -85,8 +85,8 @@ export default function SuppliersPage() {
           <Badge variant={isActive ? "default" : "destructive"}
             className={
               isActive
-                ? "bg-[#49a135] hover:bg-green-600 text-white rounded-full"
-                : "rounded-full"
+                ? "bg-green-500/20 text-green-700 border border-green-300 rounded-full"
+                : "bg-red-500/20 text-red-700 border border-red-300 rounded-full"
             }
           >
             {isActive ? "Active" : "Inactive"}

@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent } from "@radix-ui/react-collapsible";
 import { useAuth, User } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 type MainLink = {
   title: string;
@@ -117,6 +117,7 @@ const userPath: innerUserPath = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const userAccess = (currUser: User): Path => {
     if (currUser.role === "ADMIN") {
@@ -163,9 +164,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const data: Path = user
     ? userAccess(user)
     : {
-        navMain: [],
-        users: [],
-      };
+      navMain: [],
+      users: [],
+    };
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -181,7 +182,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 alt="BENG Logo"
                 className="-ml-2 h-8 w-8 drop-shadow-2xl"
               />
-              <h1 className="text-xl font-bold text-[#209ebb] group-data-[state=collapsed]/sidebar:hidden">
+              <h1 className="text-xl font-bold 
+                bg-[linear-gradient(to_right,#46b6d7,#ffb701,#ee7c3c)]
+                bg-clip-text text-transparent group-data-[state=collapsed]/sidebar:hidden">
                 BENG
               </h1>
             </div>
@@ -189,9 +192,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <CollapsibleContent></CollapsibleContent>
         </Collapsible>
       </SidebarHeader>
+
       <SidebarContent>
+        {/* ---------------- Dashboard Highlight ---------------- */}
         <div className="px-2 -mb-4">
-          <SidebarMenuButton onClick={() => navigate("/dashboard")}>
+          <SidebarMenuButton
+            onClick={() => navigate("/dashboard")}
+            className={
+              location.pathname.startsWith("/dashboard")
+                ? "bg-[#209ebb] text-white font-medium"
+                : ""
+            }
+          >
             <div className="flex items-center gap-2">
               <Home className="h-4 w-4" />
               <span className="group-data-[state=collapsed]/sidebar:hidden">
@@ -201,12 +213,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuButton>
         </div>
 
+        {/* Management */}
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.users} />
+
+        {/* ---------------- Stakeholders Highlight ---------------- */}
+        <NavProjects
+          projects={data.users}
+        />
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser user={currUser} />
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );

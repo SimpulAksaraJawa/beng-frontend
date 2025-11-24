@@ -9,6 +9,8 @@ import api from "@/api/axios";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { SiteHeader } from "@/components/site-header";
+import { Badge } from "@/components/ui/badge";
+
 
 interface AdjustmentProduct {
   id: number;
@@ -103,7 +105,24 @@ export default function AdjustmentsPage() {
       maxWidth: 200,
       renderCell: (params) => formatDate(params.row.date),
     },
-    { field: "action", headerName: "Action", flex: 1, maxWidth: 200 },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 1,
+      maxWidth: 200,
+      renderCell: (params) => (
+        <Badge
+          variant={params.row.action === "SPLIT" ? "destructive" : "default"}
+          className={
+            params.row.action === "SPLIT"
+              ? "bg-yellow-500/20 text-yellow-700 border border-yellow-300"
+              : "bg-green-500/20 text-green-700 border border-green-300"
+          }
+        >
+          {params.row.action}
+        </Badge>
+      ),
+    },
     {
       field: "view",
       headerName: "View",

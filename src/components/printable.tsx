@@ -58,6 +58,6 @@ export default function Printable({ products }: Props) {
     };
   };
 
-  return <Button className="cursor-pointer" onClick={generatePDF}>Print PDF</Button>;
+  return <Button className="cursor-pointer hover:bg-[#b4dff3] hover:text-black" onClick={generatePDF}>Print PDF</Button>;
 }
  

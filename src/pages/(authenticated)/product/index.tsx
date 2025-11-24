@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import Printable from "@/components/printable";
 import { useAuth } from "@/contexts/AuthContext";
+import { Plus } from "lucide-react";
 
 interface ProductImage {
   url: { type: string; data: number[] };
@@ -178,17 +179,17 @@ export default function Page() {
           {canCreateProduct && (
             <Button
               variant="secondary"
-              className="cursor-pointer"
+              className="cursor-pointer hover:bg-[#b4dff3] hover:text-black"
               onClick={() => navigate("/product/new")}
             >
-              Add Product
+              <Plus />Add Product
             </Button>
           )}
         </div>
       </div>
 
       {/* Products grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filteredProducts.map((product) => {
           const currentIndex = currentImageIndex[product.id] ?? 0;
           const hasImages = product.images.length > 0;
@@ -233,9 +234,9 @@ export default function Page() {
                 </div>
               )}
               <CardHeader>
-                <CardTitle className="text-base">{product.name}</CardTitle>
+                <CardTitle>{product.name}</CardTitle>
               </CardHeader>
-              <CardContent className="flex justify-between items-end">
+              <CardContent className="flex justify-between items-end -mt-6">
                 <div>
                   <p className="text-[#209ebb] font-extrabold">
                     <span>Rp </span>{formatPrice(product.price)}
@@ -245,9 +246,8 @@ export default function Page() {
                   </p>
                 </div>
                 <Button
-                  variant="outline"
                   size="sm"
-                  className="ml-2 text-sm cursor-pointer"
+                  className="ml-2 text-sm cursor-pointer bg-[#b4dff3] text-black border-[#209ebb] border-[1.5px] hover:bg-[#209ebb] hover:text-white"
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
                   Details
