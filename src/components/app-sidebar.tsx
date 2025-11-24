@@ -9,6 +9,7 @@ import {
   Key,
   LucideIcon,
   Settings,
+  Home,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -22,13 +23,9 @@ import {
   SidebarMenuButton,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-} from "@radix-ui/react-collapsible";
+import { Collapsible, CollapsibleContent } from "@radix-ui/react-collapsible";
 import { useAuth, User } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-
 
 type MainLink = {
   title: string;
@@ -44,20 +41,20 @@ type UserLink = {
   name: string;
   url: string;
   icon: LucideIcon;
-}
+};
 
 type innerMainPath = {
   [key: string]: MainLink;
-}
+};
 
 type innerUserPath = {
   [key: string]: UserLink;
-}
+};
 
 type Path = {
   navMain: MainLink[];
   users: UserLink[];
-}
+};
 
 const navMainPath: innerMainPath = {
   products: {
@@ -102,7 +99,7 @@ const navMainPath: innerMainPath = {
     url: "/permission",
     icon: Key,
   },
-}
+};
 
 const userPath: innerUserPath = {
   suppliers: {
@@ -115,7 +112,7 @@ const userPath: innerUserPath = {
     url: "/customers",
     icon: Users,
   },
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
@@ -132,46 +129,53 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           navMainPath.stocks,
           navMainPath.permission,
         ],
-        users: [
-          userPath.suppliers,
-          userPath.customers,
-        ],
+        users: [userPath.suppliers, userPath.customers],
       };
     }
-  const navMainFeature = ["products", "adjustments", "orders", "sales", "stocks"];
-  const allowed: Path = {
-    navMain: [],
-    users: [userPath.suppliers, userPath.customers],
+    const navMainFeature = [
+      "products",
+      "adjustments",
+      "orders",
+      "sales",
+      "stocks",
+    ];
+    const allowed: Path = {
+      navMain: [],
+      users: [userPath.suppliers, userPath.customers],
+    };
+
+    navMainFeature.forEach((f: string) => {
+      if (currUser.permissions[f]?.includes("read")) {
+        allowed.navMain.push(navMainPath[f]);
+      }
+    });
+
+    return allowed;
   };
-
-  navMainFeature.forEach((f: string) => {
-    if (currUser.permissions[f]?.includes("read")) {
-      allowed.navMain.push(navMainPath[f]);
-    }
-  });
-
-  return allowed;
-};
-
 
   const currUser = {
     name: user?.name || "Shadcn",
     email: user?.email || "my-email@example.com",
     avatar: "/otter.png",
     role: user?.role || "USER",
-  }
-
-  const data: Path = user ? userAccess(user) : {
-    navMain: [],
-    users: []
   };
+
+  const data: Path = user
+    ? userAccess(user)
+    : {
+        navMain: [],
+        users: [],
+      };
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <Collapsible className="group/collapsible">
           <SidebarMenuButton className="hover:bg-white/50 data-[state=open]:hover:bg-white/50 active:bg-white/50">
-            <div onClick={() => navigate("/product")} className="flex justify-start items-center flex-row">
+            <div
+              onClick={() => navigate("/product")}
+              className="flex justify-start items-center flex-row"
+            >
               <img
                 src="/favicon.png"
                 alt="BENG Logo"
@@ -186,6 +190,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </Collapsible>
       </SidebarHeader>
       <SidebarContent>
+        <div className="px-2 -mb-4">
+          <SidebarMenuButton onClick={() => navigate("/dashboard")}>
+            <div className="flex items-center gap-2">
+              <Home className="h-4 w-4" />
+              <span className="group-data-[state=collapsed]/sidebar:hidden">
+                Dashboard
+              </span>
+            </div>
+          </SidebarMenuButton>
+        </div>
+
         <NavMain items={data.navMain} />
         <NavProjects projects={data.users} />
       </SidebarContent>

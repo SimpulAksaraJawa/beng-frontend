@@ -10,6 +10,7 @@ export type Path =
   | `/customers`
   | `/customers/edit/:id`
   | `/customers/new`
+  | `/dashboard`
   | `/home`
   | `/login`
   | `/orders`
