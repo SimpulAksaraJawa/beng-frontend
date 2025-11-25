@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/select";
 
 import { Receipt, Tag, TrendingDown, TrendingUp } from "lucide-react";
+import SalesByCategoryCard from "@/components/dashboard/SalesByCategoryDonut";
+import ComparisonCard from "@/components/dashboard/ComparisonCard";
 
 const windowLabels: Record<string, string> = {
   "1d": "Last 1 Day",
@@ -65,6 +67,32 @@ const fetchOrdersChart = async (windowRange: string) => {
 
 const fetchSalesChart = async (windowRange: string) => {
   const res = await api.get(`/dashboard/sales/chart?window=${windowRange}`);
+  return res.data.data;
+};
+
+// SALES BY CATEGORY (PIE)
+const fetchSalesByCategory = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/sales/category?window=${windowRange}`);
+  return res.data.data; // { sales: [...], total: number }
+};
+
+// ORDERS TOTAL COMPARISON
+const fetchOrdersComparison = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/orders/total?window=${windowRange}`);
+  return res.data.data;
+};
+
+// SALES TOTAL COMPARISON
+const fetchSalesComparison = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/sales/total?window=${windowRange}`);
+  return res.data.data;
+};
+
+// UNIQUE CUSTOMER TOTAL
+const fetchUniqueCustomer = async (windowRange: string) => {
+  const res = await api.get(
+    `/dashboard/sales/customers?window=${windowRange}`
+  );
   return res.data.data;
 };
 
@@ -106,6 +134,33 @@ export default function Dashboard() {
     queryFn: () => fetchSalesChart(windowRange),
   });
 
+  // Sales by Category
+  const { data: salesCategory, isLoading: salesCategoryLoading } = useQuery({
+    queryKey: ["sales-category", windowRange],
+    queryFn: () => fetchSalesByCategory(windowRange),
+  });
+
+  // Orders Comparison
+  const { data: ordersComparison } =
+    useQuery({
+      queryKey: ["orders-comparison", windowRange],
+      queryFn: () => fetchOrdersComparison(windowRange),
+    });
+
+  // Sales Comparison
+  const { data: salesComparison } = useQuery(
+    {
+      queryKey: ["sales-comparison", windowRange],
+      queryFn: () => fetchSalesComparison(windowRange),
+    }
+  );
+
+  // Unique Customer Comparison
+  const { data: uniqueCustomer } = useQuery({
+    queryKey: ["unique-customer", windowRange],
+    queryFn: () => fetchUniqueCustomer(windowRange),
+  });
+
   // Loading states
   if (ordersLoading || salesLoading)
     return <p className="p-6">Loading chart...</p>;
@@ -130,12 +185,16 @@ export default function Dashboard() {
     };
   });
 
-  return (
-    <section className="p-6 w-full flex flex-col gap-6">
+return (
+  <section className="h-full w-full flex flex-col overflow-hidden">
+    {/* Scrollable content wrapper */}
+    <div className="flex-1 overflow-auto p-4 md:p-6 flex flex-col gap-6">
+      
       {/* HEADER + RANGE SELECT */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <h1 className="font-semibold text-2xl">
-          Welcome Back, <span className="text-primary">{currUser.name}</span>!
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <h1 className="font-semibold text-2xl md:text-3xl break-words">
+          Welcome Back,{" "}
+          <span className="text-primary">{currUser.name}</span>!
         </h1>
 
         <Select value={windowRange} onValueChange={setWindowRange}>
@@ -154,43 +213,10 @@ export default function Dashboard() {
         </Select>
       </div>
 
-      {/* 3 METRIC CARDS */}
-      <div className="grid grid-cols-1 grid-rows-1 md:grid-cols-6 gap-3">
-        {/* SALES CARD */}
-        <Card className="h-[180px] col-span-2">
-          <CardHeader className="pt-6">
-            <CardTitle>Sales</CardTitle>
-            <CardDescription>{windowLabels[windowRange]}</CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center gap-4">
-            <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-yellow-300/50">
-              <Tag className="text-yellow-800" size={26} />
-            </div>
-            <p className="text-2xl font-bold">{formatRupiah(salesTotal)}</p>
-          </CardContent>
-        </Card>
-
-        {/* ORDERS CARD */}
-        <Card className="h-[180px] col-span-2">
-          <CardHeader className="pt-6">
-            <CardTitle>Orders</CardTitle>
-            <CardDescription>{windowLabels[windowRange]}</CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center gap-4">
-            <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-300/50">
-              <Receipt className="text-blue-800" size={26} />
-            </div>
-            <p className="text-2xl font-bold">{formatRupiah(ordersTotal)}</p>
-          </CardContent>
-        </Card>
-
-        {/* PROFIT / DEFICIT CARD */}
-        <Card className="h-[180px] col-span-2">
-          <CardHeader className="pt-6">
-            <CardTitle>Profit / Deficit</CardTitle>
-            <CardDescription>{windowLabels[windowRange]}</CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center gap-4">
+      {/* PROFIT / DEFICIT */}
+      <Card className="pt-6">
+        <CardContent className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex flex-row items-center gap-4">
             <div
               className={`w-12 h-12 flex items-center justify-center rounded-xl ${
                 isUptrend ? "bg-green-300/50" : "bg-red-300/50"
@@ -202,30 +228,82 @@ export default function Dashboard() {
                 <TrendingDown className="text-red-800" size={26} />
               )}
             </div>
-
             <div>
-              <p className="text-lg font-semibold">
-                {isUptrend ? "Profit" : "Deficit"}
-              </p>
-              <p
-                className={`text-xl font-bold ${
-                  isUptrend ? "text-green-700" : "text-red-700"
-                }`}
-              >
-                {formatRupiah(difference)}
-              </p>
+              <CardTitle className="text-lg md:text-xl">Revenue</CardTitle>
+              <CardDescription className="text-sm md:text-base">
+                {windowLabels[windowRange]}
+              </CardDescription>
             </div>
+          </div>
+
+          <div className="text-right">
+            <p className="text-md md:text-lg font-semibold">
+              {isUptrend ? "Profit" : "Deficit"}
+            </p>
+            <p
+              className={`text-xl md:text-2xl font-bold ${
+                isUptrend ? "text-green-700" : "text-red-700"
+              }`}
+            >
+              {formatRupiah(difference)}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* METRICS + CHART GRID */}
+      <div
+        className="
+          grid
+          grid-cols-1
+          md:grid-cols-9
+          auto-rows-min
+          gap-3
+        "
+      >
+        <div className="flex flex-col gap-4 items-stretch justify-between col-span-3">
+        {/* SALES CARD */}
+        <Card className="flex-1">
+          <CardHeader className="pt-6 flex flex-row gap-2 items-center">
+            <CardTitle>Sales</CardTitle>
+            <CardDescription>{windowLabels[windowRange]}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex items-center gap-4 -mt-4">
+            <div className="size-6 flex items-center justify-center rounded-md bg-yellow-300/50">
+              <Tag className="text-yellow-800" size={16} />
+            </div>
+            <p className="text-2xl font-bold truncate">
+              {formatRupiah(salesTotal)}
+            </p>
           </CardContent>
         </Card>
+
+        {/* ORDERS CARD */}
+        <Card className="flex-1">
+          <CardHeader className="pt-6 flex flex-row gap-2 items-center">
+            <CardTitle>Orders</CardTitle>
+            <CardDescription>{windowLabels[windowRange]}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex items-center gap-4 -mt-4">
+            <div className="size-6  flex items-center justify-center rounded-md bg-blue-300/50">
+              <Receipt className="text-blue-800" size={16} />
+            </div>
+            <p className="text-2xl font-bold truncate">
+              {formatRupiah(ordersTotal)}
+            </p>
+          </CardContent>
+        </Card>
+
+        </div>
+
         {/* CHART */}
-        <Card className="h-[280px] col-span-1 md:col-span-3">
+        <Card className="md:col-span-6 h-full">
           <CardHeader className="pt-6">
             <CardTitle>Orders & Sales Overview</CardTitle>
             <CardDescription>{windowLabels[windowRange]}</CardDescription>
           </CardHeader>
-
-          <CardContent className="h-[160px] w-full">
-            <ChartContainer className="h-full w-full" config={chartConfig}>
+          <CardContent className="h-full w-full">
+            <ChartContainer className="h-[140px] max-h-full w-full" config={chartConfig}>
               <AreaChart accessibilityLayer data={combined}>
                 <CartesianGrid vertical={false} horizontal={true} />
 
@@ -238,36 +316,17 @@ export default function Dashboard() {
                   hide={true}
                 />
 
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent />}
-                />
+                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
 
                 <defs>
                   <linearGradient id="fillOrders" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-orders)"
-                      stopOpacity={0.8}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-orders)"
-                      stopOpacity={0.1}
-                    />
+                    <stop offset="5%" stopColor="var(--color-orders)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-orders)" stopOpacity={0.1} />
                   </linearGradient>
 
                   <linearGradient id="fillSales" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-sales)"
-                      stopOpacity={0.8}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-sales)"
-                      stopOpacity={0.1}
-                    />
+                    <stop offset="5%" stopColor="var(--color-sales)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-sales)" stopOpacity={0.1} />
                   </linearGradient>
                 </defs>
 
@@ -275,24 +334,61 @@ export default function Dashboard() {
                   dataKey="sales"
                   type="monotone"
                   fill="url(#fillSales)"
-                  fillOpacity={0.4}
                   stroke="var(--color-sales)"
-                  stackId="a"
+                  fillOpacity={0.4}
                 />
-
                 <Area
                   dataKey="orders"
                   type="monotone"
                   fill="url(#fillOrders)"
-                  fillOpacity={0.4}
                   stroke="var(--color-orders)"
-                  stackId="a"
+                  fillOpacity={0.4}
                 />
               </AreaChart>
             </ChartContainer>
           </CardContent>
         </Card>
+
+        {/* SALES CATEGORY DONUT */}
+        <SalesByCategoryCard
+          windowLabel={windowLabels[windowRange]}
+          data={salesCategory}
+          loading={salesCategoryLoading}
+        />
+
+        {/* COMPARISON CARDS */}
+        {ordersComparison && (
+          <ComparisonCard
+            title="Orders Comparison"
+            windowLabel={windowLabels[windowRange]}
+            data={ordersComparison}
+            icon={Receipt}
+            color="bg-blue-300/50"
+          />
+        )}
+
+        {salesComparison && (
+          <ComparisonCard
+            title="Sales Comparison"
+            windowLabel={windowLabels[windowRange]}
+            data={salesComparison}
+            icon={Tag}
+            color="bg-yellow-300/50"
+          />
+        )}
+
+        {uniqueCustomer && (
+          <ComparisonCard
+            title="Unique Customers"
+            windowLabel={windowLabels[windowRange]}
+            data={uniqueCustomer}
+            icon={TrendingUp}
+            color="bg-green-300/50"
+          />
+        )}
       </div>
-    </section>
-  );
+    </div>
+  </section>
+);
+
 }
