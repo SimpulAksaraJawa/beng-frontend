@@ -1,4 +1,10 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 
 interface Props {
   title: string;
@@ -7,12 +13,20 @@ interface Props {
   color: string;
   data: {
     current: number;
-    percentage: number;
+    previous: number | null;
+    percentage: number | null;
   };
 }
 
-export default function ComparisonCard({ title, windowLabel, icon: Icon, color, data }: Props) {
-  const isUp = data.percentage >= 0;
+export default function ComparisonCard({
+  title,
+  windowLabel,
+  icon: Icon,
+  color,
+  data,
+}: Props) {
+  const isNew = data.percentage === null;
+  const isUp = data.percentage !== null && data.percentage >= 0;
 
   return (
     <Card className="col-span-2 row-span-1">
@@ -22,20 +36,38 @@ export default function ComparisonCard({ title, windowLabel, icon: Icon, color, 
       </CardHeader>
 
       <CardContent className="flex items-center gap-4">
-        <div className={`w-12 h-12 flex items-center justify-center rounded-xl ${color}`}>
+        {/* Icon */}
+        <div
+          className={`size-12 flex items-center justify-center rounded-xl ${color}`}
+        >
           <Icon size={26} />
         </div>
 
-        <div>
-          <p className="text-2xl font-bold">{data.current}</p>
-          <p
-            className={`text-sm font-semibold ${
-              isUp ? "text-green-700" : "text-red-700"
-            }`}
-          >
-            {isUp ? "+" : ""}
-            {data.percentage}%
-          </p>
+        {/* Numbers */}
+        <div className="flex flex-col">
+          <div className="flex flex-row gap-1 items-end">
+            <p className="text-2xl/tight font-bold ">{data.current}</p>
+
+            {/* Previous value */}
+            <p className="text-sm font-medium text-gray-500">
+              {data.previous === null ? "-" : data.previous}
+            </p>
+          </div>
+          {/* Current value */}
+
+          {/* Percentage change */}
+          {isNew ? (
+            <p className="text-sm font-semibold text-green-700">New!</p>
+          ) : (
+            <p
+              className={`text-sm font-semibold ${
+                isUp ? "text-green-700" : "text-red-700"
+              }`}
+            >
+              {isUp ? "+" : ""}
+              {data.percentage}%
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>

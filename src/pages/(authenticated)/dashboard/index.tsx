@@ -30,6 +30,7 @@ import {
 import { Receipt, Tag, TrendingDown, TrendingUp } from "lucide-react";
 import SalesByCategoryCard from "@/components/dashboard/SalesByCategoryDonut";
 import ComparisonCard from "@/components/dashboard/ComparisonCard";
+import { Spinner } from "@/components/ui/spinner";
 
 const windowLabels: Record<string, string> = {
   "1d": "Last 1 Day",
@@ -163,7 +164,7 @@ export default function Dashboard() {
 
   // Loading states
   if (ordersLoading || salesLoading)
-    return <p className="p-6">Loading chart...</p>;
+    return <p className="flex items-center justify-center h-full w-full p-6 gap-2"><Spinner decelerate={0.6}/> Loading chart...</p>;
   if (!ordersChart || !salesChart)
     return <p className="p-6">No chart data found.</p>;
   if (ordersTotalLoading || salesTotalLoading)
@@ -214,8 +215,8 @@ return (
       </div>
 
       {/* PROFIT / DEFICIT */}
-      <Card className="pt-6">
-        <CardContent className="flex items-center justify-between gap-4 flex-wrap">
+      <Card className="p-2">
+        <CardContent className="px-2 flex items-center justify-between flex-wrap">
           <div className="flex flex-row items-center gap-4">
             <div
               className={`w-12 h-12 flex items-center justify-center rounded-xl ${
