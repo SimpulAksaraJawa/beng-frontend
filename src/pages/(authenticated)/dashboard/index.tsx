@@ -1,3 +1,4 @@
+import { useState } from "react";
 import api from "@/api/axios";
 import { useQuery } from "@tanstack/react-query";
 import { AreaChart, Area, CartesianGrid, XAxis } from "recharts";
@@ -9,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  // CardFooter,
 } from "@/components/ui/card";
 
 import {
@@ -19,30 +19,90 @@ import {
   ChartConfig,
 } from "@/components/ui/chart";
 
-// --- Fetchers ---
-const fetchOrdersChart = async () => {
-  const res = await api.get("/dashboard/orders/chart?window=1m");
-  return res.data.data; // [{day, total}]
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+
+import { Receipt, Tag, TrendingDown, TrendingUp } from "lucide-react";
+import SalesByCategoryCard from "@/components/dashboard/SalesByCategoryDonut";
+import ComparisonCard from "@/components/dashboard/ComparisonCard";
+import { Spinner } from "@/components/ui/spinner";
+
+const windowLabels: Record<string, string> = {
+  "1d": "Today vs Yesterday",
+  "3d": "3 days vs last",
+  "1w": "This week vs last",
+  "2w": "This 2 weeks vs last",
+  "1m": "This month vs last",
+  "3m": "This trimester vs last",
+  "6m": "This semester vs last",
 };
 
-const fetchSalesChart = async () => {
-  const res = await api.get("/dashboard/sales/chart?window=1m");
-  return res.data.data; // [{day, total}]
+// Format Rupiah
+const formatRupiah = (value: number) =>
+  value.toLocaleString("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  });
+
+// Fetchers
+const fetchOrdersTotal = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/orders?window=${windowRange}`);
+  return res.data.total;
+};
+
+const fetchSalesTotal = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/sales?window=${windowRange}`);
+  return res.data.total;
+};
+
+const fetchOrdersChart = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/orders/chart?window=${windowRange}`);
+  return res.data.data;
+};
+
+const fetchSalesChart = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/sales/chart?window=${windowRange}`);
+  return res.data.data;
+};
+
+// SALES BY CATEGORY (PIE)
+const fetchSalesByCategory = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/sales/category?window=${windowRange}`);
+  return res.data.data; // { sales: [...], total: number }
+};
+
+// ORDERS TOTAL COMPARISON
+const fetchOrdersComparison = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/orders/total?window=${windowRange}`);
+  return res.data.data;
+};
+
+// SALES TOTAL COMPARISON
+const fetchSalesComparison = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/sales/total?window=${windowRange}`);
+  return res.data.data;
+};
+
+// UNIQUE CUSTOMER TOTAL
+const fetchUniqueCustomer = async (windowRange: string) => {
+  const res = await api.get(`/dashboard/sales/customers?window=${windowRange}`);
+  return res.data.data;
 };
 
 const chartConfig = {
-  orders: {
-    label: "Orders",
-    color: "var(--chart-1)",
-  },
-  sales: {
-    label: "Sales",
-    color: "var(--chart-2)",
-  },
+  orders: { label: "Orders", color: "var(--chart-1)" },
+  sales: { label: "Sales", color: "var(--chart-2)" },
 } satisfies ChartConfig;
 
 export default function Dashboard() {
   const { user } = useAuth();
+
   const currUser = {
     name: user?.name || "Shadcn",
     email: user?.email || "my-email@example.com",
@@ -50,26 +110,72 @@ export default function Dashboard() {
     role: user?.role || "USER",
   };
 
+  const [windowRange, setWindowRange] = useState("1m");
+
   // Queries
+  const { data: ordersTotal, isLoading: ordersTotalLoading } = useQuery({
+    queryKey: ["orders-total", windowRange],
+    queryFn: () => fetchOrdersTotal(windowRange),
+  });
+
+  const { data: salesTotal, isLoading: salesTotalLoading } = useQuery({
+    queryKey: ["sales-total", windowRange],
+    queryFn: () => fetchSalesTotal(windowRange),
+  });
+
   const { data: ordersChart, isLoading: ordersLoading } = useQuery({
-    queryKey: ["orders-chart"],
-    queryFn: fetchOrdersChart,
+    queryKey: ["orders-chart", windowRange],
+    queryFn: () => fetchOrdersChart(windowRange),
   });
 
   const { data: salesChart, isLoading: salesLoading } = useQuery({
-    queryKey: ["sales-chart"],
-    queryFn: fetchSalesChart,
+    queryKey: ["sales-chart", windowRange],
+    queryFn: () => fetchSalesChart(windowRange),
   });
 
-  // Loading or no data
-  if (ordersLoading || salesLoading) {
-    return <p className="p-6">Loading chart...</p>;
-  }
-  if (!ordersChart || !salesChart) {
-    return <p className="p-6">No chart data found.</p>;
-  }
+  // Sales by Category
+  const { data: salesCategory, isLoading: salesCategoryLoading } = useQuery({
+    queryKey: ["sales-category", windowRange],
+    queryFn: () => fetchSalesByCategory(windowRange),
+  });
 
-  // Combine datasets by date
+  // Orders Comparison
+  const { data: ordersComparison } = useQuery({
+    queryKey: ["orders-comparison", windowRange],
+    queryFn: () => fetchOrdersComparison(windowRange),
+  });
+
+  // Sales Comparison
+  const { data: salesComparison } = useQuery({
+    queryKey: ["sales-comparison", windowRange],
+    queryFn: () => fetchSalesComparison(windowRange),
+  });
+
+  // Unique Customer Comparison
+  const { data: uniqueCustomer } = useQuery({
+    queryKey: ["unique-customer", windowRange],
+    queryFn: () => fetchUniqueCustomer(windowRange),
+  });
+
+  // Loading states
+  if (ordersLoading || salesLoading)
+    return (
+      <p className="flex items-center justify-center h-full w-full p-6 gap-2">
+        <Spinner decelerate={0.6} /> Loading chart...
+      </p>
+    );
+  if (!ordersChart || !salesChart)
+    return <p className="p-6">No chart data found.</p>;
+  if (ordersTotalLoading || salesTotalLoading)
+    return <p className="p-6">Loading summary...</p>;
+  if (ordersTotal == null || salesTotal == null)
+    return <p className="p-6">No summary data found.</p>;
+
+  // Trend logic
+  const difference = salesTotal - ordersTotal;
+  const isUptrend = difference >= 0;
+
+  // Combine datasets
   const combined = ordersChart.map((o: any) => {
     const matched = salesChart.find((s: any) => s.day === o.day);
     return {
@@ -80,103 +186,245 @@ export default function Dashboard() {
   });
 
   return (
-    <section className="p-6 w-full flex flex-col gap-6">
-      <h1 className="font-semibold text-2xl">
-        Welcome Back, <span className="text-primary">{currUser.name}</span>!
-      </h1>
-      <div className="grid grid-cols-3 grid-rows-2 gap-3">
-        <Card className="col-span-1 row-span-1">
+    <section className="h-full w-full flex flex-col overflow-hidden">
+      {/* Scrollable content wrapper */}
+      <div className="p-4 md:p-6 flex flex-col gap-4 flex-1 min-h-0">
+        {/* HEADER + RANGE SELECT */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <h1 className="font-semibold text-2xl md:text-3xl break-words">
+            Welcome Back, <span className="text-primary">{currUser.name}</span>!
+          </h1>
 
-        </Card>
-      <Card className="col-span-2 row-span-1">
-        <CardHeader>
-          <CardTitle className="pt-6">Orders & Sales Overview</CardTitle>
-          <CardDescription>Last 1 Month</CardDescription>
-        </CardHeader>
+          <Select value={windowRange} onValueChange={setWindowRange}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Select range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1d">Last 1 Day</SelectItem>
+              <SelectItem value="3d">Last 3 Days</SelectItem>
+              <SelectItem value="1w">Last 1 Week</SelectItem>
+              <SelectItem value="2w">Last 2 Weeks</SelectItem>
+              <SelectItem value="1m">Last 1 Month</SelectItem>
+              <SelectItem value="3m">Last 3 Months</SelectItem>
+              <SelectItem value="6m">Last 6 Months</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        <CardContent>
-          <ChartContainer config={chartConfig}>
-            <AreaChart
-              accessibilityLayer
-              data={combined}
-              margin={{ left: 12, right: 12 }}
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="day"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(value) => value.slice(5)}
-                hide={true}
-              />
-
-              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-
-              <defs>
-                <linearGradient id="fillOrders" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-orders)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-orders)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-
-                <linearGradient id="fillSales" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-sales)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-sales)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-              </defs>
-
-              <Area
-                dataKey="sales"
-                type="monotone"
-                fill="url(#fillSales)"
-                fillOpacity={0.4}
-                stroke="var(--color-sales)"
-                stackId="a"
-              />
-
-              <Area
-                dataKey="orders"
-                type="monotone"
-                fill="url(#fillOrders)"
-                fillOpacity={0.4}
-                stroke="var(--color-orders)"
-                stackId="a"
-              />
-            </AreaChart>
-          </ChartContainer>
-        </CardContent>
-
-        {/* <CardFooter>
-          <div className="flex w-full items-start gap-2 text-sm">
-            <div className="grid gap-2">
-              <div className="flex items-center gap-2 leading-none font-medium">
-                Trending up <TrendingUp className="h-4 w-4" />
+        {/* PROFIT / DEFICIT */}
+        <Card className="p-2">
+          <CardContent className="px-2 flex items-center justify-between flex-wrap">
+            <div className="flex flex-row items-center gap-4">
+              <div
+                className={`w-12 h-12 flex items-center justify-center rounded-xl ${
+                  isUptrend ? "bg-green-300/50" : "bg-red-300/50"
+                }`}
+              >
+                {isUptrend ? (
+                  <TrendingUp className="text-green-800" size={26} />
+                ) : (
+                  <TrendingDown className="text-red-800" size={26} />
+                )}
               </div>
-              <div className="text-muted-foreground flex items-center gap-2 leading-none">
-                Based on behavior from last 30 days
+              <div>
+                <CardTitle className="text-lg md:text-xl">Revenue</CardTitle>
+                <CardDescription className="text-sm md:text-base">
+                  {windowLabels[windowRange]}
+                </CardDescription>
               </div>
             </div>
+
+            <div className="text-right">
+              <p className="text-md md:text-lg font-semibold">
+                {isUptrend ? "Profit" : "Deficit"}
+              </p>
+              <p
+                className={`text-xl md:text-2xl font-bold ${
+                  isUptrend ? "text-green-700" : "text-red-700"
+                }`}
+              >
+                {formatRupiah(difference)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* METRICS + CHART GRID */}
+        <div className="flex-1 min-h-0">
+          <div
+            className="
+          h-full
+          grid
+          grid-cols-1
+          md:grid-cols-9
+          grid-rows-[auto_1fr]
+          gap-3
+        "
+          >
+            <div className="flex flex-col gap-4 items-stretch justify-between col-span-3">
+              {/* SALES CARD */}
+              <Card className="flex-1">
+                <CardHeader className="pt-6 flex flex-row gap-2 items-center">
+                  <CardTitle>Sales</CardTitle>
+                  <CardDescription>{windowLabels[windowRange]}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex items-center gap-4 -mt-4">
+                  <div className="size-6 flex items-center justify-center rounded-md bg-yellow-300/50">
+                    <Tag className="text-yellow-800" size={16} />
+                  </div>
+                  <p className="text-2xl font-bold truncate">
+                    {formatRupiah(salesTotal)}
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* ORDERS CARD */}
+              <Card className="flex-1">
+                <CardHeader className="pt-6 flex flex-row gap-2 items-center">
+                  <CardTitle>Orders</CardTitle>
+                  <CardDescription>{windowLabels[windowRange]}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex items-center gap-4 -mt-4">
+                  <div className="size-6  flex items-center justify-center rounded-md bg-blue-300/50">
+                    <Receipt className="text-blue-800" size={16} />
+                  </div>
+                  <p className="text-2xl font-bold truncate">
+                    {formatRupiah(ordersTotal)}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* CHART */}
+            <Card className="md:col-span-6 h-full">
+              <CardHeader className="pt-6">
+                <CardTitle>Orders & Sales Overview</CardTitle>
+                <CardDescription>{windowLabels[windowRange]}</CardDescription>
+              </CardHeader>
+              <CardContent className="h-full w-full">
+                <ChartContainer
+                  className="h-[140px] max-h-full w-full"
+                  config={chartConfig}
+                >
+                  <AreaChart accessibilityLayer data={combined}>
+                    <CartesianGrid vertical={false} horizontal={true} />
+
+                    <XAxis
+                      dataKey="day"
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={8}
+                      tickFormatter={(value) => value.slice(5)}
+                      hide={true}
+                    />
+
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent />}
+                    />
+
+                    <defs>
+                      <linearGradient
+                        id="fillOrders"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor="var(--color-orders)"
+                          stopOpacity={0.8}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="var(--color-orders)"
+                          stopOpacity={0.1}
+                        />
+                      </linearGradient>
+
+                      <linearGradient
+                        id="fillSales"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor="var(--color-sales)"
+                          stopOpacity={0.8}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="var(--color-sales)"
+                          stopOpacity={0.1}
+                        />
+                      </linearGradient>
+                    </defs>
+
+                    <Area
+                      dataKey="sales"
+                      type="monotone"
+                      fill="url(#fillSales)"
+                      stroke="var(--color-sales)"
+                      fillOpacity={0.4}
+                    />
+                    <Area
+                      dataKey="orders"
+                      type="monotone"
+                      fill="url(#fillOrders)"
+                      stroke="var(--color-orders)"
+                      fillOpacity={0.4}
+                    />
+                  </AreaChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+
+            {/* SALES CATEGORY DONUT */}
+            <SalesByCategoryCard
+              windowLabel={windowLabels[windowRange]}
+              data={salesCategory}
+              loading={salesCategoryLoading}
+            />
+
+            {/* COMPARISON CARDS */}
+            {ordersComparison && (
+              <ComparisonCard
+                title="Orders"
+                windowLabel={windowLabels[windowRange]}
+                data={ordersComparison}
+                icon={Receipt}
+                color="bg-blue-300/50"
+                unit="orders"
+              />
+            )}
+
+            {salesComparison && (
+              <ComparisonCard
+                title="Sales"
+                windowLabel={windowLabels[windowRange]}
+                data={salesComparison}
+                icon={Tag}
+                color="bg-yellow-300/50"
+                unit="sales"
+              />
+            )}
+
+            {uniqueCustomer && (
+              <ComparisonCard
+                title="Unique Customers"
+                windowLabel={windowLabels[windowRange]}
+                data={uniqueCustomer}
+                icon={TrendingUp}
+                color="bg-green-300/50"
+                unit="customers"
+              />
+            )}
           </div>
-        </CardFooter> */}
-      </Card>
+        </div>
       </div>
-      {/* Combined Orders + Sales Chart */}
     </section>
   );
 }
