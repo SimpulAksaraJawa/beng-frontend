@@ -398,6 +398,7 @@ export default function Dashboard() {
                 icon={Receipt}
                 color="bg-blue-300/50"
                 unit="orders"
+                redirectTo="/orders"
               />
             )}
 
@@ -409,6 +410,7 @@ export default function Dashboard() {
                 icon={Tag}
                 color="bg-yellow-300/50"
                 unit="sales"
+                redirectTo="/sales"
               />
             )}
 
@@ -420,6 +422,7 @@ export default function Dashboard() {
                 icon={TrendingUp}
                 color="bg-green-300/50"
                 unit="customers"
+                redirectTo="/customers"
               />
             )}
           </div>

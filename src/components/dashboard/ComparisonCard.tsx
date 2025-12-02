@@ -6,6 +6,9 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { ArrowUpRightFromSquareIcon } from "lucide-react";
 
 interface Props {
   title: string;
@@ -13,42 +16,60 @@ interface Props {
   icon: any;
   color: string;
   unit?: string;
+  redirectTo?: string; // <-- added
   data: {
     current: number;
     previous: number | null;
     percentage: number | null;
   };
 }
+
 export default function ComparisonCard({
   title,
   windowLabel,
   icon: Icon,
   color,
   unit,
+  redirectTo,
   data,
 }: Props) {
   const isNew = data.percentage === null;
   const isUp = data.percentage !== null && data.percentage >= 0;
 
+  const navigate = useNavigate();
+  const handleRedirect = () => {
+    if (redirectTo) navigate(redirectTo);
+  };
+
   return (
     <Card className="col-span-2 row-span-1 gap-2 flex flex-col">
-      <CardHeader className="pt-6">
+      <CardHeader className="pt-6 flex flex-row items-center justify-between">
         <CardTitle>{title}</CardTitle>
+
+        {/* Top-right button */}
+        {redirectTo && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRedirect}
+            className="ml-auto"
+          >
+            View
+            <ArrowUpRightFromSquareIcon size={5}/>
+          </Button>
+        )}
       </CardHeader>
 
-      {/* Push content + footer to bottom */}
       <div className="flex flex-col mt-auto">
         <CardContent className="flex items-center gap-4">
-          {/* Icon */}
           <div
             className={`size-12 flex items-center justify-center rounded-xl ${color}`}
           >
             <Icon size={26} />
           </div>
 
-          {/* Numbers */}
           <div className="flex flex-col">
-            <div className="flex flex-row items-baseline gap-1">
+            <div className="flex items-baseline gap-1">
               <p className="text-2xl font-bold">{data.current}</p>
 
               {unit && (
@@ -56,7 +77,6 @@ export default function ComparisonCard({
               )}
             </div>
 
-            {/* Percentage change */}
             {isNew ? (
               <p className="text-sm font-semibold text-green-700">New!</p>
             ) : (
@@ -77,4 +97,3 @@ export default function ComparisonCard({
     </Card>
   );
 }
-
