@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "@/router"
 import { useAuth } from "@/contexts/AuthContext"
 import { cn } from "@/lib/utils"
+import { Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -22,6 +23,7 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
 
@@ -94,13 +96,16 @@ export function LoginForm({
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                 </div>
-                <Input
-                  style={{ border: `${passwordError ? "1px solid red" : ""}` }}
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required />
+                <div className="relative">
+                  <Input
+                    style={{ border: `${passwordError ? "1px solid red" : ""}` }}
+                    id="password"
+                    type={showPass ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required />
+                  <button className="absolute inset-y-0 right-3 flex items-center text-gray-500" onClick={() => setShowPass(!showPass)}>{showPass ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                </div>
                 {passwordError && <Label className="text-red-500">Invalid password</Label>}
               </div>
               <div className="flex flex-col gap-3">

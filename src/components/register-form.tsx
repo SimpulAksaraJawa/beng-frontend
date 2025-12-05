@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "@/router"
 import { useAuth } from "@/contexts/AuthContext"
 import { cn } from "@/lib/utils"
+import { Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -23,6 +24,9 @@ export function RegisterForm({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [retypePass, setRetypePass] = useState("");
+  const [showRetype, setRetype] = useState(false);
   const [role, setRole] = useState("USER");
 
   const [emailExist, setEmailExist] = useState(false);
@@ -33,8 +37,13 @@ export function RegisterForm({
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim() || !email.trim() || !password.trim()) {
+    if (!name.trim() || !email.trim() || !password.trim() || !retypePass.trim()) {
       toast.warning("Please fill in all fields");
+      return;
+    }
+
+    if (password !== retypePass && password.length !== retypePass.length) {
+      toast.warning("Passwords do not match");
       return;
     }
 
@@ -98,7 +107,19 @@ export function RegisterForm({
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                 </div>
-                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <div className="relative">
+                  <Input id="password" type={showPass ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required />
+                  <button className="absolute inset-y-0 right-3 flex items-center text-gray-500" onClick={() => setShowPass(!showPass)}>{showPass ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                </div>
+              </div>
+              <div className="grid gap-3">
+                <div className="flex items-center">
+                  <Label htmlFor="retype-password">Retype Password</Label>
+                </div>
+                <div className="relative">
+                  <Input id="retype-password" type={showRetype ? "text" : "password"} value={retypePass} onChange={(e) => setRetypePass(e.target.value)} required />
+                  <button className="absolute inset-y-0 right-3 flex items-center text-gray-500" onClick={() => setRetype(!showRetype)}>{showRetype ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                </div>
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="role">Role</Label>
