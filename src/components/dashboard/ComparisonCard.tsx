@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowUpRightFromSquareIcon } from "lucide-react";
+import { cn } from "@/lib/utils"; // <-- make sure this exists
 
 interface Props {
   title: string;
@@ -16,7 +17,8 @@ interface Props {
   icon: any;
   color: string;
   unit?: string;
-  redirectTo?: string; // <-- added
+  redirectTo?: string;
+  className?: string; // <-- added
   data: {
     current: number;
     previous: number | null;
@@ -31,6 +33,7 @@ export default function ComparisonCard({
   color,
   unit,
   redirectTo,
+  className,
   data,
 }: Props) {
   const isNew = data.percentage === null;
@@ -42,11 +45,15 @@ export default function ComparisonCard({
   };
 
   return (
-    <Card className="col-span-2 row-span-1 gap-2 flex flex-col">
+    <Card
+      className={cn(
+        "col-span-2 row-span-1 gap-2 flex flex-col",
+        className // <-- apply parent class
+      )}
+    >
       <CardHeader className="pt-6 flex flex-row items-center justify-between">
         <CardTitle>{title}</CardTitle>
 
-        {/* Top-right button */}
         {redirectTo && (
           <Button
             variant="outline"
@@ -54,8 +61,7 @@ export default function ComparisonCard({
             onClick={handleRedirect}
             className="ml-auto"
           >
-            View
-            <ArrowUpRightFromSquareIcon size={5}/>
+            <ArrowUpRightFromSquareIcon size={5} />
           </Button>
         )}
       </CardHeader>
