@@ -77,7 +77,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin}>
+          <form>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="email">Email</Label>
@@ -104,12 +104,12 @@ export function LoginForm({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required />
-                  <button className="absolute inset-y-0 right-3 flex items-center text-gray-500" onClick={() => setShowPass(!showPass)}>{showPass ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                  <button className="absolute inset-y-0 right-3 flex items-center text-gray-500" onClick={(e) => { e.preventDefault(); setShowPass(!showPass) }}>{showPass ? <EyeOff size={18} /> : <Eye size={18} />}</button>
                 </div>
                 {passwordError && <Label className="text-red-500">Invalid password</Label>}
               </div>
               <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full">
+                <Button onClick={handleLogin} type="submit" className="w-full">
                   Login
                 </Button>
               </div>

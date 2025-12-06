@@ -36,7 +36,7 @@ const Content: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#8ecae6] via-white to-[#ffedbe] py-32">
+    <div className="min-h-screen bg-gradient-to-b from-[#8ecae6] via-white to-[#ffedbe] py-32 px-4 sm:px-6">
       {/* Title */}
       <div className="text-center mb-12">
         <h1 className="text-4xl sm:text-4xl md:text-6xl lg:text-8xl font-bold text-gray-800 mb-6">
@@ -48,7 +48,7 @@ const Content: React.FC = () => {
       </div>
 
       {/* Bento Grid */}
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
         {/* Left Column */}
         <div className="flex flex-col gap-10">
           {offers.slice(0, 2).map((offer, index) => (
@@ -79,7 +79,7 @@ const Content: React.FC = () => {
           <img
             src={centerImage}
             alt="center"
-            className="rounded-2xl w-full h-full object-contain transition-transform duration-500 hover:scale-105"
+            className="rounded-2xl w-full max-w-xs sm:max-w-full object-contain transition-transform duration-500 hover:scale-105"
           />
         </div>
 

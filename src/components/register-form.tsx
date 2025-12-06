@@ -77,7 +77,7 @@ export function RegisterForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleRegister}>
+          <form >
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="name">Name</Label>
@@ -109,7 +109,7 @@ export function RegisterForm({
                 </div>
                 <div className="relative">
                   <Input id="password" type={showPass ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required />
-                  <button className="absolute inset-y-0 right-3 flex items-center text-gray-500" onClick={() => setShowPass(!showPass)}>{showPass ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                  <button className="absolute inset-y-0 right-3 flex items-center text-gray-500" onClick={(e) => { e.preventDefault(); setShowPass(!showPass) }}>{showPass ? <EyeOff size={18} /> : <Eye size={18} />}</button>
                 </div>
               </div>
               <div className="grid gap-3">
@@ -118,7 +118,7 @@ export function RegisterForm({
                 </div>
                 <div className="relative">
                   <Input id="retype-password" type={showRetype ? "text" : "password"} value={retypePass} onChange={(e) => setRetypePass(e.target.value)} required />
-                  <button className="absolute inset-y-0 right-3 flex items-center text-gray-500" onClick={() => setRetype(!showRetype)}>{showRetype ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                  <button className="absolute inset-y-0 right-3 flex items-center text-gray-500" onClick={(e) => { e.preventDefault(); setRetype(!showRetype) }}>{showRetype ? <EyeOff size={18} /> : <Eye size={18} />}</button>
                 </div>
               </div>
               <div className="grid gap-3">
@@ -137,7 +137,7 @@ export function RegisterForm({
                 </Select>
               </div>
               <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full">
+                <Button onClick={handleRegister} type="submit" className="w-full">
                   Register
                 </Button>
               </div>
