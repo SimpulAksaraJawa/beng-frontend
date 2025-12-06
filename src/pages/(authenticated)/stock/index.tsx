@@ -322,6 +322,7 @@ export default function StockInventoryPage() {
       field: "productName",
       headerName: "Product Name",
       flex: 2,
+      minWidth: 200,
       renderCell: (params: GridRenderCellParams) => {
         try {
           const productName = params.row.productName;
@@ -340,6 +341,7 @@ export default function StockInventoryPage() {
       field: "stockCurrent",
       headerName: "Quantity",
       flex: 1,
+      minWidth: 200,
       renderCell: (params: GridRenderCellParams) => {
         try {
           const value = params.row.stockCurrent;
@@ -354,6 +356,7 @@ export default function StockInventoryPage() {
       field: "unitPrice",
       headerName: "Unit Price",
       flex: 1,
+      minWidth: 200,
       renderCell: (params: GridRenderCellParams) => {
         try {
           const value = Number(params.row.unitPrice) || 0;
@@ -367,6 +370,7 @@ export default function StockInventoryPage() {
       field: "totalWorth",
       headerName: "Total Worth",
       flex: 1,
+      minWidth: 200,
       renderCell: (params: GridRenderCellParams) => {
         try {
           const value = Number(params.row.totalWorth) ||
@@ -381,6 +385,7 @@ export default function StockInventoryPage() {
       field: "costOfGoodsSold",
       headerName: "COGS",
       flex: 1,
+      minWidth: 200,
       renderCell: (params: GridRenderCellParams) => {
         try {
           const value = Number(params.row.costOfGoodsSold) || 0;
@@ -394,8 +399,7 @@ export default function StockInventoryPage() {
       field: "actions",
       headerName: "Actions",
       flex: 1,
-      minWidth: 100,
-      maxWidth: 120,
+      minWidth: 200,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         try {
@@ -407,7 +411,7 @@ export default function StockInventoryPage() {
           const isExpanded = expandedProductId === productId;
 
           return (
-            <Box sx={{ display: "block", gap: 0.2, alignItems: "center"}}>
+            <Box sx={{ display: "block", gap: 0.2, alignItems: "center" }}>
               <Tooltip title="View Product Details">
                 <Button
                   variant="text"
