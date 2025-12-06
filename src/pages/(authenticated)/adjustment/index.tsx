@@ -97,19 +97,19 @@ export default function AdjustmentsPage() {
   };
 
   const columns: GridColDef<Adjustment>[] = [
-    { field: "id", headerName: "Adj ID", flex: 0.5, maxWidth: 150 },
+    { field: "id", headerName: "Adj ID", flex: 0.5, minWidth: 150 },
     {
       field: "date",
       headerName: "Date",
       flex: 1,
-      maxWidth: 200,
+      minWidth: 200,
       renderCell: (params) => formatDate(params.row.date),
     },
     {
       field: "action",
       headerName: "Action",
       flex: 1,
-      maxWidth: 200,
+      minWidth: 200,
       renderCell: (params) => (
         <Badge
           variant={params.row.action === "SPLIT" ? "destructive" : "default"}
@@ -128,7 +128,7 @@ export default function AdjustmentsPage() {
       headerName: "View",
       flex: 0.5,
       sortable: false,
-      maxWidth: 150,
+      minWidth: 150,
       renderCell: (params: GridRenderCellParams<Adjustment>) => (
         <Button
           variant="text"
