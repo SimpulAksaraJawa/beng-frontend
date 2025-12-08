@@ -44,7 +44,7 @@ export function LoginForm({
 
       const { jwtToken, user } = res.data;
       setAuth(user, jwtToken);
-      navigate('/product');
+      navigate('/dashboard');
 
     } catch (error: any) {
       if (error.response?.status === 401) {
