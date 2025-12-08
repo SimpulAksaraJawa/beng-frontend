@@ -125,6 +125,7 @@ const AddOrderPage = () => {
         ? res.data.products
         : [];
 
+        console.log(arr)
       setProductsOptions(
         arr.map((p: any) => ({
           id: p.id,
