@@ -31,6 +31,7 @@ import { Receipt, Tag, TrendingDown, TrendingUp } from "lucide-react";
 import SalesByCategoryCard from "@/components/dashboard/SalesByCategoryDonut";
 import ComparisonCard from "@/components/dashboard/ComparisonCard";
 import { Spinner } from "@/components/ui/spinner";
+import { SiteHeader } from "@/components/site-header";
 
 const windowLabels: Record<string, string> = {
   "1d": "Today vs Yesterday",
@@ -186,7 +187,9 @@ export default function Dashboard() {
   });
 
   return (
-    <section className="h-full w-full flex flex-col overflow-hidden">
+    <section className="h-full w-full flex flex-col overflow-hidden p-6 mx-auto">
+      <SiteHeader />
+
       {/* Scrollable content wrapper */}
       <div className="p-4 md:p-6 flex flex-col gap-4 flex-1 min-h-0">
         {/* HEADER + RANGE SELECT */}
@@ -264,7 +267,7 @@ export default function Dashboard() {
             <div className="flex flex-col gap-4 items-stretch justify-between col-span-3">
               {/* SALES CARD */}
               <Card className="flex-1">
-                <CardHeader className="pt-6 flex flex-row gap-2 items-center">
+                <CardHeader className="pt-6 flex flex-col lg:flex-row gap-2 lg:items-center">
                   <CardTitle>Sales</CardTitle>
                   <CardDescription>{windowLabels[windowRange]}</CardDescription>
                 </CardHeader>
@@ -272,7 +275,7 @@ export default function Dashboard() {
                   <div className="size-6 flex items-center justify-center rounded-md bg-yellow-300/50">
                     <Tag className="text-yellow-800" size={16} />
                   </div>
-                  <p className="text-2xl font-bold truncate">
+                  <p className="md:text-lg lg:text-xl font-bold">
                     {formatRupiah(salesTotal)}
                   </p>
                 </CardContent>
@@ -280,7 +283,7 @@ export default function Dashboard() {
 
               {/* ORDERS CARD */}
               <Card className="flex-1">
-                <CardHeader className="pt-6 flex flex-row gap-2 items-center">
+                <CardHeader className="pt-6 flex flex-col lg:flex-row gap-2 lg:items-center">
                   <CardTitle>Orders</CardTitle>
                   <CardDescription>{windowLabels[windowRange]}</CardDescription>
                 </CardHeader>
@@ -288,7 +291,7 @@ export default function Dashboard() {
                   <div className="size-6  flex items-center justify-center rounded-md bg-blue-300/50">
                     <Receipt className="text-blue-800" size={16} />
                   </div>
-                  <p className="text-2xl font-bold truncate">
+                  <p className="md:text-lg lg:text-xl font-bold">
                     {formatRupiah(ordersTotal)}
                   </p>
                 </CardContent>
@@ -390,6 +393,7 @@ export default function Dashboard() {
             />
 
             {/* COMPARISON CARDS */}
+            <div className="col-span-6 gap-4 grid grid-cols-2 grid-rows-2">
             {ordersComparison && (
               <ComparisonCard
                 title="Orders"
@@ -399,6 +403,7 @@ export default function Dashboard() {
                 color="bg-blue-300/50"
                 unit="orders"
                 redirectTo="/orders"
+                className="col-span-1"
               />
             )}
 
@@ -411,6 +416,7 @@ export default function Dashboard() {
                 color="bg-yellow-300/50"
                 unit="sales"
                 redirectTo="/sales"
+                className="col-span-1"
               />
             )}
 
@@ -425,6 +431,7 @@ export default function Dashboard() {
                 redirectTo="/customers"
               />
             )}
+            </div>
           </div>
         </div>
       </div>
