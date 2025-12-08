@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { TrendingUp } from "lucide-react";
+import { ArrowUpRightFromSquareIcon, TrendingUp } from "lucide-react";
 import { PieChart, Pie, Label, Legend, Cell } from "recharts";
 
 import {
@@ -11,6 +11,7 @@ import {
   CardDescription,
   CardTitle,
   CardFooter,
+  CardAction,
 } from "@/components/ui/card";
 
 import {
@@ -21,6 +22,8 @@ import {
 } from "@/components/ui/chart";
 
 import { cn } from "@/lib/utils"; // <-- needed for merging classes
+import { Button } from "../ui/button";
+import { useNavigate } from "react-router";
 
 interface Props {
   windowLabel: string;
@@ -56,6 +59,7 @@ export default function SalesByCategoryCard({
     () => data?.sales?.reduce((acc, curr) => acc + curr.totalItems, 0) ?? 0,
     [data]
   );
+  const navigate = useNavigate();
 
   const [width, setWidth] = React.useState<number>(0);
 
@@ -155,6 +159,18 @@ export default function SalesByCategoryCard({
     >
       <CardHeader className="items-center pb-0">
         <CardTitle>Sales by Category</CardTitle>
+        <CardAction>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              navigate("/sales");
+            }}
+            className="ml-auto"
+          >
+            <ArrowUpRightFromSquareIcon size={5} />
+          </Button>
+        </CardAction>
       </CardHeader>
 
       <CardContent className="flex-1 pb-0 md:px-0 lg:px-2 w-full max-h-[250px]">
@@ -216,17 +232,16 @@ export default function SalesByCategoryCard({
                 ))}
               </Pie>
 
-                <Legend
-                  layout="horizontal"
-                  align="center"
-                  verticalAlign="bottom"
-                  wrapperStyle={{
-                    marginTop: "12px",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                />
-
+              <Legend
+                layout="horizontal"
+                align="center"
+                verticalAlign="bottom"
+                wrapperStyle={{
+                  marginTop: "12px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              />
             </PieChart>
           </ChartContainer>
         </div>

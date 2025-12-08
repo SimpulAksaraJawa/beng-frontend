@@ -1,6 +1,7 @@
- import { jsPDF } from "jspdf";
+import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Button } from "./ui/button";
+import { Printer } from "lucide-react";
 
 type PrintableProduct = {
   id: number;
@@ -24,7 +25,9 @@ export default function Printable({ products }: Props) {
     doc.text("Product Download Report", 14, 20);
 
     // Table headers
-    const headers = [["ID", "Name", "Category", "Brand", "Initial Price", "Initial Qty"]];
+    const headers = [
+      ["ID", "Name", "Category", "Brand", "Initial Price", "Initial Qty"],
+    ];
 
     // Format price into Rp
     const formatPrice = (value: number) =>
@@ -58,6 +61,20 @@ export default function Printable({ products }: Props) {
     };
   };
 
-  return <Button className="cursor-pointer hover:bg-[#b4dff3] hover:text-black" onClick={generatePDF}>Print PDF</Button>;
+  return (
+    <>
+      <Button
+        className="cursor-pointer hover:bg-[#b4dff3] hover:text-black hidden md:display"
+        onClick={generatePDF}
+      >
+        <Printer className="mr-1"/>Print PDF
+      </Button>
+      <Button
+        className="cursor-pointer hover:bg-[#b4dff3] hover:text-black md:hidden"
+        onClick={generatePDF}
+      >
+        <Printer/>
+      </Button>
+    </>
+  );
 }
- 

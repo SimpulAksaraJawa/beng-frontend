@@ -11,7 +11,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { SiteHeader } from "@/components/site-header";
 import { Badge } from "@/components/ui/badge";
 
-
 interface AdjustmentProduct {
   id: number;
   productId: number;
@@ -186,13 +185,22 @@ export default function AdjustmentsPage() {
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Adjustments</h1>
           {canCreateAdjustment && (
-            <ButtonShad
-              variant="default"
-              className="cursor-pointer"
-              onClick={() => navigate("/adjustment/new")}
-            >
-              <Plus /> Add New Adjustment
-            </ButtonShad>
+            <>
+              <ButtonShad
+                variant="default"
+                className="cursor-pointer hidden md:flex"
+                onClick={() => navigate("/adjustment/new")}
+              >
+                <Plus /> Add New Adjustment
+              </ButtonShad>
+              <ButtonShad
+                variant="default"
+                className="cursor-pointer md:hidden"
+                onClick={() => navigate("/adjustment/new")}
+              >
+                <Plus />
+              </ButtonShad>
+            </>
           )}
         </div>
         <Box sx={{ height: 600 }}>

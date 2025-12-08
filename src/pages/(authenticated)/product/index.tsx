@@ -4,12 +4,7 @@ import api from "@/api/axios";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { ChevronLeft, ChevronRight, LoaderIcon } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -39,7 +34,10 @@ interface Product {
 }
 
 // Helper to convert Buffer object to Base64
-function bufferToBase64FromObject(bufferObj: { type: string; data: number[] }): string {
+function bufferToBase64FromObject(bufferObj: {
+  type: string;
+  data: number[];
+}): string {
   const bytes = new Uint8Array(bufferObj.data);
   let binary = "";
   const chunkSize = 0x8000;
@@ -78,18 +76,22 @@ const fetchProducts = async (): Promise<Product[]> => {
       images: p.images || [],
     };
   });
-
 };
 
-
 export default function Page() {
-  const [currentImageIndex, setCurrentImageIndex] = useState<Record<number, number>>({});
+  const [currentImageIndex, setCurrentImageIndex] = useState<
+    Record<number, number>
+  >({});
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const { data: products = [], isLoading, error } = useQuery({
+  const {
+    data: products = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["products"],
     queryFn: fetchProducts,
     staleTime: 1000 * 60 * 15, // 15 minutes
@@ -118,16 +120,24 @@ export default function Page() {
         <LoaderIcon className="animate-spin size-10" />
         <p>Loading products...</p>
       </div>
-    )
+    );
   }
 
-  if (error) return <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">Failed to load products.</div>;
+  if (error)
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 text-red-500">
+        Failed to load products.
+      </div>
+    );
 
   const categories = Array.from(new Set(products.map((p) => p.category)));
 
   const filteredProducts = products.filter((p) => {
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || p.category === selectedCategory;
+    const matchesSearch = p.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "all" || p.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -163,7 +173,7 @@ export default function Page() {
             value={selectedCategory}
             onValueChange={(value) => setSelectedCategory(value)}
           >
-            <SelectTrigger className="w-full md:w-40 cursor-pointer">
+            <SelectTrigger className="flex-1 md:w-40 cursor-pointer">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
@@ -177,13 +187,24 @@ export default function Page() {
           </Select>
 
           {canCreateProduct && (
-            <Button
-              variant="secondary"
-              className="whitespace-nowrap cursor-pointer hover:bg-[#b4dff3] hover:text-black px-3"
-              onClick={() => navigate("/product/new")}
-            >
-              <Plus className="mr-1" />Add Product
-            </Button>
+            <>
+              <Button
+                variant="secondary"
+                className="cursor-pointer hidden md:flex"
+                onClick={() => navigate("/product/new")}
+              >
+                <Plus className="mr-1" />Add Product
+              </Button>
+
+              {/* Plus icon for sm screens */}
+              <Button
+                variant="secondary"
+                className="cursor-pointer flex md:hidden"
+                onClick={() => navigate("/product/new")}
+              >
+                <Plus />
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -195,8 +216,8 @@ export default function Page() {
           const hasImages = product.images.length > 0;
           const currentImageUrl = hasImages
             ? `data:image/jpeg;base64,${bufferToBase64FromObject(
-              product.images[currentIndex].url
-            )}`
+                product.images[currentIndex].url
+              )}`
             : null;
 
           return (
@@ -216,7 +237,9 @@ export default function Page() {
                       <Button
                         size="icon"
                         variant="secondary"
-                        onClick={() => prevImage(product.id, product.images.length)}
+                        onClick={() =>
+                          prevImage(product.id, product.images.length)
+                        }
                         className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full cursor-pointer bg-[#8ecae6]/30 hover:bg-[#8ecae6]/50"
                       >
                         <ChevronLeft />
@@ -224,7 +247,9 @@ export default function Page() {
                       <Button
                         size="icon"
                         variant="secondary"
-                        onClick={() => nextImage(product.id, product.images.length)}
+                        onClick={() =>
+                          nextImage(product.id, product.images.length)
+                        }
                         className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full cursor-pointer bg-[#8ecae6]/30 hover:bg-[#8ecae6]/50"
                       >
                         <ChevronRight />
@@ -239,7 +264,8 @@ export default function Page() {
               <CardContent className="flex justify-between items-end -mt-6">
                 <div>
                   <p className="text-[#209ebb] font-extrabold">
-                    <span>Rp </span>{formatPrice(product.price)}
+                    <span>Rp </span>
+                    {formatPrice(product.price)}
                   </p>
                   <p className="text-gray-500 text-sm font-medium">
                     {product.category}

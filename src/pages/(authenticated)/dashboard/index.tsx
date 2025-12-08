@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardAction,
 } from "@/components/ui/card";
 
 import {
@@ -27,11 +28,19 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
-import { Receipt, Tag, TrendingDown, TrendingUp } from "lucide-react";
+import {
+  ArrowUpRightFromSquareIcon,
+  Receipt,
+  Tag,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import SalesByCategoryCard from "@/components/dashboard/SalesByCategoryDonut";
 import ComparisonCard from "@/components/dashboard/ComparisonCard";
 import { Spinner } from "@/components/ui/spinner";
 import { SiteHeader } from "@/components/site-header";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router";
 
 const windowLabels: Record<string, string> = {
   "1d": "Today vs Yesterday",
@@ -103,6 +112,8 @@ const chartConfig = {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
 
   const currUser = {
     name: user?.name || "Shadcn",
@@ -267,9 +278,25 @@ export default function Dashboard() {
             <div className="flex flex-col sm:flex-row lg:flex-col gap-4 items-stretch justify-between col-span-9 lg:col-span-3">
               {/* SALES CARD */}
               <Card className="flex-1">
-                <CardHeader className="pt-6 flex flex-col lg:flex-row gap-2 lg:items-center">
-                  <CardTitle>Sales</CardTitle>
-                  <CardDescription>{windowLabels[windowRange]}</CardDescription>
+                <CardHeader className="pt-6">
+                  <div className=" flex flex-col lg:flex-row gap-2 lg:items-center">
+                    <CardTitle>Sales</CardTitle>
+                    <CardDescription>
+                      {windowLabels[windowRange]}
+                    </CardDescription>
+                  </div>
+                  <CardAction>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        navigate("/sales");
+                      }}
+                      className="ml-auto"
+                    >
+                      <ArrowUpRightFromSquareIcon size={5} />
+                    </Button>
+                  </CardAction>
                 </CardHeader>
                 <CardContent className="flex items-center gap-4 -mt-4">
                   <div className="size-6 flex items-center justify-center rounded-md bg-yellow-300/50">
@@ -283,9 +310,25 @@ export default function Dashboard() {
 
               {/* ORDERS CARD */}
               <Card className="flex-1">
-                <CardHeader className="pt-6 flex flex-col lg:flex-row gap-2 lg:items-center">
-                  <CardTitle>Orders</CardTitle>
-                  <CardDescription>{windowLabels[windowRange]}</CardDescription>
+                <CardHeader className="pt-6">
+                  <div className="flex flex-col lg:flex-row gap-2 lg:items-center">
+                    <CardTitle>Orders</CardTitle>
+                    <CardDescription>
+                      {windowLabels[windowRange]}
+                    </CardDescription>
+                  </div>
+                  <CardAction>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        navigate("/orders");
+                      }}
+                      className="ml-auto"
+                    >
+                      <ArrowUpRightFromSquareIcon size={5} />
+                    </Button>
+                  </CardAction>
                 </CardHeader>
                 <CardContent className="flex items-center gap-4 -mt-4">
                   <div className="size-6  flex items-center justify-center rounded-md bg-blue-300/50">
@@ -303,6 +346,18 @@ export default function Dashboard() {
               <CardHeader className="pt-6">
                 <CardTitle>Orders & Sales Overview</CardTitle>
                 <CardDescription>{windowLabels[windowRange]}</CardDescription>
+                <CardAction>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      navigate("/sales");
+                    }}
+                    className="ml-auto"
+                  >
+                    <ArrowUpRightFromSquareIcon size={5} />
+                  </Button>
+                </CardAction>
               </CardHeader>
               <CardContent className="h-full w-full">
                 <ChartContainer
@@ -395,43 +450,43 @@ export default function Dashboard() {
 
             {/* COMPARISON CARDS */}
             <div className="lg:col-span-6 gap-4 grid grid-cols-2 grid-rows-2 col-span-9">
-            {ordersComparison && (
-              <ComparisonCard
-                title="Orders"
-                windowLabel={windowLabels[windowRange]}
-                data={ordersComparison}
-                icon={Receipt}
-                color="bg-blue-300/50"
-                unit="orders"
-                redirectTo="/orders"
-                className="col-span-2 sm:col-span-1"
-              />
-            )}
+              {ordersComparison && (
+                <ComparisonCard
+                  title="Orders"
+                  windowLabel={windowLabels[windowRange]}
+                  data={ordersComparison}
+                  icon={Receipt}
+                  color="bg-blue-300/50"
+                  unit="orders"
+                  redirectTo="/orders"
+                  className="col-span-2 sm:col-span-1"
+                />
+              )}
 
-            {salesComparison && (
-              <ComparisonCard
-                title="Sales"
-                windowLabel={windowLabels[windowRange]}
-                data={salesComparison}
-                icon={Tag}
-                color="bg-yellow-300/50"
-                unit="sales"
-                redirectTo="/sales"
-                className="col-span-2 sm:col-span-1"
-              />
-            )}
+              {salesComparison && (
+                <ComparisonCard
+                  title="Sales"
+                  windowLabel={windowLabels[windowRange]}
+                  data={salesComparison}
+                  icon={Tag}
+                  color="bg-yellow-300/50"
+                  unit="sales"
+                  redirectTo="/sales"
+                  className="col-span-2 sm:col-span-1"
+                />
+              )}
 
-            {uniqueCustomer && (
-              <ComparisonCard
-                title="Unique Customers"
-                windowLabel={windowLabels[windowRange]}
-                data={uniqueCustomer}
-                icon={TrendingUp}
-                color="bg-green-300/50"
-                unit="customers"
-                redirectTo="/customers"
-              />
-            )}
+              {uniqueCustomer && (
+                <ComparisonCard
+                  title="Unique Customers"
+                  windowLabel={windowLabels[windowRange]}
+                  data={uniqueCustomer}
+                  icon={TrendingUp}
+                  color="bg-green-300/50"
+                  unit="customers"
+                  redirectTo="/customers"
+                />
+              )}
             </div>
           </div>
         </div>
