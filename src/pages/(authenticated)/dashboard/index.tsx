@@ -1,6 +1,5 @@
 import { useState } from "react";
 import api from "@/api/axios";
-import { SiteHeader } from "@/components/site-header";
 import { useQuery } from "@tanstack/react-query";
 import { AreaChart, Area, CartesianGrid, XAxis } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
@@ -194,7 +193,6 @@ export default function Dashboard() {
       {/* Scrollable content wrapper */}
       <div className="p-4 md:p-6 flex flex-col gap-4 flex-1 min-h-0">
         {/* HEADER + RANGE SELECT */}
-        <SiteHeader />
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <h1 className="font-semibold text-2xl md:text-3xl break-words">
             Welcome Back, <span className="text-primary">{currUser.name}</span>!
@@ -221,8 +219,9 @@ export default function Dashboard() {
           <CardContent className="px-2 flex items-center justify-between flex-wrap">
             <div className="flex flex-row items-center gap-4">
               <div
-                className={`w-12 h-12 flex items-center justify-center rounded-xl ${isUptrend ? "bg-green-300/50" : "bg-red-300/50"
-                  }`}
+                className={`w-12 h-12 flex items-center justify-center rounded-xl ${
+                  isUptrend ? "bg-green-300/50" : "bg-red-300/50"
+                }`}
               >
                 {isUptrend ? (
                   <TrendingUp className="text-green-800" size={26} />
@@ -243,8 +242,9 @@ export default function Dashboard() {
                 {isUptrend ? "Profit" : "Deficit"}
               </p>
               <p
-                className={`text-xl md:text-2xl font-bold ${isUptrend ? "text-green-700" : "text-red-700"
-                  }`}
+                className={`text-xl md:text-2xl font-bold ${
+                  isUptrend ? "text-green-700" : "text-red-700"
+                }`}
               >
                 {formatRupiah(difference)}
               </p>
