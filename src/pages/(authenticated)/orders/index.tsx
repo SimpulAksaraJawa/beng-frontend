@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/contexts/AuthContext";
-
+import { Badge } from "@/components/ui/badge";
 
 interface Supplier {
   id: number;
@@ -80,6 +80,8 @@ export default function OrdersPage() {
     staleTime: 1000 * 60 * 15,
   });
 
+  const grandTotal = orders.reduce((sum, o) => sum + (o.totalPrice ?? 0), 0);
+
   const handleView = async (id: number) => {
     if (openReceipts.find((o) => o.id === id)) return;
 
@@ -105,13 +107,13 @@ export default function OrdersPage() {
     user?.role === "ADMIN" || user?.permissions?.orders?.includes("create");
 
 
-      useEffect(()=>{
-        const read =
-          user?.role === "ADMIN" || user?.permissions?.orders?.includes("read");
+  useEffect(() => {
+    const read =
+      user?.role === "ADMIN" || user?.permissions?.orders?.includes("read");
     if (!read) {
       navigate("/product");
     }
-  },[user])
+  }, [user])
 
 
 
@@ -170,9 +172,14 @@ export default function OrdersPage() {
 
       {/* Header bar with search + filter */}
       <div className="flex flex-wrap items-center justify-between gap-4 mt-4 mb-4">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">Orders</h1>
-        </div>
+        <h1 className="text-2xl font-bold">Orders
+          <div className="text-sm items-center flex gap-2">
+            Total
+            <Badge>
+              <p className="font-semibold">{formatRupiah(grandTotal)}</p>
+            </Badge>
+          </div>
+        </h1>
 
         <div className="flex items-center gap-2">
 

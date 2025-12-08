@@ -3,7 +3,6 @@ import api from "@/api/axios";
 import { useQuery } from "@tanstack/react-query";
 import { AreaChart, Area, CartesianGrid, XAxis } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
-
 import {
   Card,
   CardContent,
@@ -41,6 +40,8 @@ import { Spinner } from "@/components/ui/spinner";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
+import * as htmlToImage from "html-to-image";
+import jsPDF from "jspdf";
 
 const windowLabels: Record<string, string> = {
   "1d": "Today vs Yesterday",
@@ -59,6 +60,32 @@ const formatRupiah = (value: number) =>
     currency: "IDR",
     minimumFractionDigits: 0,
   });
+
+const handleDownloadPDF = async () => {
+  const element = document.getElementById("pdf-area");
+  if (!element) {
+    console.error("pdf-area NOT FOUND");
+    return;
+  }
+
+  try {
+    const dataUrl = await htmlToImage.toPng(element, {
+      cacheBust: true,
+      pixelRatio: 2,
+    });
+
+    const pdf = new jsPDF("p", "mm", "a4");
+    const imgProps = pdf.getImageProperties(dataUrl);
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+    pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save("orders-report.pdf");
+  } catch (error) {
+    console.error("PDF generation failed:", error);
+  }
+};
 
 // Fetchers
 const fetchOrdersTotal = async (windowRange: string) => {
@@ -198,9 +225,8 @@ export default function Dashboard() {
   });
 
   return (
-    <section className="h-full w-full flex flex-col overflow-hidden p-6 mx-auto">
+    <section id="pdf-area" className="h-full w-full flex flex-col overflow-hidden p-6 mx-auto">
       <SiteHeader />
-
       {/* Scrollable content wrapper */}
       <div className="p-4 md:p-6 flex flex-col gap-4 flex-1 min-h-0">
         {/* HEADER + RANGE SELECT */}
@@ -210,29 +236,32 @@ export default function Dashboard() {
           </h1>
 
           <Select value={windowRange} onValueChange={setWindowRange}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-48 cursor-pointer">
               <SelectValue placeholder="Select range" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1d">Last 1 Day</SelectItem>
-              <SelectItem value="3d">Last 3 Days</SelectItem>
-              <SelectItem value="1w">Last 1 Week</SelectItem>
-              <SelectItem value="2w">Last 2 Weeks</SelectItem>
-              <SelectItem value="1m">Last 1 Month</SelectItem>
-              <SelectItem value="3m">Last 3 Months</SelectItem>
-              <SelectItem value="6m">Last 6 Months</SelectItem>
+              <SelectItem value="1d" className="cursor-pointer">Last 1 Day</SelectItem>
+              <SelectItem value="3d" className="cursor-pointer">Last 3 Days</SelectItem>
+              <SelectItem value="1w" className="cursor-pointer">Last 1 Week</SelectItem>
+              <SelectItem value="2w" className="cursor-pointer">Last 2 Weeks</SelectItem>
+              <SelectItem value="1m" className="cursor-pointer">Last 1 Month</SelectItem>
+              <SelectItem value="3m" className="cursor-pointer">Last 3 Months</SelectItem>
+              <SelectItem value="6m" className="cursor-pointer">Last 6 Months</SelectItem>
             </SelectContent>
           </Select>
+
+          <Button onClick={handleDownloadPDF} variant="outline" className="ml-auto my-2">
+            Export PDF
+          </Button>
         </div>
 
         {/* PROFIT / DEFICIT */}
-        <Card className="p-2">
+        <Card className="p-2 hover:bg-[#fbffb1] transition-colors hover:cursor-pointer">
           <CardContent className="px-2 flex items-center justify-between flex-wrap">
             <div className="flex flex-row items-center gap-4">
               <div
-                className={`w-12 h-12 flex items-center justify-center rounded-xl ${
-                  isUptrend ? "bg-green-300/50" : "bg-red-300/50"
-                }`}
+                className={`w-12 h-12 flex items-center justify-center rounded-xl ${isUptrend ? "bg-green-300/50" : "bg-red-300/50"
+                  }`}
               >
                 {isUptrend ? (
                   <TrendingUp className="text-green-800" size={26} />
@@ -253,9 +282,8 @@ export default function Dashboard() {
                 {isUptrend ? "Profit" : "Deficit"}
               </p>
               <p
-                className={`text-xl md:text-2xl font-bold ${
-                  isUptrend ? "text-green-700" : "text-red-700"
-                }`}
+                className={`text-xl md:text-2xl font-bold ${isUptrend ? "text-green-700" : "text-red-700"
+                  }`}
               >
                 {formatRupiah(difference)}
               </p>
@@ -277,7 +305,7 @@ export default function Dashboard() {
           >
             <div className="flex flex-col sm:flex-row lg:flex-col gap-4 items-stretch justify-between col-span-9 lg:col-span-3">
               {/* SALES CARD */}
-              <Card className="flex-1">
+              <Card className="flex-1 hover:bg-[#fbffb1] transition-colors hover:cursor-pointer">
                 <CardHeader className="pt-6">
                   <div className=" flex flex-col lg:flex-row gap-2 lg:items-center">
                     <CardTitle>Sales</CardTitle>
@@ -309,7 +337,7 @@ export default function Dashboard() {
               </Card>
 
               {/* ORDERS CARD */}
-              <Card className="flex-1">
+              <Card className="flex-1 hover:bg-[#fbffb1] transition-colors hover:cursor-pointer">
                 <CardHeader className="pt-6">
                   <div className="flex flex-col lg:flex-row gap-2 lg:items-center">
                     <CardTitle>Orders</CardTitle>
@@ -459,7 +487,7 @@ export default function Dashboard() {
                   color="bg-blue-300/50"
                   unit="orders"
                   redirectTo="/orders"
-                  className="col-span-2 sm:col-span-1"
+                  className="col-span-2 sm:col-span-1 hover:bg-[#fbffb1] transition-colors hover:cursor-pointer"
                 />
               )}
 
@@ -472,7 +500,7 @@ export default function Dashboard() {
                   color="bg-yellow-300/50"
                   unit="sales"
                   redirectTo="/sales"
-                  className="col-span-2 sm:col-span-1"
+                  className="col-span-2 sm:col-span-1 hover:bg-[#fbffd0] transition-colors hover:cursor-pointer"
                 />
               )}
 
@@ -485,6 +513,7 @@ export default function Dashboard() {
                   color="bg-green-300/50"
                   unit="customers"
                   redirectTo="/customers"
+                  className="hover:bg-[#fbffb1] transition-colors hover:cursor-pointer"
                 />
               )}
             </div>

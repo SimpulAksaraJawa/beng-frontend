@@ -8,6 +8,19 @@ import { SearchableSelect } from "@/components/searchable-select";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogFooter,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogCancel,
+    AlertDialogAction,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Spinner } from "@/components/ui/spinner";
+
 
 interface Product {
     id: number;
@@ -39,17 +52,20 @@ export default function NewAdjustmentPage() {
     const [categories, setCategories] = useState<string[]>([]);
     const [sources, setSources] = useState<AdjustmentProductInput[]>([]);
     const [results, setResults] = useState<AdjustmentProductInput[]>([]);
+    const [openConfirm, setOpenConfirm] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const navigate = useNavigate();
     const { user } = useAuth();
 
     useEffect(() => {
         const canCreateAdjustment =
-          user?.role === "ADMIN" || user?.permissions?.adjustments?.includes("create");
-      
+            user?.role === "ADMIN" || user?.permissions?.adjustments?.includes("create");
+
         if (!canCreateAdjustment) {
-          navigate("/404");
+            navigate("/404");
         }
-      }, [user, navigate]);
+    }, [user, navigate]);
 
     useEffect(() => {
         api.get("/products").then((res) => {
@@ -403,15 +419,69 @@ export default function NewAdjustmentPage() {
                     + Add Result
                 </Button>
             </div>
-
             <div className="flex gap-4">
-                <Button type="submit" onClick={handleSubmit}>
-                    Save Adjustment
-                </Button>
+                <AlertDialog open={openConfirm} onOpenChange={setOpenConfirm}>
+                    {/* Trigger tombol */}
+                    <AlertDialogTrigger asChild>
+                        <Button
+                            type="button"
+                            className="cursor-pointer"
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <Spinner className="mr-2" />
+                                    Loading...
+                                </>
+                            ) : (
+                                "Save Adjustment"
+                            )}
+                        </Button>
+                    </AlertDialogTrigger>
+
+                    {/* Dialog */}
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Confirm Adjustment</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to save this adjustment? Make sure all data is
+                                correct.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                            <AlertDialogCancel disabled={isSubmitting} className="cursor-pointer">
+                                Cancel
+                            </AlertDialogCancel>
+
+                            <AlertDialogAction
+                                className="cursor-pointer bg-primary text-white"
+                                disabled={isSubmitting}
+                                onClick={async () => {
+                                    setIsSubmitting(true);
+                                    await handleSubmit();
+                                    setIsSubmitting(false);
+                                    setOpenConfirm(false);
+                                }}
+                            >
+                                {isSubmitting ? (
+                                    <div className="flex items-center gap-2">
+                                        <Spinner className="w-4 h-4" />
+                                        Processing...
+                                    </div>
+                                ) : (
+                                    "Yes, Save"
+                                )}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+
                 <Button
                     type="button"
                     variant="outline"
                     onClick={() => navigate("/adjustment")}
+                    className="cursor-pointer"
                 >
                     Cancel
                 </Button>
