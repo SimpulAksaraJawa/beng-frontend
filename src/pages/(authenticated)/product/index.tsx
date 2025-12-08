@@ -139,15 +139,15 @@ export default function Page() {
       <SiteHeader />
 
       {/* Header bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 w-full">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <h1 className="text-2xl font-bold">Products</h1>
           <Badge className="bg-transparent border-[#209ebb] text-[#023047]">
             {filteredProducts.length} items
           </Badge>
         </div>
 
-        <div className="relative flex-1">
+        <div className="relative w-full md:flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-black h-4 w-4" />
           <Input
             placeholder="Search"
@@ -157,13 +157,13 @@ export default function Page() {
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap md:flex-nowrap items-center gap-2 w-full md:w-auto">
           <Printable products={products as any} />
           <Select
             value={selectedCategory}
             onValueChange={(value) => setSelectedCategory(value)}
           >
-            <SelectTrigger className="w-40 cursor-pointer">
+            <SelectTrigger className="w-full md:w-40 cursor-pointer">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
@@ -179,10 +179,10 @@ export default function Page() {
           {canCreateProduct && (
             <Button
               variant="secondary"
-              className="cursor-pointer hover:bg-[#b4dff3] hover:text-black"
+              className="whitespace-nowrap cursor-pointer hover:bg-[#b4dff3] hover:text-black px-3"
               onClick={() => navigate("/product/new")}
             >
-              <Plus />Add Product
+              <Plus className="mr-1" />Add Product
             </Button>
           )}
         </div>
