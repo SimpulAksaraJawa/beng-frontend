@@ -4,12 +4,13 @@ import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Button } from "@mui/material";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button as ButtonShad } from "@/components/ui/button";
-import { Eye, X, Plus, LoaderIcon } from "lucide-react";
+import { Eye, Plus, LoaderIcon, Minus } from "lucide-react";
 import api from "@/api/axios";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { SiteHeader } from "@/components/site-header";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface AdjustmentProduct {
   id: number;
@@ -242,11 +243,11 @@ export default function AdjustmentsPage() {
             <CardHeader className="flex flex-row justify-between items-center">
               <CardTitle>Adjustment #{selectedAdjustment.id}</CardTitle>
               <ButtonShad
-                variant="ghost"
+                variant="destructive"
                 size="icon"
                 onClick={() => setSelectedAdjustment(null)}
               >
-                <X className="h-4 w-4" />
+                <Minus className="h-4 w-4" />
               </ButtonShad>
             </CardHeader>
             <CardContent>
@@ -257,22 +258,28 @@ export default function AdjustmentsPage() {
                 <strong>Action:</strong> {selectedAdjustment.action}
               </p>
 
-              <Box sx={{ height: 300 }}>
-                <DataGrid
-                  rows={selectedAdjustment.products}
-                  columns={detailColumns}
-                  getRowId={(row) => row.id}
-                  hideFooter
-                  sx={{
-                    fontFamily: "Outfit, sans-serif",
-                    "& .MuiDataGrid-columnHeaders": {
-                      backgroundColor: "#f9fafb",
-                      fontWeight: "bold",
-                    },
-                  }}
-                  showToolbar
-                />
-              </Box>
+              {/* i want to change this part into shadcn's style */}
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Qty</TableHead>
+                    <TableHead>Price</TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                  {selectedAdjustment.products.map((p) => (
+                    <TableRow key={p.id}>
+                      <TableCell>{p.role}</TableCell>
+                      <TableCell>{p.productName}</TableCell>
+                      <TableCell>{p.quantity}</TableCell>
+                      <TableCell>{formatRupiah(p.price)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         ) : (

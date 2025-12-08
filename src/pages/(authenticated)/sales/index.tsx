@@ -276,7 +276,7 @@ export default function SalesPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Invoice: {sale.invoice}</CardTitle>
               <ButtonShad
-                variant="ghost"
+                variant="destructive"
                 size="icon"
                 onClick={() => handleClose(sale.id)}
               >

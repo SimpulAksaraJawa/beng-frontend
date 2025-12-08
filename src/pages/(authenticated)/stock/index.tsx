@@ -6,11 +6,7 @@ import axios from "@/api/axios";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { Box, Tooltip, Button } from "@mui/material";
 import { Button as ButtonShad } from "@/components/ui/button";
-import {
-  IconEye,
-  IconChartBar,
-  IconChevronUp,
-} from "@tabler/icons-react";
+import { IconEye, IconChartBar, IconChevronUp } from "@tabler/icons-react";
 import { useAuth } from "@/contexts/AuthContext";
 import StockAnalyticsComponent from "./StockAnalytics";
 
@@ -63,21 +59,23 @@ export default function StockInventoryPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [expandedProductId, setExpandedProductId] = useState<number | null>(null);
+  const [expandedProductId, setExpandedProductId] = useState<number | null>(
+    null
+  );
   useEffect(() => {
     const read =
       user?.role === "ADMIN" || user?.permissions?.stocks?.includes("read");
     if (!read) {
       navigate("/product");
     }
-  }, [user])
+  }, [user]);
 
   // Handle URL parameters to auto-open analytics for a specific product
   useEffect(() => {
-    const productIdParam = searchParams.get('productId');
-    const viewParam = searchParams.get('view');
+    const productIdParam = searchParams.get("productId");
+    const viewParam = searchParams.get("view");
 
-    if (productIdParam && viewParam === 'analytics') {
+    if (productIdParam && viewParam === "analytics") {
       const productId = parseInt(productIdParam, 10);
       if (!isNaN(productId)) {
         setExpandedProductId(productId);
@@ -89,13 +87,15 @@ export default function StockInventoryPage() {
   const {
     data: analyticsData,
     isLoading: isLoadingAnalytics,
-    error: analyticsError
+    error: analyticsError,
   } = useQuery<AnalyticsResponse>({
     queryKey: ["stockAnalytics", expandedProductId],
     queryFn: async () => {
       try {
         if (!expandedProductId) throw new Error("No product ID selected");
-        const response = await axios.get(`/stocks/analytics/${expandedProductId}`);
+        const response = await axios.get(
+          `/stocks/analytics/${expandedProductId}`
+        );
         return response.data;
       } catch (error) {
         console.error("Error fetching stock analytics:", error);
@@ -108,7 +108,7 @@ export default function StockInventoryPage() {
   const {
     data: productsData,
     isLoading: isLoadingProducts,
-    error: productsError
+    error: productsError,
   } = useQuery({
     queryKey: ["stock-products"],
     queryFn: async () => {
@@ -120,7 +120,10 @@ export default function StockInventoryPage() {
           return response.data.data;
         } else if (Array.isArray(response.data)) {
           return response.data;
-        } else if (response.data?.products && Array.isArray(response.data.products)) {
+        } else if (
+          response.data?.products &&
+          Array.isArray(response.data.products)
+        ) {
           return response.data.products;
         } else {
           return [];
@@ -138,7 +141,7 @@ export default function StockInventoryPage() {
   const {
     data: stocksData,
     isLoading: isLoadingStocks,
-    error: stocksError
+    error: stocksError,
   } = useQuery({
     queryKey: ["stocks"],
     queryFn: async () => {
@@ -164,11 +167,11 @@ export default function StockInventoryPage() {
   const stocks = Array.isArray(stocksData) ? stocksData : [];
 
   // Extract unique product IDs from stocks for batch fetching
-  const uniqueProductIds = [...new Set(stocks.map(stock => stock.productId))];
+  const uniqueProductIds = [...new Set(stocks.map((stock) => stock.productId))];
 
   // Fetch individual product details using a single hook call
   const individualProductQueries = useQueries({
-    queries: uniqueProductIds.map(productId => ({
+    queries: uniqueProductIds.map((productId) => ({
       queryKey: ["stock-product", productId],
       queryFn: async () => {
         try {
@@ -177,7 +180,10 @@ export default function StockInventoryPage() {
           // Handle various response formats
           if (response.data?.success && response.data.data) {
             return response.data.data;
-          } else if (typeof response.data === "object" && !Array.isArray(response.data)) {
+          } else if (
+            typeof response.data === "object" &&
+            !Array.isArray(response.data)
+          ) {
             return response.data;
           } else {
             return null;
@@ -203,7 +209,10 @@ export default function StockInventoryPage() {
           allProducts = response.data.data;
         } else if (Array.isArray(response.data)) {
           allProducts = response.data;
-        } else if (response.data?.products && Array.isArray(response.data.products)) {
+        } else if (
+          response.data?.products &&
+          Array.isArray(response.data.products)
+        ) {
           allProducts = response.data.products;
         } else {
           allProducts = [];
@@ -236,9 +245,12 @@ export default function StockInventoryPage() {
       const productFromDirectQuery = productDetailsMap[productId];
 
       // If not found, fall back to the products list or allProductDetails
-      const product = productFromDirectQuery ||
+      const product =
+        productFromDirectQuery ||
         products.find((p: Product) => Number(p.productId) === productId) ||
-        allProductDetails.find((p: Product) => Number(p.productId) === productId);
+        allProductDetails.find(
+          (p: Product) => Number(p.productId) === productId
+        );
 
       // Extract product name - handle different response structures
       let productName = `Product ID: ${stock.productId}`;
@@ -290,7 +302,8 @@ export default function StockInventoryPage() {
   // Create a backup data array as fallback
   const fallbackData = stocks.map((stock: Stock) => {
     const productId = Number(stock.productId);
-    const product = productDetailsMap[productId] ||
+    const product =
+      productDetailsMap[productId] ||
       products.find((p: any) => Number(p.productId) === productId) ||
       allProductDetails.find((p: any) => Number(p.productId) === productId);
 
@@ -309,14 +322,20 @@ export default function StockInventoryPage() {
       stockCurrent: Number(stock.stockCurrent) || 0,
       unitPrice: Number(stock.unitPrice) || 0,
       costOfGoodsSold: Number(stock.costOfGoodsSold) || 0,
-      totalWorth: (Number(stock.stockCurrent) || 0) * (Number(stock.unitPrice) || 0),
+      totalWorth:
+        (Number(stock.stockCurrent) || 0) * (Number(stock.unitPrice) || 0),
       productName: productName,
-      productUnit: productUnit
+      productUnit: productUnit,
     };
   });
 
   // Use stock data if available, otherwise fallback data
-  const dataToDisplay = stockData.length > 0 ? stockData : (fallbackData.length > 0 ? fallbackData : []);
+  const dataToDisplay =
+    stockData.length > 0
+      ? stockData
+      : fallbackData.length > 0
+      ? fallbackData
+      : [];
   const columns: GridColDef[] = [
     {
       field: "productName",
@@ -341,12 +360,16 @@ export default function StockInventoryPage() {
       field: "stockCurrent",
       headerName: "Quantity",
       flex: 1,
-      minWidth: 200,
+      maxWidth: 200,
       renderCell: (params: GridRenderCellParams) => {
         try {
           const value = params.row.stockCurrent;
           const unit = params.row.productUnit || "Unit";
-          return <span>{value} {unit}</span>;
+          return (
+            <span>
+              {value} {unit}
+            </span>
+          );
         } catch (error) {
           return <span>0 Unit</span>;
         }
@@ -356,7 +379,7 @@ export default function StockInventoryPage() {
       field: "unitPrice",
       headerName: "Unit Price",
       flex: 1,
-      minWidth: 200,
+      maxWidth: 200,
       renderCell: (params: GridRenderCellParams) => {
         try {
           const value = Number(params.row.unitPrice) || 0;
@@ -370,11 +393,12 @@ export default function StockInventoryPage() {
       field: "totalWorth",
       headerName: "Total Worth",
       flex: 1,
-      minWidth: 200,
+      maxWidth: 200,
       renderCell: (params: GridRenderCellParams) => {
         try {
-          const value = Number(params.row.totalWorth) ||
-            (Number(params.row.stockCurrent) * Number(params.row.unitPrice));
+          const value =
+            Number(params.row.totalWorth) ||
+            Number(params.row.stockCurrent) * Number(params.row.unitPrice);
           return <span>Rp. {value.toLocaleString()}</span>;
         } catch (error) {
           return <span>Rp. 0</span>;
@@ -385,7 +409,7 @@ export default function StockInventoryPage() {
       field: "costOfGoodsSold",
       headerName: "COGS",
       flex: 1,
-      minWidth: 200,
+      maxWidth: 200,
       renderCell: (params: GridRenderCellParams) => {
         try {
           const value = Number(params.row.costOfGoodsSold) || 0;
@@ -399,13 +423,19 @@ export default function StockInventoryPage() {
       field: "actions",
       headerName: "Actions",
       flex: 1,
-      minWidth: 200,
+      maxWidth: 200,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         try {
           const productId = params.row.productId;
           if (!productId) {
-            return <Box sx={{ display: "block" }}><Button variant="text" size="small" disabled><IconEye size={18} /></Button></Box>;
+            return (
+              <Box sx={{ display: "block" }}>
+                <Button variant="text" size="small" disabled>
+                  <IconEye size={18} />
+                </Button>
+              </Box>
+            );
           }
 
           const isExpanded = expandedProductId === productId;
@@ -437,24 +467,39 @@ export default function StockInventoryPage() {
                     }
                   }}
                 >
-                  {isExpanded ? <IconChevronUp size={18} /> : <IconChartBar size={18} />}
+                  {isExpanded ? (
+                    <IconChevronUp size={18} />
+                  ) : (
+                    <IconChartBar size={18} />
+                  )}
                 </Button>
               </Tooltip>
             </Box>
           );
         } catch (error) {
-          return <Box sx={{ display: "block" }}><Button variant="text" size="small" disabled><IconEye size={18} /></Button></Box>;
+          return (
+            <Box sx={{ display: "block" }}>
+              <Button variant="text" size="small" disabled>
+                <IconEye size={18} />
+              </Button>
+            </Box>
+          );
         }
       },
     },
   ];
 
   // Check if any individual product queries are still loading
-  const isAnyProductQueryLoading = individualProductQueries.some(query => query.isLoading);
-  const hasAnyProductQueryError = individualProductQueries.some(query => !!query.error);
+  const isAnyProductQueryLoading = individualProductQueries.some(
+    (query) => query.isLoading
+  );
+  const hasAnyProductQueryError = individualProductQueries.some(
+    (query) => !!query.error
+  );
 
   // Check for loading and error states
-  const isLoading = isLoadingProducts || isLoadingStocks || isAnyProductQueryLoading;
+  const isLoading =
+    isLoadingProducts || isLoadingStocks || isAnyProductQueryLoading;
   const hasError = productsError || stocksError || hasAnyProductQueryError;
 
   return (
@@ -463,7 +508,9 @@ export default function StockInventoryPage() {
       <div className="flex items-center justify-between mt-4 mb-4">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">Stock Inventory</h1>
-          {isLoading && <span className="text-gray-500 ml-2">(Loading...)</span>}
+          {isLoading && (
+            <span className="text-gray-500 ml-2">(Loading...)</span>
+          )}
         </div>
         <div className="space-x-2">
           <Tooltip title="Adjust Products">
@@ -482,17 +529,21 @@ export default function StockInventoryPage() {
       {hasError && (
         <div className="bg-red-50 border border-red-200 text-red-700 p-4 mb-4 rounded">
           <p className="font-medium">Error loading data</p>
-          <p className="text-sm">There was a problem loading the stock data. Please try refreshing the page.</p>
+          <p className="text-sm">
+            There was a problem loading the stock data. Please try refreshing
+            the page.
+          </p>
         </div>
       )}
 
       {!isLoading && !hasError && dataToDisplay.length === 0 && (
         <div className="bg-blue-50 border border-blue-200 text-blue-700 p-4 mb-4 rounded">
           <p className="font-medium">No stock data available</p>
-          <p className="text-sm">There are currently no stock entries in the database.</p>
+          <p className="text-sm">
+            There are currently no stock entries in the database.
+          </p>
         </div>
       )}
-
 
       <Box sx={{ height: 500, width: "100%" }}>
         <DataGrid
@@ -507,7 +558,7 @@ export default function StockInventoryPage() {
           getRowId={(row) => row.id || row.stockId}
           sx={{
             fontFamily: "Outfit, sans-serif",
-
+            width: "100%",
             "& .MuiDataGrid-columnHeader": {
               backgroundColor: "rgba(32, 158, 187, 0.8) !important",
               color: "#FFF !important",
