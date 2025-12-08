@@ -36,17 +36,17 @@ export function RegisterForm({
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (!name.trim() || !email.trim() || !password.trim() || !retypePass.trim()) {
       toast.warning("Please fill in all fields");
       return;
     }
-
+    
     if (password !== retypePass && password.length !== retypePass.length) {
       toast.warning("Passwords do not match");
       return;
     }
-
+    
     try {
       const res = await api.post('/auth/register', {
         name,
@@ -54,10 +54,14 @@ export function RegisterForm({
         password,
         role
       }, { withCredentials: true });
+      
+      const { user } = res.data;
+      // setAuth(user, jwtToken);
+      // user must sign up, and log in is done seperately.
 
-      const { jwtToken, user } = res.data;
-      setAuth(user, jwtToken);
-      navigate('/product');
+      toast.success(`${user.name} registered successfully!`)
+
+      navigate('/login');
     } catch (error: any) {
       if (error.response?.status === 401) {
         setEmailExist(true);
