@@ -17,7 +17,7 @@ const index = () => {
     return <Navigate to="/home" replace />
   }
 
-  return <Navigate to="/product" replace />
+  return <Navigate to="/dashboard" replace />
 
 }
 
