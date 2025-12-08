@@ -12,6 +12,17 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface SKU {
   skuId?: number;
@@ -33,6 +44,7 @@ export default function EditProductPage() {
   const { id } = useParams("/product/edit/:id");
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [openConfirm, setOpenConfirm] = useState(false);
 
   const [name, setName] = useState("");
   const [brandName, setBrandName] = useState("");
@@ -188,12 +200,13 @@ export default function EditProductPage() {
       return;
     }
 
-    setImages(prev => [...prev, ...newFiles]);
+    setImages((prev) => [...prev, ...newFiles]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setOpenConfirm(false);
 
     const cleanName = sanitize(name);
     const cleanBrand = sanitize(brandName || "unknown");
@@ -237,9 +250,10 @@ export default function EditProductPage() {
     formData.append("deletedSkuIds", JSON.stringify(deletedSkuIds));
 
     // const remainingImageIds = existingImages.map(img => img.id);
-    formData.append("remainingImages", JSON.stringify(existingImages.map(img => img.id)));
-
-
+    formData.append(
+      "remainingImages",
+      JSON.stringify(existingImages.map((img) => img.id))
+    );
 
     if (images.length > 0) {
       images.forEach((img) => formData.append("images", img));
@@ -263,7 +277,13 @@ export default function EditProductPage() {
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Edit Product</h1>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setOpenConfirm(true);
+        }}
+        className="space-y-6"
+      >
         {/* Product Name */}
         <div className="space-y-2">
           <Label>Name</Label>
@@ -453,21 +473,49 @@ export default function EditProductPage() {
 
         {/* Buttons */}
         <div className="flex gap-4">
-          <Button
-            type="submit"
-            className="hover:cursor-pointer"
-            variant="default"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <Spinner/>
-                Loading...
-              </>
-            ) : (
-              "Save Product"
-            )}
-          </Button>
+          <AlertDialog open={openConfirm} onOpenChange={setOpenConfirm}>
+            <AlertDialogTrigger asChild>
+              <Button
+                type="submit"
+                className="hover:cursor-pointer"
+                variant="default"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Spinner />
+                    Loading...
+                  </>
+                ) : (
+                  "Save Product"
+                )}
+              </Button>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirm Update</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to update this product? All changes will
+                  be saved immediately.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel className="cursor-pointer">
+                  Cancel
+                </AlertDialogCancel>
+
+                <AlertDialogAction
+                  className="cursor-pointer"
+                  onClick={handleSubmit}
+                >
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
           <Button
             type="button"
             className="cursor-pointer"

@@ -11,6 +11,17 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface SKU {
   code: string;
@@ -20,6 +31,8 @@ interface SKU {
 }
 
 const AddProductPage = () => {
+  const [openConfirm, setOpenConfirm] = useState(false);
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
@@ -100,6 +113,7 @@ const AddProductPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setOpenConfirm(false);
 
     const cleanName = sanitize(name);
     const cleanBrand = sanitize(brandName || "unknown");
@@ -164,7 +178,13 @@ const AddProductPage = () => {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Add New Product</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setOpenConfirm(true);
+        }}
+        className="space-y-6"
+      >
         {/* Product Name */}
         <div className="space-y-2">
           <Label>Name</Label>
@@ -329,20 +349,48 @@ const AddProductPage = () => {
 
         {/* Buttons */}
         <div className="flex gap-4">
-          <Button
-            type="submit"
-            className="cursor-pointer"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <Spinner />
-                Loading...
-              </>
-            ) : (
-              "Save Product"
-            )}
-          </Button>
+          <AlertDialog open={openConfirm} onOpenChange={setOpenConfirm}>
+            <AlertDialogTrigger asChild>
+              <Button
+                type="submit"
+                className="cursor-pointer"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Spinner />
+                    Loading...
+                  </>
+                ) : (
+                  "Save Product"
+                )}
+              </Button>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirm Submit</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to save this product? Please review all
+                  details before continuing.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel className="cursor-pointer">
+                  Cancel
+                </AlertDialogCancel>
+
+                <AlertDialogAction
+                  className="cursor-pointer"
+                  onClick={handleSubmit}
+                >
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
           <Button
             type="button"
             variant="outline"
