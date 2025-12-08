@@ -98,7 +98,7 @@ export default function ComparisonCard({
           </div>
         </CardContent>
 
-        <CardFooter className="text-gray-500">{windowLabel}</CardFooter>
+        <CardFooter className="text-gray-500 text-xs">{windowLabel}</CardFooter>
       </div>
     </Card>
   );

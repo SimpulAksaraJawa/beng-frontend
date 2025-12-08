@@ -65,6 +65,50 @@ export default function SalesByCategoryCard({
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
+  const [radius, setRadius] = React.useState({
+    inner: 70,
+    outer: 90,
+  });
+
+  React.useEffect(() => {
+    const sm = window.matchMedia("(min-width: 640px)");
+    const md = window.matchMedia("(min-width: 768px)");
+    const lg = window.matchMedia("(min-width: 1024px)");
+    const xl = window.matchMedia("(min-width: 1280px)");
+
+    const updateRadius = () => {
+      if (xl.matches) {
+        // >= 1280px
+        setRadius({ inner: 60, outer: 80 });
+      } else if (lg.matches) {
+        // >= 1024px
+        setRadius({ inner: 50, outer: 70 });
+      } else if (md.matches) {
+        // >= 768px
+        setRadius({ inner: 40, outer: 50 });
+      } else if (sm.matches) {
+        // >= 640px
+        setRadius({ inner: 60, outer: 80 });
+      } else {
+        // < 640px
+        setRadius({ inner: 40, outer: 60 });
+      }
+    };
+
+    updateRadius();
+
+    sm.addEventListener("change", updateRadius);
+    md.addEventListener("change", updateRadius);
+    lg.addEventListener("change", updateRadius);
+    xl.addEventListener("change", updateRadius);
+
+    return () => {
+      sm.removeEventListener("change", updateRadius);
+      md.removeEventListener("change", updateRadius);
+      lg.removeEventListener("change", updateRadius);
+      xl.removeEventListener("change", updateRadius);
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -113,13 +157,16 @@ export default function SalesByCategoryCard({
         <CardTitle>Sales by Category</CardTitle>
       </CardHeader>
 
-      <CardContent className="flex-1 pb-0 w-full max-h-[150px]">
-        <div className="flex h-full w-full items-center justify-center gap-4">
+      <CardContent className="flex-1 pb-0 md:px-0 lg:px-2 w-full max-h-[250px]">
+        <div className="flex h-full items-start justify-center gap-4">
           <ChartContainer
             config={chartConfig}
-            className="aspect-square w-full"
+            className="w-full h-full flex items-center justify-center"
           >
-            <PieChart>
+            <PieChart
+              className="flex flex-col items-start -p-2"
+              style={{ gap: "16px" }}
+            >
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent hideLabel />}
@@ -129,8 +176,8 @@ export default function SalesByCategoryCard({
                 data={chartData}
                 dataKey="value"
                 nameKey="name"
-                innerRadius={40}
-                outerRadius={60}
+                innerRadius={radius.inner}
+                outerRadius={radius.outer}
                 strokeWidth={2}
               >
                 <Label
@@ -169,14 +216,17 @@ export default function SalesByCategoryCard({
                 ))}
               </Pie>
 
-              {!(width >= 768 && width <= 1140) && (
                 <Legend
-                  className="text-sm"
-                  layout="vertical"
-                  align="right"
-                  verticalAlign="middle"
+                  layout="horizontal"
+                  align="center"
+                  verticalAlign="bottom"
+                  wrapperStyle={{
+                    marginTop: "12px",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
                 />
-              )}
+
             </PieChart>
           </ChartContainer>
         </div>
