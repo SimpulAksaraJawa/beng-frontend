@@ -220,6 +220,22 @@ export default function EditProductPage() {
       salePrice: Number(sanitize(sku.salePrice)) || 0,
     }));
 
+    // Validate at least one complete SKU
+    const hasAtLeastOneCompleteSKU = cleanSkus.some(
+      (sku) =>
+        sku.code.trim() !== "" &&
+        sku.name.trim() !== "" &&
+        sku.salePrice > 0
+    );
+
+    if (!hasAtLeastOneCompleteSKU) {
+      toast.error(
+        "You must fill at least ONE complete SKU (code, name, sale price)."
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
     if (hasInitialStocks) {
       if (!initialQty || Number(initialQty) <= 0) {
         toast.error("Invalid initial quantity");
