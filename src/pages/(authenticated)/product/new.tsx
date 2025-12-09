@@ -126,6 +126,24 @@ const AddProductPage = () => {
       salePrice: sanitize(sku.salePrice),
     }));
 
+    // Validate at least one complete SKU
+    const hasAtLeastOneCompleteSKU = cleanSkus.some(
+      (sku) =>
+        sku.code.trim() !== "" &&
+        sku.name.trim() !== "" &&
+        sku.salePrice.trim() !== "" &&
+        !isNaN(Number(sku.salePrice)) &&
+        Number(sku.salePrice) > 0
+    );
+
+    if (!hasAtLeastOneCompleteSKU) {
+      toast.error(
+        "You must fill at least ONE complete SKU (code, name, sale price)."
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
     if (hasInitialStocks) {
       if (!initialQty || isNaN(Number(initialQty)) || Number(initialQty) <= 0) {
         toast.error("Invalid initial quantity");
