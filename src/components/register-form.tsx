@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "@/router"
-import { useAuth } from "@/contexts/AuthContext"
+// import { useAuth } from "@/contexts/AuthContext"
 import { cn } from "@/lib/utils"
 import { Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -31,7 +31,7 @@ export function RegisterForm({
 
   const [emailExist, setEmailExist] = useState(false);
 
-  const { setAuth } = useAuth();
+  // const { setAuth } = useAuth();
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -52,7 +52,7 @@ export function RegisterForm({
         name,
         email,
         password,
-        role
+        role:"USER",
       }, { withCredentials: true });
       
       const { user } = res.data;
@@ -125,7 +125,7 @@ export function RegisterForm({
                   <button className="absolute inset-y-0 right-3 flex items-center text-gray-500" onClick={(e) => { e.preventDefault(); setRetype(!showRetype) }}>{showRetype ? <EyeOff size={18} /> : <Eye size={18} />}</button>
                 </div>
               </div>
-              <div className="grid gap-3">
+              {/* <div className="grid gap-3">
                 <Label htmlFor="role">Role</Label>
                 <Select defaultValue={role} onValueChange={(value) => setRole(value)}>
                   <SelectTrigger className="w-full">
@@ -139,7 +139,7 @@ export function RegisterForm({
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
               <div className="flex flex-col gap-3">
                 <Button onClick={handleRegister} type="submit" className="w-full">
                   Register
